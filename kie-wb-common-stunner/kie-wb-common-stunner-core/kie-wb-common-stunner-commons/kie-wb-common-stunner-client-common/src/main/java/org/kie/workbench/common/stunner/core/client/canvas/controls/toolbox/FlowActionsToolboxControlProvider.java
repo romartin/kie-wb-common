@@ -98,7 +98,7 @@ public class FlowActionsToolboxControlProvider extends AbstractToolboxControlPro
     public List<ToolboxCommand<?, ?>> getCommands( final AbstractCanvasHandler context,
                                                    final Element item ) {
         final Diagram diagram = context.getDiagram();
-        final String defSetId = diagram.getSettings().getDefinitionSetId();
+        final String defSetId = diagram.getMetadata().getDefinitionSetId();
         if ( item.getContent() instanceof Definition ) {
             final Definition definitionContent = ( Definition ) item.getContent();
             final List<ToolboxCommand<?, ?>> commands = new LinkedList<>();

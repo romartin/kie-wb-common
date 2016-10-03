@@ -33,6 +33,8 @@ import javax.enterprise.context.Dependent;
 @Dependent
 public class FloatingWidgetView extends FlowPanel implements FloatingView<IsWidget> {
 
+    private double ox;
+    private double oy;
     private double x;
     private double y;
     private boolean attached;
@@ -42,11 +44,25 @@ public class FloatingWidgetView extends FlowPanel implements FloatingView<IsWidg
 
     public FloatingWidgetView() {
         this.attached = false;
+        this.ox = 0;
+        this.oy = 0;
     }
 
     @Override
     public void destroy() {
         detach();
+    }
+
+    @Override
+    public FloatingView<IsWidget> setOffsetX( final double ox ) {
+        this.ox = ox;
+        return this;
+    }
+
+    @Override
+    public FloatingView<IsWidget> setOffsetY( final double oy ) {
+        this.oy = oy;
+        return this;
     }
 
     @Override
@@ -77,8 +93,8 @@ public class FloatingWidgetView extends FlowPanel implements FloatingView<IsWidg
     public FloatingWidgetView show() {
         attach();
         startTimeout();
-        this.getElement().getStyle().setLeft( x, Style.Unit.PX );
-        this.getElement().getStyle().setTop( y, Style.Unit.PX );
+        this.getElement().getStyle().setLeft( ox + x, Style.Unit.PX );
+        this.getElement().getStyle().setTop( oy + y, Style.Unit.PX );
         this.getElement().getStyle().setDisplay( Style.Display.INLINE );
         return this;
     }

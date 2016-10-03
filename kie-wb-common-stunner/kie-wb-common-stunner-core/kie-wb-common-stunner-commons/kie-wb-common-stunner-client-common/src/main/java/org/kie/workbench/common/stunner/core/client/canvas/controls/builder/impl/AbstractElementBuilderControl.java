@@ -252,7 +252,7 @@ public abstract class AbstractElementBuilderControl extends AbstractCanvasHandle
     public Node<View<?>, Edge> getParent( final double _x,
                                           final double _y ) {
         if ( _x > -1 && _y > -1 ) {
-            final String rootUUID = canvasHandler.getDiagram().getSettings().getCanvasRootUUID();
+            final String rootUUID = canvasHandler.getDiagram().getMetadata().getCanvasRootUUID();
             graphBoundsIndexer.setRootUUID( rootUUID ).build( canvasHandler.getDiagram().getGraph() );
             final Node<View<?>, Edge> r = graphBoundsIndexer.getAt( _x, _y );
             return r;

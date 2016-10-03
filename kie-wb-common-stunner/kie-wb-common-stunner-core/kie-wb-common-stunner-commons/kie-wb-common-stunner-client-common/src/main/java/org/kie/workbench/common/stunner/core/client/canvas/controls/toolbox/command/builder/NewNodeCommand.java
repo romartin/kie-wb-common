@@ -16,6 +16,7 @@
 
 package org.kie.workbench.common.stunner.core.client.canvas.controls.toolbox.command.builder;
 
+import com.google.gwt.logging.client.LogConfiguration;
 import org.kie.workbench.common.stunner.core.client.ShapeManager;
 import org.kie.workbench.common.stunner.core.client.api.ClientDefinitionManager;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
@@ -48,8 +49,12 @@ import org.kie.workbench.common.stunner.core.util.UUID;
 import org.uberfire.mvp.Command;
 
 import javax.enterprise.event.Event;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public abstract class NewNodeCommand<I> extends AbstractElementBuilderCommand<I> {
+
+    private static Logger LOGGER = Logger.getLogger( NewNodeCommand.class.getName() );
 
     NodeDragProxy<AbstractCanvasHandler> nodeDragProxyFactory;
     NodeBuilderControl<AbstractCanvasHandler> nodeBuilderControl;
@@ -91,7 +96,7 @@ public abstract class NewNodeCommand<I> extends AbstractElementBuilderCommand<I>
     }
 
     protected String getEdgeIdentifier( final Context<AbstractCanvasHandler> context ) {
-        final String defSetId = context.getCanvasHandler().getDiagram().getSettings().getDefinitionSetId();
+        final String defSetId = context.getCanvasHandler().getDiagram().getMetadata().getDefinitionSetId();
         return definitionUtils.getDefaultConnectorId( defSetId );
     }
 
@@ -114,6 +119,7 @@ public abstract class NewNodeCommand<I> extends AbstractElementBuilderCommand<I>
     public void click( final Context<AbstractCanvasHandler> context,
                        final Element element ) {
         super.click( context, element );
+        log( Level.INFO, "Click - Start adding a new node..." );
         addOnNextLayoutPosition( context, element );
     }
 
@@ -123,7 +129,7 @@ public abstract class NewNodeCommand<I> extends AbstractElementBuilderCommand<I>
                                           final Element element ) {
         fireLoadingStarted( context );
         final AbstractCanvasHandler canvasHandler = context.getCanvasHandler();
-        graphBoundsIndexer.setRootUUID( canvasHandler.getDiagram().getSettings().getCanvasRootUUID() );
+        graphBoundsIndexer.setRootUUID( canvasHandler.getDiagram().getMetadata().getCanvasRootUUID() );
         graphBoundsIndexer.build( canvasHandler.getDiagram().getGraph() );
         clientFactoryServices.newElement( UUID.uuid(), getDefinitionIdentifier( context ), new ServiceCallback<Element>() {
 
@@ -139,6 +145,8 @@ public abstract class NewNodeCommand<I> extends AbstractElementBuilderCommand<I>
                         NewNodeCommand.this.sourceMagnet = 0;
                         NewNodeCommand.this.targetMagnet = 7;
                         final double[] next = canvasLayoutUtils.getNextLayoutPosition( canvasHandler, element );
+                        log( Level.INFO, "New edge request complete - [UUID=" + newEdgeElement.getUUID()
+                                + ", x=" + next[0] + ", y=" + next[1] + "]" );
                         NewNodeCommand.this.onComplete( context, element, newEdgeElement, ( int ) next[ 0 ], ( int ) next[ 1 ] );
 
                     }
@@ -373,6 +381,12 @@ public abstract class NewNodeCommand<I> extends AbstractElementBuilderCommand<I>
 
     protected String getDefinitionId( final Object def ) {
         return definitionUtils.getDefinitionManager().adapters().forDefinition().getId( def );
+    }
+
+    private void log( final Level level, final String message ) {
+        if ( LogConfiguration.loggingIsEnabled() ) {
+            LOGGER.log( level, message );
+        }
     }
 
 }

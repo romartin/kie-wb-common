@@ -22,6 +22,5 @@ public interface DynamicRegistry<T> extends Registry<T> {
 
     boolean remove( T item );
 
-    void clear();
 
 }

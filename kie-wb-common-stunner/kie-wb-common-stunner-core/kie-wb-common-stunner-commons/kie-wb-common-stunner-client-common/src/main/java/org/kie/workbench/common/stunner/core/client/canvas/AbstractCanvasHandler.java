@@ -137,7 +137,7 @@ public abstract class AbstractCanvasHandler<D extends Diagram, C extends Abstrac
 
     protected void doLoadRules() {
         // Load the rules that apply for the diagram.
-        final String defSetId = getDiagram().getSettings().getDefinitionSetId();
+        final String defSetId = getDiagram().getMetadata().getDefinitionSetId();
         clientFactoryServices.newDefinition( defSetId, new ServiceCallback<Object>() {
             @Override
             public void onSuccess( Object definitionSet ) {

@@ -48,7 +48,7 @@ public class CanvasLayoutUtils {
 
     public static boolean isCanvasRoot( final Diagram diagram,
                                         final String pUUID ) {
-        final String canvasRoot = diagram.getSettings().getCanvasRootUUID();
+        final String canvasRoot = diagram.getMetadata().getCanvasRootUUID();
         return ( null != canvasRoot && null != pUUID && canvasRoot.equals( pUUID ) );
     }
 
@@ -59,7 +59,7 @@ public class CanvasLayoutUtils {
     }
 
     public double[] getNextLayoutPosition( final CanvasHandler canvasHandler ) {
-        final String ruuid = canvasHandler.getDiagram().getSettings().getCanvasRootUUID();
+        final String ruuid = canvasHandler.getDiagram().getMetadata().getCanvasRootUUID();
         final double[] next = getNextLayoutPosition( canvasHandler, ruuid );
         return checkNextLayoutPosition( next[ 0 ], next[ 1 ], canvasHandler );
     }

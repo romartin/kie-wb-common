@@ -16,6 +16,7 @@
 
 package org.kie.workbench.common.stunner.core.client.canvas.controls.toolbox.command.builder;
 
+import com.google.gwt.logging.client.LogConfiguration;
 import org.kie.workbench.common.stunner.core.client.api.ClientDefinitionManager;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
 import org.kie.workbench.common.stunner.core.client.canvas.controls.builder.BuildRequest;
@@ -101,7 +102,7 @@ public abstract class AbstractBuilderCommand<I> extends AbstractToolboxCommand<I
         final AbstractCanvasHandler canvasHandler = context.getCanvasHandler();
         final double x = context.getX();
         final double y = context.getY();
-        graphBoundsIndexer.setRootUUID( canvasHandler.getDiagram().getSettings().getCanvasRootUUID() );
+        graphBoundsIndexer.setRootUUID( canvasHandler.getDiagram().getMetadata().getCanvasRootUUID() );
         clientFactoryServices.newElement( UUID.uuid(), getDefinitionIdentifier( context ), new ServiceCallback<Element>() {
 
             @Override
@@ -168,12 +169,15 @@ public abstract class AbstractBuilderCommand<I> extends AbstractToolboxCommand<I
                                final int y1 ) {
         fireLoadingStarted( context );
         final Node targetNode = graphBoundsIndexer.getAt( x1, y1 );
+        log( Level.INFO, "Completing element creation - Creating node for parent ["
+            + ( null != targetNode ? targetNode.getUUID() : "null") );
         if ( null != targetNode ) {
             final BuildRequest buildRequest = createBuildRequest( x1, y1, element, item, targetNode );
             getBuilderControl().build( buildRequest, new BuilderControl.BuildCallback() {
 
                 @Override
                 public void onSuccess( final String uuid ) {
+                    log( Level.INFO, "Item build with UUID [" + uuid + "]" );
                     onItemBuilt( context, uuid );
 
                 }
@@ -221,6 +225,12 @@ public abstract class AbstractBuilderCommand<I> extends AbstractToolboxCommand<I
         this.clientFactoryServices = null;
         this.graphBoundsIndexer = null;
 
+    }
+
+    private void log( final Level level, final String message ) {
+        if ( LogConfiguration.loggingIsEnabled() ) {
+            LOGGER.log( level, message );
+        }
     }
 
 }

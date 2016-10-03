@@ -34,4 +34,6 @@ public interface CommandRegistry<C extends Command> extends DynamicRegistry<C>, 
 
     int getCommandHistorySize();
 
+    void clear();
+
 }

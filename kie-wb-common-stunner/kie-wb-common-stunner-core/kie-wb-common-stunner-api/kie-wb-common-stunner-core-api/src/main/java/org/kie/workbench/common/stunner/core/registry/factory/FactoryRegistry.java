@@ -21,10 +21,16 @@ import org.kie.workbench.common.stunner.core.factory.definition.DefinitionFactor
 import org.kie.workbench.common.stunner.core.factory.graph.ElementFactory;
 import org.kie.workbench.common.stunner.core.registry.DynamicRegistry;
 
+import java.util.Collection;
+
 public interface FactoryRegistry<F extends Factory<?, ?>> extends DynamicRegistry<F> {
 
     DefinitionFactory<?> getDefinitionFactory( String id );
 
     ElementFactory<?, ?> getGraphFactory( Class<? extends ElementFactory> type );
+
+    Collection<F> getAllFactories();
+
+    void clear();
 
 }

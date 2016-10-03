@@ -30,6 +30,7 @@ import org.kie.workbench.common.stunner.core.client.components.palette.ClientPal
 import org.kie.workbench.common.stunner.core.client.components.palette.model.GlyphPaletteItem;
 import org.kie.workbench.common.stunner.core.client.components.palette.model.definition.DefinitionPaletteCategory;
 import org.kie.workbench.common.stunner.core.client.components.palette.model.definition.DefinitionSetPalette;
+import org.kie.workbench.common.stunner.core.client.components.views.FloatingView;
 import org.kie.workbench.common.stunner.core.client.components.views.FloatingWidgetView;
 import org.kie.workbench.common.stunner.core.client.service.ClientFactoryServices;
 
@@ -110,6 +111,11 @@ public class BS3PaletteWidgetImpl extends AbstractPaletteWidget<DefinitionSetPal
     }
 
     @Override
+    public FloatingView<IsWidget> getFloatingView() {
+        return floatingView;
+    }
+
+    @Override
     protected void beforeBind() {
         super.beforeBind();
         hideFloatingPalette();
@@ -154,10 +160,11 @@ public class BS3PaletteWidgetImpl extends AbstractPaletteWidget<DefinitionSetPal
             paletteCategory.bind( item );
             final int[] mainPaletteSize = getMainPaletteSize();
             final double pX = mainPaletteSize[ 0 ];
-            final double pY = getViewAbsoluteTop();
             floatingView
+                    .setOffsetX( getViewAbsoluteLeft() )
+                    .setOffsetY( getViewAbsoluteTop() )
                     .setX( pX )
-                    .setY( pY );
+                    .setY( 0 );
             paletteCategory.onItemMouseDown( ( id1, mouseX, mouseY, itemX1, itemY1 ) -> {
                 view.showDragProxy( id1, mouseX, mouseY );
                 floatingView.hide();
@@ -229,6 +236,10 @@ public class BS3PaletteWidgetImpl extends AbstractPaletteWidget<DefinitionSetPal
 
     private double getViewAbsoluteTop() {
         return view.getAbsoluteTop();
+    }
+
+    private double getViewAbsoluteLeft() {
+        return view.getAbsoluteLeft();
     }
 
     @Override

@@ -29,5 +29,6 @@
 	<source path="forms"/>
 	<source path="shape/def"/>
 	<source path="" includes="BPMNDefinitionSet.java"/>
+	<source path="" includes="BPMNDefinitionSetResourceType.java"/>
 
 </module>

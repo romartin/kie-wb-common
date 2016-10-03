@@ -132,13 +132,14 @@ public class DiagramsNavigatorImpl implements DiagramsNavigator {
                 width,
                 height,
                 () -> {
-                    final String itemUUID = diagramRepresentation.getUUID();
-                    fireLoadDiagram( itemUUID );
+                    fireLoadDiagram( diagramRepresentation );
                 } );
     }
 
-    private void fireLoadDiagram( final String uuid ) {
-        loadDiagramEventEvent.fire( new LoadDiagramEvent( uuid ) );
+    private void fireLoadDiagram( final DiagramRepresentation diagramRepresentation ) {
+        final String name = diagramRepresentation.getName();
+        final String path = diagramRepresentation.getPath().toURI();
+        loadDiagramEventEvent.fire( new LoadDiagramEvent( path, name ) );
     }
 
     private void fireProcessingStarted() {

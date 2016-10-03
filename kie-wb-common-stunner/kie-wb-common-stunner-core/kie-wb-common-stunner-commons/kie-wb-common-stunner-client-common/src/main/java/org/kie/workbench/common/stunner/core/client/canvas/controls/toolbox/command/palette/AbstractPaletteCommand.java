@@ -143,7 +143,7 @@ public abstract class AbstractPaletteCommand<I> extends AbstractToolboxCommand<I
         this.paletteVisible = true;
         this.canvasHandler = context.getCanvasHandler();
         this.sourceNode = ( Node<? extends Definition<Object>, ? extends Edge> ) element;
-        this.graphBoundsIndexer.setRootUUID( canvasHandler.getDiagram().getSettings().getCanvasRootUUID() );
+        this.graphBoundsIndexer.setRootUUID( canvasHandler.getDiagram().getMetadata().getCanvasRootUUID() );
         final Set<String> allowedDefinitions = getDefinitions();
         log( Level.FINE, "Allowed Definitions -> " + allowedDefinitions );
         if ( null != allowedDefinitions && !allowedDefinitions.isEmpty() ) {

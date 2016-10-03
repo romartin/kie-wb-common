@@ -21,7 +21,7 @@ import org.jboss.errai.common.client.api.RemoteCallback;
 import org.kie.workbench.common.stunner.core.client.api.ClientFactoryManager;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
 import org.kie.workbench.common.stunner.core.graph.Element;
-import org.kie.workbench.common.stunner.core.remote.FactoryService;
+import org.kie.workbench.common.stunner.core.service.FactoryService;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -153,7 +153,6 @@ public class ClientFactoryServices {
         final D diagram = clientFactoryManager.newDiagram( uuid, id );
         if ( null != diagram ) {
             callback.onSuccess( diagram );
-
         } else {
             factoryServiceCaller.call( new RemoteCallback<D>() {
                 @Override

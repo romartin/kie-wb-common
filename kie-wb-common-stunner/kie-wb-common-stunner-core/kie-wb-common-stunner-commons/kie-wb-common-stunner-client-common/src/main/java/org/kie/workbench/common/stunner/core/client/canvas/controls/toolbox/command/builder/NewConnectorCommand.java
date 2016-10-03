@@ -38,8 +38,8 @@ import org.kie.workbench.common.stunner.core.graph.processing.index.bounds.Graph
 
 public abstract class NewConnectorCommand<I> extends AbstractElementBuilderCommand<I> {
 
-    protected ConnectorDragProxy<AbstractCanvasHandler> connectorDragProxyFactory;
-    protected EdgeBuilderControl<AbstractCanvasHandler> edgeBuilderControl;
+    private ConnectorDragProxy<AbstractCanvasHandler> connectorDragProxyFactory;
+    private EdgeBuilderControl<AbstractCanvasHandler> edgeBuilderControl;
 
     private String edgeId;
 

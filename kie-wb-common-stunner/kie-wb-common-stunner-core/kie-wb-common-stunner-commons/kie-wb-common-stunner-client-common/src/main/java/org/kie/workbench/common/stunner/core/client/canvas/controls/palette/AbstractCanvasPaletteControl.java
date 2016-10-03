@@ -38,6 +38,7 @@ import org.kie.workbench.common.stunner.core.client.shape.view.event.MouseDouble
 import org.kie.workbench.common.stunner.core.client.shape.view.event.MouseDoubleClickHandler;
 import org.kie.workbench.common.stunner.core.client.shape.view.event.ViewEventType;
 import org.kie.workbench.common.stunner.core.client.shape.view.event.ViewHandler;
+import org.kie.workbench.common.stunner.core.diagram.Metadata;
 
 public abstract class AbstractCanvasPaletteControl
         extends AbstractCanvasHandlerControl
@@ -114,7 +115,7 @@ public abstract class AbstractCanvasPaletteControl
 
     private void initializePalette() {
         if ( null == palette ) {
-            final String ssid = canvasHandler.getDiagram().getSettings().getShapeSetId();
+            final String ssid = getShapeSetId( canvasHandler.getDiagram().getMetadata() );
             this.palette = paletteFactory.newPalette( ssid, getGrid() );
             this.palette.onItemClick( AbstractCanvasPaletteControl.this::_onItemClick );
             this.palette.onClose( () -> {
@@ -126,6 +127,14 @@ public abstract class AbstractCanvasPaletteControl
 
         }
 
+    }
+
+    private String getShapeSetId( final Metadata metadata ) {
+        final String ssid = metadata.getShapeSetId();
+        if ( null == ssid ) {
+            return shapeManager.getDefaultShapeSet( metadata.getDefinitionSetId() ).getId();
+        }
+        return ssid;
     }
 
     @Override
