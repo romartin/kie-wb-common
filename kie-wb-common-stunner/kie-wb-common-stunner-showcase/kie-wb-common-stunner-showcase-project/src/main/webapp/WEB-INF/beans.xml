@@ -16,10 +16,13 @@
   -->
 
 <beans xmlns="http://xmlns.jcp.org/xml/ns/javaee" bean-discovery-mode="all">
-  <scan>
-    <!-- These exclusions were added by Errai to avoid deploying client-side classes to the server -->
-    <!-- End of Errai exclusions -->
 
+  <!-- Use the "bpmn2" suffix as the stunner workbench asset resource type in this webapp. -->
+  <alternatives>
+    <class>org.kie.workbench.common.stunner.bpmn.resource.BPMN2DefinitionSetResourceType</class>
+  </alternatives>
+
+  <scan>
 
     <!-- These exclusions are added to avoid deploying this project's client-side classes to the server -->
 

@@ -17,6 +17,7 @@ package org.kie.workbench.common.stunner.bpmn.project.client.editor;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import org.kie.workbench.common.stunner.bpmn.project.client.resource.BPMNDiagramResourceType;
 import org.kie.workbench.common.stunner.client.widgets.palette.bs3.factory.BS3PaletteFactory;
 import org.kie.workbench.common.stunner.client.widgets.session.presenter.impl.AbstractClientSessionPresenter;
 import org.kie.workbench.common.stunner.core.client.session.command.impl.SessionCommandFactory;

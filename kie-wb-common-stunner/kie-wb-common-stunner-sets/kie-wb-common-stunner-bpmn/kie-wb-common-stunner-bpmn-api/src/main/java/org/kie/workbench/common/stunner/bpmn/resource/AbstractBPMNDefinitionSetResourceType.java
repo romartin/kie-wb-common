@@ -1,12 +1,11 @@
 /*
  * Copyright 2016 Red Hat, Inc. and/or its affiliates.
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- * 	http://www.apache.org/licenses/LICENSE-2.0
- *
+ *  
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *  
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,30 +13,26 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.stunner.bpmn;
+package org.kie.workbench.common.stunner.bpmn.resource;
 
+import org.kie.workbench.common.stunner.bpmn.BPMNDefinitionSet;
 import org.kie.workbench.common.stunner.core.definition.AbstractDefinitionSetResourceType;
 
-import javax.enterprise.context.ApplicationScoped;
+public abstract class AbstractBPMNDefinitionSetResourceType
+        extends AbstractDefinitionSetResourceType
+        implements BPMNDefinitionSetResourceType {
 
-@ApplicationScoped
-public class BPMNDefinitionSetResourceType extends AbstractDefinitionSetResourceType {
-
-    public static final String FILE_EXTENSION = "bpmn2";
+    public static final String NAME = "Stunner - BPMN2 Diagram";
+    public static final String DESCRIPTION = "Stunner - BPMN2 Diagram";
 
     @Override
     public String getShortName() {
-        return "BPMN2";
+        return NAME;
     }
 
     @Override
     public String getDescription() {
-        return "BPMN2";
-    }
-
-    @Override
-    public String getSuffix() {
-        return FILE_EXTENSION;
+        return DESCRIPTION;
     }
 
     @Override

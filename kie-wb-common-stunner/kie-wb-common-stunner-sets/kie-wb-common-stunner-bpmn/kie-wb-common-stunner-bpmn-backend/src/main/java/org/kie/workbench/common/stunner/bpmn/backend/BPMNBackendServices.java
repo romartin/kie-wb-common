@@ -17,7 +17,7 @@
 package org.kie.workbench.common.stunner.bpmn.backend;
 
 import org.kie.workbench.common.stunner.backend.service.AbstractDefinitionSetServices;
-import org.kie.workbench.common.stunner.bpmn.BPMNDefinitionSetResourceType;
+import org.kie.workbench.common.stunner.bpmn.resource.BPMNDefinitionSetResourceType;
 import org.kie.workbench.common.stunner.core.definition.DefinitionSetResourceType;
 
 import javax.enterprise.context.ApplicationScoped;

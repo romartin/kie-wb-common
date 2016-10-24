@@ -13,14 +13,22 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.stunner.bpmn.project.client.editor;
-
-import org.kie.workbench.common.stunner.bpmn.BPMNDefinitionSetResourceType;
-import org.uberfire.client.workbench.type.ClientResourceType;
+package org.kie.workbench.common.stunner.bpmn.resource;
 
 import javax.enterprise.context.ApplicationScoped;
 
+/**
+ * By default, the workbench resources with suffix "bpmn" will be bind to Stunner's editor.
+ */
 @ApplicationScoped
-public class BPMNDiagramResourceType extends BPMNDefinitionSetResourceType implements ClientResourceType {
+public class BPMNDefinitionSetResourceTypeImpl
+        extends AbstractBPMNDefinitionSetResourceType {
+
+    public static final String BPMN_EXTENSION = "bpmn";
+
+    @Override
+    public String getSuffix() {
+        return BPMN_EXTENSION;
+    }
 
 }
