@@ -24,6 +24,10 @@ import javax.inject.Inject;
 @ApplicationScoped
 public class BPMNDiagramResourceType extends AbstractStunnerClientResourceType<BPMNDefinitionSetResourceType> {
 
+    protected BPMNDiagramResourceType() {
+        this( null );
+    }
+
     @Inject
     public BPMNDiagramResourceType( final BPMNDefinitionSetResourceType definitionSetResourceType ) {
         super( definitionSetResourceType );

@@ -16,15 +16,8 @@
   -->
 
 <beans xmlns="http://xmlns.jcp.org/xml/ns/javaee" bean-discovery-mode="all">
-
-  <!-- Use the "bpmn2" suffix as the stunner workbench asset resource type in this webapp. -->
-  <alternatives>
-    <class>org.kie.workbench.common.stunner.bpmn.resource.BPMN2DefinitionSetResourceType</class>
-  </alternatives>
-
+  <!-- These exclusions are added to avoid deploying this project's client-side classes to the server -->
   <scan>
-
-    <!-- These exclusions are added to avoid deploying this project's client-side classes to the server -->
 
     <!-- Stunner. -->
     <exclude name="org.kie.workbench.common.stunner.core.client.**"/>

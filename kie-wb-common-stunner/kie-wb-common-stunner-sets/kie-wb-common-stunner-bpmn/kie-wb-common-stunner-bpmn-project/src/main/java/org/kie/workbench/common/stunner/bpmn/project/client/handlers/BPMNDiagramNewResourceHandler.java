@@ -16,10 +16,10 @@
 package org.kie.workbench.common.stunner.bpmn.project.client.handlers;
 
 import com.google.gwt.user.client.ui.IsWidget;
-import org.kie.workbench.common.stunner.bpmn.resource.AbstractBPMNDefinitionSetResourceType;
 import org.kie.workbench.common.stunner.bpmn.BPMNDefinitionSet;
 import org.kie.workbench.common.stunner.bpmn.project.client.editor.BPMNDiagramEditor;
 import org.kie.workbench.common.stunner.bpmn.project.client.resource.BPMNDiagramResourceType;
+import org.kie.workbench.common.stunner.bpmn.resource.BPMNDefinitionSetResourceType;
 import org.kie.workbench.common.stunner.core.api.DefinitionManager;
 import org.kie.workbench.common.stunner.project.client.handlers.AbstractProjectDiagramNewResourceHandler;
 import org.kie.workbench.common.stunner.project.client.service.ClientProjectDiagramServices;
@@ -53,7 +53,7 @@ public class BPMNDiagramNewResourceHandler extends AbstractProjectDiagramNewReso
 
     @Override
     public String getDescription() {
-        return AbstractBPMNDefinitionSetResourceType.NAME;
+        return BPMNDefinitionSetResourceType.NAME;
     }
 
     @Override

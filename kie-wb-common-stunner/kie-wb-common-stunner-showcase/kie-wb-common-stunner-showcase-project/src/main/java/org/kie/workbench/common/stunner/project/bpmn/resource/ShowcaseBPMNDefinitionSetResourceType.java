@@ -13,35 +13,28 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.stunner.bpmn.resource;
+package org.kie.workbench.common.stunner.project.bpmn.resource;
 
 import org.kie.workbench.common.stunner.bpmn.BPMNDefinitionSet;
+import org.kie.workbench.common.stunner.bpmn.resource.BPMNDefinitionSetResourceType;
 import org.kie.workbench.common.stunner.core.definition.AbstractDefinitionSetResourceType;
 
-public abstract class AbstractBPMNDefinitionSetResourceType
-        extends AbstractDefinitionSetResourceType
-        implements BPMNDefinitionSetResourceType {
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Specializes;
 
-    public static final String NAME = "Stunner - BPMN2 Diagram";
-    public static final String DESCRIPTION = "Stunner - BPMN2 Diagram";
+/**
+ * This resource override the extension used for bpmn files in this workbench project's showcase to the use of "bpmn2"
+ * instead of the default "bpmn" one, due to the jbpm example repositories are using bpmn2 extensions.
+ */
+@ApplicationScoped
+@Specializes
+public class ShowcaseBPMNDefinitionSetResourceType extends BPMNDefinitionSetResourceType {
 
-    @Override
-    public String getShortName() {
-        return NAME;
-    }
-
-    @Override
-    public String getDescription() {
-        return DESCRIPTION;
-    }
+    public static final String BPMN2_EXTENSION = "bpmn2";
 
     @Override
-    public int getPriority() {
-        return 0;
+    public String getSuffix() {
+        return BPMN2_EXTENSION;
     }
 
-    @Override
-    public Class<?> getDefinitionSetType() {
-        return BPMNDefinitionSet.class;
-    }
 }

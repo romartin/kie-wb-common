@@ -15,7 +15,43 @@
 
 package org.kie.workbench.common.stunner.bpmn.resource;
 
+import org.kie.workbench.common.stunner.bpmn.BPMNDefinitionSet;
 import org.kie.workbench.common.stunner.core.definition.DefinitionSetResourceType;
 
-public interface BPMNDefinitionSetResourceType extends DefinitionSetResourceType {
+
+import org.kie.workbench.common.stunner.core.definition.AbstractDefinitionSetResourceType;
+
+import javax.enterprise.context.ApplicationScoped;
+
+@ApplicationScoped
+public class BPMNDefinitionSetResourceType extends AbstractDefinitionSetResourceType {
+
+    public static final String BPMN_EXTENSION = "bpmn";
+    public static final String NAME = "Stunner - BPMN2 Diagram";
+    public static final String DESCRIPTION = "Stunner - BPMN2 Diagram";
+
+    @Override
+    public String getShortName() {
+        return NAME;
+    }
+
+    @Override
+    public String getDescription() {
+        return DESCRIPTION;
+    }
+
+    @Override
+    public String getSuffix() {
+        return BPMN_EXTENSION;
+    }
+
+    @Override
+    public int getPriority() {
+        return 0;
+    }
+
+    @Override
+    public Class<?> getDefinitionSetType() {
+        return BPMNDefinitionSet.class;
+    }
 }
