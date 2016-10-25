@@ -19,7 +19,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.google.gwt.regexp.shared.RegExp;
+import org.kie.workbench.common.stunner.core.client.qualifier.StunnerSpecific;
 
+@StunnerSpecific
 public class VariableNameTextBox extends AbstractValidatingTextBox {
 
     Set<String> invalidValues = null;

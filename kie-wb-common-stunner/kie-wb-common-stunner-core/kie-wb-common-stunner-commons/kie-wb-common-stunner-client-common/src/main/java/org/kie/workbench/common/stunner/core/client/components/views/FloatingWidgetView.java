@@ -23,6 +23,7 @@ import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.RootPanel;
+import org.kie.workbench.common.stunner.core.client.qualifier.StunnerSpecific;
 import org.kie.workbench.common.stunner.core.client.shape.view.event.HandlerRegistrationImpl;
 
 import javax.enterprise.context.Dependent;
@@ -31,6 +32,7 @@ import javax.enterprise.context.Dependent;
  * Floating view implementation for generic GWT Widgets.
  */
 @Dependent
+@StunnerSpecific
 public class FloatingWidgetView extends FlowPanel implements FloatingView<IsWidget> {
 
     private double ox;
