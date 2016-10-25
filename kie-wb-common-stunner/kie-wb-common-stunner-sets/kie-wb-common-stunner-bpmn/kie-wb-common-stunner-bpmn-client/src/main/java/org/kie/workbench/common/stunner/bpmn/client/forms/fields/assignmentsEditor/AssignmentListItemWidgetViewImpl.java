@@ -47,6 +47,7 @@ import org.kie.workbench.common.stunner.bpmn.client.forms.util.ListBoxValues;
 import org.kie.workbench.common.stunner.bpmn.client.forms.widgets.ComboBox;
 import org.kie.workbench.common.stunner.bpmn.client.forms.widgets.ComboBoxView;
 import org.kie.workbench.common.stunner.bpmn.client.forms.widgets.VariableNameTextBox;
+import org.kie.workbench.common.stunner.core.client.qualifier.StunnerSpecific;
 import org.uberfire.workbench.events.NotificationEvent;
 
 /**
@@ -74,6 +75,7 @@ public class AssignmentListItemWidgetViewImpl extends Composite implements Assig
     @Inject
     @Bound
     @DataField
+    @StunnerSpecific
     protected VariableNameTextBox name;
 
     private boolean allowDuplicateNames = true;

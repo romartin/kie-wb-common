@@ -26,6 +26,7 @@ import org.kie.workbench.common.stunner.core.client.canvas.event.keyboard.Keyboa
 import org.kie.workbench.common.stunner.core.client.canvas.event.selection.CanvasElementSelectedEvent;
 import org.kie.workbench.common.stunner.core.client.components.actions.NameEditBox;
 import org.kie.workbench.common.stunner.core.client.components.views.FloatingView;
+import org.kie.workbench.common.stunner.core.client.qualifier.StunnerSpecific;
 import org.kie.workbench.common.stunner.core.client.shape.Shape;
 import org.kie.workbench.common.stunner.core.client.shape.view.HasEventHandlers;
 import org.kie.workbench.common.stunner.core.client.shape.view.ShapeView;
@@ -55,7 +56,7 @@ public class CanvasNameEditionControlImpl
     private String uuid;
 
     @Inject
-    public CanvasNameEditionControlImpl( final FloatingView<IsWidget> floatingView,
+    public CanvasNameEditionControlImpl( @StunnerSpecific final FloatingView<IsWidget> floatingView,
                                          final NameEditBox<AbstractCanvasHandler, Element> nameEditBox,
                                          final Event<CanvasElementSelectedEvent> elementSelectedEvent ) {
         this.floatingView = floatingView;
