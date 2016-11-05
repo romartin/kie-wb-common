@@ -21,9 +21,6 @@ import org.jboss.errai.ioc.client.container.SyncBeanManager;
 import org.kie.workbench.common.stunner.core.api.AbstractFactoryManager;
 import org.kie.workbench.common.stunner.core.api.DefinitionManager;
 import org.kie.workbench.common.stunner.core.api.FactoryManager;
-import org.kie.workbench.common.stunner.core.client.ShapeManager;
-import org.kie.workbench.common.stunner.core.diagram.Metadata;
-import org.kie.workbench.common.stunner.core.diagram.MetadataImpl;
 import org.kie.workbench.common.stunner.core.factory.definition.DefinitionFactory;
 import org.kie.workbench.common.stunner.core.factory.diagram.DiagramFactory;
 import org.kie.workbench.common.stunner.core.factory.graph.EdgeFactory;
@@ -40,23 +37,17 @@ import java.util.Collection;
 public class ClientFactoryManager extends AbstractFactoryManager implements FactoryManager {
 
     private final SyncBeanManager beanManager;
-    private final ShapeManager shapeManager;
 
     protected ClientFactoryManager() {
-        super();
-        this.beanManager = null;
-        this.shapeManager = null;
+        this( null, null, null );
     }
 
     @Inject
     public ClientFactoryManager( final RegistryFactory registryFactory,
                                  final DefinitionManager definitionManager,
-                                 final SyncBeanManager beanManager,
-                                 final ShapeManager shapeManager,
-                                 final DiagramFactory diagramFactory ) {
-        super( registryFactory, definitionManager, diagramFactory );
+                                 final SyncBeanManager beanManager ) {
+        super( registryFactory, definitionManager );
         this.beanManager = beanManager;
-        this.shapeManager = shapeManager;
 
     }
 
@@ -67,6 +58,12 @@ public class ClientFactoryManager extends AbstractFactoryManager implements Fact
         Collection<SyncBeanDef<DefinitionFactory>> beanDefSetAdapters = beanManager.lookupBeans( DefinitionFactory.class );
         for ( SyncBeanDef<DefinitionFactory> defSet : beanDefSetAdapters ) {
             DefinitionFactory factory = defSet.getInstance();
+            registry().register( factory );
+        }
+        // Client diagram factories..
+        Collection<SyncBeanDef<DiagramFactory>> beanDiagramFactories = beanManager.lookupBeans( DiagramFactory.class );
+        for ( SyncBeanDef<DiagramFactory> facBean : beanDiagramFactories ) {
+            DiagramFactory factory = facBean.getInstance();
             registry().register( factory );
         }
         // Graph factories.
@@ -88,13 +85,6 @@ public class ClientFactoryManager extends AbstractFactoryManager implements Fact
             registry().register( factory );
         }
 
-    }
-
-    @Override
-    protected Metadata buildMetadata( final String defSetId, final String title ) {
-        return new MetadataImpl.MetadataImplBuilder( defSetId, getDefinitionManager(), shapeManager )
-                .setTitle( title )
-                .build();
     }
 
 }

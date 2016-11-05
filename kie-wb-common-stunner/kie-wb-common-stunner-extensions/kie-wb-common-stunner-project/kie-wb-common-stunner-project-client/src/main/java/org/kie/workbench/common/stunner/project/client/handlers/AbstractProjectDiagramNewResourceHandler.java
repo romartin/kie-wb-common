@@ -67,7 +67,8 @@ public abstract class AbstractProjectDiagramNewResourceHandler<R extends ClientR
         final Path path = pkg.getPackageMainResourcesPath();
         final Class<?> type = getDefinitionSetType();
         final String setId = getId( type );
-        projectDiagramServices.create( path, name, setId, new ServiceCallback<Path>() {
+        final String projPkg = pkg.getPackageName();
+        projectDiagramServices.create( path, name, setId, name, projPkg, new ServiceCallback<Path>() {
             @Override
             public void onSuccess( Path path ) {
                 BusyPopup.close();
