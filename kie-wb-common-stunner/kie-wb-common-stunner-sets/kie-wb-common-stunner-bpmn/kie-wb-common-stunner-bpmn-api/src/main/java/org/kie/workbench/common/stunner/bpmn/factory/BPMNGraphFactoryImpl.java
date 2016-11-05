@@ -20,7 +20,7 @@ import org.kie.workbench.common.stunner.bpmn.definition.BPMNDiagram;
 import org.kie.workbench.common.stunner.core.api.DefinitionManager;
 import org.kie.workbench.common.stunner.core.api.FactoryManager;
 import org.kie.workbench.common.stunner.core.factory.graph.ElementFactory;
-import org.kie.workbench.common.stunner.core.graph.Edge;
+import org.kie.workbench.common.stunner.core.factory.impl.AbstractElementFactory;
 import org.kie.workbench.common.stunner.core.graph.Graph;
 import org.kie.workbench.common.stunner.core.graph.Node;
 import org.kie.workbench.common.stunner.core.graph.command.EmptyRulesCommandExecutionContext;
@@ -34,15 +34,23 @@ import org.kie.workbench.common.stunner.core.graph.content.view.BoundsImpl;
 import org.kie.workbench.common.stunner.core.graph.impl.GraphImpl;
 import org.kie.workbench.common.stunner.core.graph.processing.index.GraphIndexBuilder;
 import org.kie.workbench.common.stunner.core.graph.processing.index.Index;
-import org.kie.workbench.common.stunner.core.graph.processing.index.IndexBuilder;
 import org.kie.workbench.common.stunner.core.graph.store.GraphNodeStoreImpl;
 import org.kie.workbench.common.stunner.core.util.UUID;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+/**
+ * The custom factory for BPMN graphs.
+ * It initializes the BPMN graph with a new Diagram node instance, which represents th main process.
+ * This class uses the Commands API in order to avoid adding nodes/edges and setting bean values manually on the graph structure,
+ * so this will avoid further errors, but in fact there should be not need to check runtime rules when executing
+ * the commands.
+ */
 @ApplicationScoped
-public class BPMNGraphFactoryImpl implements BPMNGraphFactory {
+public class BPMNGraphFactoryImpl
+        extends AbstractElementFactory<String, DefinitionSet, Graph<DefinitionSet, Node>>
+        implements BPMNGraphFactory {
 
     private final DefinitionManager definitionManager;
     private final GraphCommandManager graphCommandManager;
@@ -73,17 +81,11 @@ public class BPMNGraphFactoryImpl implements BPMNGraphFactory {
     }
 
     @Override
-    public Graph<DefinitionSet, Node> build( final String uuid ) {
-        return build( uuid, null );
-    }
-
-    @Override
     @SuppressWarnings( "unchecked" )
     public Graph<DefinitionSet, Node> build( final String uuid,
-                                             final Object definitionSet ) {
+                                             final String definitionSetId ) {
         final GraphImpl graph = new GraphImpl<>( uuid, new GraphNodeStoreImpl() );
-        final String id = getId( definitionSet );
-        final DefinitionSet content = new DefinitionSetImpl( id );
+        final DefinitionSet content = new DefinitionSetImpl( definitionSetId );
         graph.setContent( content );
         if ( null == content.getBounds() ) {
             content.setBounds( new BoundsImpl(
@@ -91,7 +93,8 @@ public class BPMNGraphFactoryImpl implements BPMNGraphFactory {
                     new BoundImpl( BPMNGraphFactory.GRAPH_DEFAULT_WIDTH, BPMNGraphFactory.GRAPH_DEFAULT_HEIGHT )
             ) );
         }
-        // Add a BPMN diagram node by default.
+
+        // Add a BPMN diagram node by default when creating a new BPMN graph.
         Node diagramNode = ( Node ) factoryManager.newElement( UUID.uuid(), BPMNDiagram.class );
         graphCommandManager
                 .batch( graphCommandFactory.ADD_NODE( diagramNode ) )
@@ -106,10 +109,6 @@ public class BPMNGraphFactoryImpl implements BPMNGraphFactory {
         return new EmptyRulesCommandExecutionContext(
                 definitionManager,
                 factoryManager, index );
-    }
-
-    private String getId( final Object defSet ) {
-        return definitionManager.adapters().forDefinitionSet().getId( defSet );
     }
 
 }

@@ -38,33 +38,36 @@ import javax.inject.Inject;
 public class ApplicationFactoryManager extends AbstractFactoryManager implements FactoryService, FactoryManager {
 
     private Instance<DefinitionFactory<?>> definitionFactoryInstances;
-    private Instance<GraphFactory<?>> graphFactoryInstances;
+    private Instance<GraphFactory> graphFactoryInstances;
     private Instance<NodeFactory<?>> nodeFactoryInstances;
     private Instance<EdgeFactory<?>> edgeFactoryInstances;
+    private Instance<DiagramFactory<?, ?>> diagramFactoryInstances;
 
     protected ApplicationFactoryManager() {
-        super();
+        this( null, null, null, null, null, null, null );
     }
 
     @Inject
     public ApplicationFactoryManager( final RegistryFactory registryFactory,
                                       final DefinitionManager definitionManager,
                                       final Instance<DefinitionFactory<?>> definitionFactoryInstances,
-                                      final Instance<GraphFactory<?>> graphFactoryInstances,
+                                      final Instance<GraphFactory> graphFactoryInstances,
                                       final Instance<NodeFactory<?>> nodeFactoryInstances,
                                       final Instance<EdgeFactory<?>> edgeFactoryInstances,
-                                      final DiagramFactory diagramFactory ) {
-        super( registryFactory, definitionManager, diagramFactory );
+                                      final Instance<DiagramFactory<?, ?>> diagramFactoryInstances ) {
+        super( registryFactory, definitionManager );
         this.definitionFactoryInstances = definitionFactoryInstances;
         this.graphFactoryInstances = graphFactoryInstances;
         this.nodeFactoryInstances = nodeFactoryInstances;
         this.edgeFactoryInstances = edgeFactoryInstances;
+        this.diagramFactoryInstances = diagramFactoryInstances;
     }
 
     @PostConstruct
     public void init() {
         initDefinitionFactories();
         initGraphFactories();
+        initDiagramFactories();
     }
 
     @SuppressWarnings( "unchecked" )
@@ -76,13 +79,20 @@ public class ApplicationFactoryManager extends AbstractFactoryManager implements
 
     @SuppressWarnings( "unchecked" )
     private void initGraphFactories() {
-        for ( GraphFactory<?> factory : graphFactoryInstances ) {
+        for ( GraphFactory factory : graphFactoryInstances ) {
             registry().register( factory );
         }
         for ( NodeFactory<?> factory : nodeFactoryInstances ) {
             registry().register( factory );
         }
         for ( EdgeFactory<?> factory : edgeFactoryInstances ) {
+            registry().register( factory );
+        }
+    }
+
+    @SuppressWarnings( "unchecked" )
+    private void initDiagramFactories() {
+        for ( DiagramFactory<?, ?> factory : diagramFactoryInstances  ) {
             registry().register( factory );
         }
     }
