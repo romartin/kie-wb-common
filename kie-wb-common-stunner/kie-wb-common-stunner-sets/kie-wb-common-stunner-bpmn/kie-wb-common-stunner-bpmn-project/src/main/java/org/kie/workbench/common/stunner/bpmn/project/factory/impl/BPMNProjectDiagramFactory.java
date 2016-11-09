@@ -70,8 +70,8 @@ public class BPMNProjectDiagramFactory
         }
         final BPMNDiagram diagram = diagramNode.getContent().getDefinition();
         final String id = diagram.getDiagramSet().getId().getValue();
-        if ( null == id ) {
-            diagram.getDiagramSet().getId().setValue( name );
+        if ( null == id || diagram.getDiagramSet().getId().getDefaultValue().equals( id ) ) {
+            diagram.getDiagramSet().getId().setValue( metadata.getProjectName() + "." + name );
         }
         final String p = diagram.getDiagramSet().getPackageProperty().getValue();
         if (  null == p ) {

@@ -81,7 +81,7 @@ class ProjectDiagramServiceController extends AbstractVFSDiagramService<ProjectD
                 .forDefinitionSetId( defSetId )
                 .forProjectName( projName )
                 .forProjectPackage( projPkg )
-                .forTitile( name )
+                .forTitle( name )
                 .forPath( path )
                 .build();
     }
