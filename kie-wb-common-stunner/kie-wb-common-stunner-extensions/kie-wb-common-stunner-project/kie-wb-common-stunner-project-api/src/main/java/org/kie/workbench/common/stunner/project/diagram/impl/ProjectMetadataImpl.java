@@ -69,7 +69,7 @@ public class ProjectMetadataImpl extends AbstractMetadata implements ProjectMeta
             return this;
         }
 
-        public ProjectMetadataBuilder forTitile( String t ) {
+        public ProjectMetadataBuilder forTitle( String t ) {
             this.title = t;
             return this;
         }
