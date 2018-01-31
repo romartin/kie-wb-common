@@ -245,22 +245,22 @@ public class BPMNDiagramEditor extends AbstractProjectDiagramEditor<BPMNDiagramR
             setPull(Pull.RIGHT);
         }};
 
-        menu.add(new AnchorListItem(getTranslationService().getKeyValue(BPMNClientConstants.EditorGenerateProcessForm)) {{
+        menu.add(new AnchorListItem(getTranslationService().getValue(BPMNClientConstants.EditorGenerateProcessForm)) {{
             setIcon(IconType.LIST_ALT);
             setIconPosition(IconPosition.LEFT);
-            setTitle(getTranslationService().getKeyValue(BPMNClientConstants.EditorGenerateProcessForm));
+            setTitle(getTranslationService().getValue(BPMNClientConstants.EditorGenerateProcessForm));
             addClickHandler(event -> generateProcessForm.execute());
         }});
-        menu.add(new AnchorListItem(getTranslationService().getKeyValue(BPMNClientConstants.EditorGenerateAllForms)) {{
+        menu.add(new AnchorListItem(getTranslationService().getValue(BPMNClientConstants.EditorGenerateAllForms)) {{
             setIcon(IconType.LIST_ALT);
             setIconPosition(IconPosition.LEFT);
-            setTitle(getTranslationService().getKeyValue(BPMNClientConstants.EditorGenerateAllForms));
+            setTitle(getTranslationService().getValue(BPMNClientConstants.EditorGenerateAllForms));
             addClickHandler(event -> generateAllForms.execute());
         }});
-        menu.add(new AnchorListItem(getTranslationService().getKeyValue(BPMNClientConstants.EditorGenerateSelectionForms)) {{
+        menu.add(new AnchorListItem(getTranslationService().getValue(BPMNClientConstants.EditorGenerateSelectionForms)) {{
             setIcon(IconType.LIST_ALT);
             setIconPosition(IconPosition.LEFT);
-            setTitle(getTranslationService().getKeyValue(BPMNClientConstants.EditorGenerateSelectionForms));
+            setTitle(getTranslationService().getValue(BPMNClientConstants.EditorGenerateSelectionForms));
             addClickHandler(event -> generateSelectedForms.execute());
         }});
         final IsWidget group = new ButtonGroup() {{
@@ -269,7 +269,7 @@ public class BPMNDiagramEditor extends AbstractProjectDiagramEditor<BPMNDiagramR
                 setDataToggle(Toggle.DROPDOWN);
                 setIcon(IconType.LIST_ALT);
                 setSize(ButtonSize.SMALL);
-                setTitle(getTranslationService().getKeyValue(BPMNClientConstants.EditorFormGenerationTitle));
+                setTitle(getTranslationService().getValue(BPMNClientConstants.EditorFormGenerationTitle));
             }});
             add(menu);
         }};

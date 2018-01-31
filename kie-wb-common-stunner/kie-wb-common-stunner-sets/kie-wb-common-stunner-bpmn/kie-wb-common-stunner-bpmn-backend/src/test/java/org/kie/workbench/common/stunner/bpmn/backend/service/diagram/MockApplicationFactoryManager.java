@@ -16,9 +16,9 @@
 
 package org.kie.workbench.common.stunner.bpmn.backend.service.diagram;
 
-import org.kie.workbench.common.stunner.backend.ApplicationFactoryManager;
 import org.kie.workbench.common.stunner.backend.definition.factory.TestScopeModelFactory;
 import org.kie.workbench.common.stunner.bpmn.BPMNDefinitionSet;
+import org.kie.workbench.common.stunner.core.backend.BackendFactoryManager;
 import org.kie.workbench.common.stunner.core.backend.definition.adapter.reflect.BackendDefinitionAdapter;
 import org.kie.workbench.common.stunner.core.definition.adapter.binding.BindableAdapterUtils;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
@@ -36,7 +36,7 @@ import org.kie.workbench.common.stunner.core.graph.Node;
 
 import static org.kie.workbench.common.stunner.bpmn.backend.service.diagram.BPMNDirectDiagramMarshallerTest.BPMN_DEF_SET_ID;
 
-public class MockApplicationFactoryManager extends ApplicationFactoryManager {
+public class MockApplicationFactoryManager extends BackendFactoryManager {
 
     private final GraphFactory bpmnGraphFactory;
     private final TestScopeModelFactory testScopeModelFactory;
