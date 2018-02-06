@@ -61,7 +61,8 @@ import org.uberfire.mvp.Command;
 import static org.kie.soup.commons.validation.PortablePreconditions.checkNotNull;
 
 @Dependent
-public class FormPropertiesWidget implements IsElement, FormPropertiesWidgetView.Presenter {
+public class FormPropertiesWidget implements IsElement,
+                                             FormPropertiesWidgetView.Presenter {
 
     private static Logger LOGGER = Logger.getLogger(FormPropertiesWidget.class.getName());
 
