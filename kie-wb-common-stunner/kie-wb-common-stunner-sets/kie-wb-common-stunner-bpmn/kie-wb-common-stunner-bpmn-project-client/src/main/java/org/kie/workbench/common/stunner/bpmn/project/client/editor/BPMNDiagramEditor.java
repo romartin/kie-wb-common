@@ -16,28 +16,47 @@
 
 package org.kie.workbench.common.stunner.bpmn.project.client.editor;
 
+import java.util.Map;
+
 import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import org.gwtbootstrap3.client.ui.AnchorListItem;
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.ButtonGroup;
+import org.gwtbootstrap3.client.ui.DropDownMenu;
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
+import org.gwtbootstrap3.client.ui.constants.IconPosition;
+import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.gwtbootstrap3.client.ui.constants.Pull;
+import org.gwtbootstrap3.client.ui.constants.Toggle;
+import org.jboss.errai.ioc.client.api.ManagedInstance;
+import org.kie.workbench.common.stunner.bpmn.client.forms.util.ContextUtils;
 import org.kie.workbench.common.stunner.bpmn.factory.BPMNGraphFactory;
 import org.kie.workbench.common.stunner.bpmn.project.client.type.BPMNDiagramResourceType;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionPresenterFactory;
 import org.kie.workbench.common.stunner.core.client.annotation.DiagramEditor;
 import org.kie.workbench.common.stunner.core.client.api.SessionManager;
 import org.kie.workbench.common.stunner.core.client.error.DiagramClientErrorHandler;
+import org.kie.workbench.common.stunner.core.client.service.ClientRuntimeError;
+import org.kie.workbench.common.stunner.core.client.session.command.AbstractClientSessionCommand;
+import org.kie.workbench.common.stunner.core.client.session.command.ClientSessionCommand;
 import org.kie.workbench.common.stunner.core.client.session.command.impl.SessionCommandFactory;
 import org.kie.workbench.common.stunner.core.client.session.impl.AbstractClientFullSession;
 import org.kie.workbench.common.stunner.core.client.session.impl.AbstractClientReadOnlySession;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
+import org.kie.workbench.common.stunner.forms.client.sessopm.command.GenerateDiagramFormsSessionCommand;
+import org.kie.workbench.common.stunner.forms.client.sessopm.command.GenerateSelectedFormsSessionCommand;
 import org.kie.workbench.common.stunner.project.client.editor.AbstractProjectDiagramEditor;
 import org.kie.workbench.common.stunner.project.client.editor.ProjectDiagramEditorMenuItemsBuilder;
 import org.kie.workbench.common.stunner.project.client.editor.event.OnDiagramFocusEvent;
 import org.kie.workbench.common.stunner.project.client.editor.event.OnDiagramLoseFocusEvent;
 import org.kie.workbench.common.stunner.project.client.screens.ProjectMessagesListener;
 import org.kie.workbench.common.stunner.project.client.service.ClientProjectDiagramService;
+import org.kie.workbench.common.widgets.client.menu.FileMenuBuilder;
 import org.uberfire.backend.vfs.ObservablePath;
 import org.uberfire.client.annotations.WorkbenchEditor;
 import org.uberfire.client.annotations.WorkbenchMenu;
@@ -54,7 +73,9 @@ import org.uberfire.lifecycle.OnLostFocus;
 import org.uberfire.lifecycle.OnMayClose;
 import org.uberfire.lifecycle.OnOpen;
 import org.uberfire.lifecycle.OnStartup;
+import org.uberfire.mvp.Command;
 import org.uberfire.mvp.PlaceRequest;
+import org.uberfire.workbench.model.menu.MenuItem;
 import org.uberfire.workbench.model.menu.Menus;
 
 @Dependent
@@ -63,6 +84,9 @@ import org.uberfire.workbench.model.menu.Menus;
 public class BPMNDiagramEditor extends AbstractProjectDiagramEditor<BPMNDiagramResourceType> {
 
     public static final String EDITOR_ID = "BPMNDiagramEditor";
+
+    private final ManagedInstance<GenerateDiagramFormsSessionCommand> generateDiagramFormsSessionCommands;
+    private final ManagedInstance<GenerateSelectedFormsSessionCommand> generateSelectedFormsSessionCommands;
 
     @Inject
     public BPMNDiagramEditor(final View view,
@@ -79,7 +103,9 @@ public class BPMNDiagramEditor extends AbstractProjectDiagramEditor<BPMNDiagramR
                              final Event<OnDiagramFocusEvent> onDiagramFocusEvent,
                              final Event<OnDiagramLoseFocusEvent> onDiagramLostFocusEvent,
                              final ProjectMessagesListener projectMessagesListener,
-                             final DiagramClientErrorHandler diagramClientErrorHandler) {
+                             final DiagramClientErrorHandler diagramClientErrorHandler,
+                             final ManagedInstance<GenerateDiagramFormsSessionCommand> generateDiagramFormsSessionCommands,
+                             final ManagedInstance<GenerateSelectedFormsSessionCommand> generateSelectedFormsSessionCommands) {
         super(view,
               placeManager,
               errorPopupPresenter,
@@ -95,6 +121,8 @@ public class BPMNDiagramEditor extends AbstractProjectDiagramEditor<BPMNDiagramR
               onDiagramLostFocusEvent,
               projectMessagesListener,
               diagramClientErrorHandler);
+        this.generateDiagramFormsSessionCommands = generateDiagramFormsSessionCommands;
+        this.generateSelectedFormsSessionCommands = generateSelectedFormsSessionCommands;
     }
 
     @OnStartup
@@ -102,6 +130,25 @@ public class BPMNDiagramEditor extends AbstractProjectDiagramEditor<BPMNDiagramR
                           final PlaceRequest place) {
         super.doStartUp(path,
                         place);
+    }
+
+    @Override
+    protected void initializeCommands(final Map<Class, ClientSessionCommand> commands) {
+        super.initializeCommands(commands);
+        commands.put(GenerateDiagramFormsSessionCommand.class,
+                     generateDiagramFormsSessionCommands.get());
+        commands.put(GenerateSelectedFormsSessionCommand.class,
+                     generateSelectedFormsSessionCommands
+                             .get()
+                             .setElementAcceptor(ContextUtils::isFormGenerationSupported));
+    }
+
+    @Override
+    protected void makeAdditionalStunnerMenus(final FileMenuBuilder fileMenuBuilder) {
+        super.makeAdditionalStunnerMenus(fileMenuBuilder);
+        fileMenuBuilder
+                .addNewTopLevelMenu(newFormsGenerationMenuItem(() -> executeFormsCommand(GenerateDiagramFormsSessionCommand.class),
+                                                               () -> executeFormsCommand(GenerateSelectedFormsSessionCommand.class)));
     }
 
     @Override
@@ -162,5 +209,54 @@ public class BPMNDiagramEditor extends AbstractProjectDiagramEditor<BPMNDiagramR
     @OnMayClose
     public boolean onMayClose() {
         return super.mayClose(getCurrentDiagramHash());
+    }
+
+    private void executeFormsCommand(Class<? extends AbstractClientSessionCommand> type) {
+        showLoadingViews();
+        getCommand(type)
+                .execute(new ClientSessionCommand.Callback<ClientRuntimeError>() {
+                    @Override
+                    public void onSuccess() {
+                        hideLoadingViews();
+                    }
+
+                    @Override
+                    public void onError(ClientRuntimeError error) {
+                        hideLoadingViews();
+                        // TODO
+                    }
+                });
+    }
+
+    // TODO: I18n.
+    // TODO: Icons.
+    private static MenuItem newFormsGenerationMenuItem(final Command generateAllForms,
+                                                       final Command generateSelectedForms) {
+        final DropDownMenu menu = new DropDownMenu() {{
+            setPull(Pull.RIGHT);
+        }};
+        menu.add(new AnchorListItem("Generate all forms") {{
+            setIcon(IconType.GEARS);
+            setIconPosition(IconPosition.LEFT);
+            setTitle("Generate all forms");
+            addClickHandler(event -> generateAllForms.execute());
+        }});
+        menu.add(new AnchorListItem("Generate forms for selection") {{
+            setIcon(IconType.GEARS);
+            setIconPosition(IconPosition.LEFT);
+            setTitle("Generate forms for selection");
+            addClickHandler(event -> generateSelectedForms.execute());
+        }});
+        final IsWidget group = new ButtonGroup() {{
+            add(new Button() {{
+                setToggleCaret(true);
+                setDataToggle(Toggle.DROPDOWN);
+                setIcon(IconType.GEARS);
+                setSize(ButtonSize.SMALL);
+                setTitle("Form Generation");
+            }});
+            add(menu);
+        }};
+        return ProjectDiagramEditorMenuItemsBuilder.buildItem(group);
     }
 }
