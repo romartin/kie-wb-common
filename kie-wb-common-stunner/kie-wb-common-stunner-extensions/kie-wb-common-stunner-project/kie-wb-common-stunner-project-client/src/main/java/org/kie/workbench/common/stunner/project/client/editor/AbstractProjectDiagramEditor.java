@@ -72,6 +72,7 @@ import org.kie.workbench.common.stunner.project.client.editor.event.OnDiagramLos
 import org.kie.workbench.common.stunner.project.client.screens.ProjectMessagesListener;
 import org.kie.workbench.common.stunner.project.client.service.ClientProjectDiagramService;
 import org.kie.workbench.common.stunner.project.diagram.ProjectDiagram;
+import org.kie.workbench.common.widgets.client.menu.FileMenuBuilder;
 import org.kie.workbench.common.widgets.client.resources.i18n.CommonConstants;
 import org.kie.workbench.common.widgets.metadata.client.KieEditor;
 import org.kie.workbench.common.widgets.metadata.client.KieEditorView;
@@ -114,6 +115,7 @@ public abstract class AbstractProjectDiagramEditor<R extends ClientResourceType>
     private ClientProjectDiagramService projectDiagramServices;
     private SessionManager sessionManager;
     private SessionPresenterFactory<Diagram, AbstractClientReadOnlySession, AbstractClientFullSession> sessionPresenterFactory;
+    private SessionCommandFactory sessionCommandFactory;
     private ProjectDiagramEditorMenuItemsBuilder menuItemsBuilder;
     private ProjectMessagesListener projectMessagesListener;
 
@@ -151,18 +153,28 @@ public abstract class AbstractProjectDiagramEditor<R extends ClientResourceType>
         this.projectDiagramServices = projectDiagramServices;
         this.sessionManager = sessionManager;
         this.sessionPresenterFactory = sessionPresenterFactory;
+        this.sessionCommandFactory = sessionCommandFactory;
         this.menuItemsBuilder = menuItemsBuilder;
         this.projectMessagesListener = projectMessagesListener;
         this.diagramClientErrorHandler = diagramClientErrorHandler;
-
         this.onDiagramFocusEvent = onDiagramFocusEvent;
         this.onDiagramLostFocusEvent = onDiagramLostFocusEvent;
-
-        initializeCommands(sessionCommandFactory);
+        this.commands = new HashMap<>();
     }
 
-    private void initializeCommands(SessionCommandFactory sessionCommandFactory) {
-        this.commands = new HashMap<>();
+    protected abstract int getCanvasWidth();
+
+    protected abstract int getCanvasHeight();
+
+    @PostConstruct
+    @SuppressWarnings("unchecked")
+    public void init() {
+        initializeCommands(commands);
+        getView().init(this);
+        projectMessagesListener.enable();
+    }
+
+    protected void initializeCommands(final Map<Class, ClientSessionCommand> commands) {
         commands.put(ClearStatesSessionCommand.class, sessionCommandFactory.newClearStatesCommand());
         commands.put(VisitGraphSessionCommand.class, sessionCommandFactory.newVisitGraphCommand());
         commands.put(SwitchGridSessionCommand.class, sessionCommandFactory.newSwitchGridCommand());
@@ -178,17 +190,6 @@ public abstract class AbstractProjectDiagramEditor<R extends ClientResourceType>
         commands.put(CopySelectionSessionCommand.class, sessionCommandFactory.newCopySelectionCommand());
         commands.put(PasteSelectionSessionCommand.class, sessionCommandFactory.newPasteSelectionCommand());
         commands.put(CutSelectionSessionCommand.class, sessionCommandFactory.newCutSelectionCommand());
-    }
-
-    protected abstract int getCanvasWidth();
-
-    protected abstract int getCanvasHeight();
-
-    @PostConstruct
-    @SuppressWarnings("unchecked")
-    public void init() {
-        getView().init(this);
-        projectMessagesListener.enable();
     }
 
     protected void doStartUp(final ObservablePath path,
@@ -378,6 +379,8 @@ public abstract class AbstractProjectDiagramEditor<R extends ClientResourceType>
                 .addNewTopLevelMenu(cutItem)
                 .addNewTopLevelMenu(pasteItem);
 
+        makeAdditionalStunnerMenus(fileMenuBuilder);
+
         if (menuItemsBuilder.isDevItemsEnabled()) {
             fileMenuBuilder.addNewTopLevelMenu(menuItemsBuilder.newDevItems());
         }
@@ -397,7 +400,10 @@ public abstract class AbstractProjectDiagramEditor<R extends ClientResourceType>
                 .addNewTopLevelMenu(versionRecordManager.buildMenu());
     }
 
-    private <T> T getCommand(Class<T> key){
+    protected void makeAdditionalStunnerMenus(final FileMenuBuilder fileMenuBuilder) {
+    }
+
+    protected <T> T getCommand(Class<T> key) {
         return (T) commands.get(key);
     }
 
@@ -547,7 +553,7 @@ public abstract class AbstractProjectDiagramEditor<R extends ClientResourceType>
 
     private void destroySession() {
         unbindCommands();
-        if(Objects.nonNull(presenter)) {
+        if (Objects.nonNull(presenter)) {
             presenter.clear();
             presenter.destroy();
         }
@@ -664,12 +670,12 @@ public abstract class AbstractProjectDiagramEditor<R extends ClientResourceType>
                                                           getEditorIdentifier()));
     }
 
-    private void showError(final ClientRuntimeError error) {
+    protected void showError(final ClientRuntimeError error) {
         diagramClientErrorHandler.handleError(error, message -> showError(message));
         log(Level.SEVERE, error.toString());
     }
 
-    private void showError(final String message) {
+    protected void showError(final String message) {
         errorPopupPresenter.showMessage(message);
         hideLoadingViews();
     }

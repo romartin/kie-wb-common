@@ -317,7 +317,7 @@ public class ProjectDiagramEditorMenuItemsBuilder {
         return "Are you sure?";
     }
 
-    private MenuItem buildItem(final IsWidget widget) {
+    public static MenuItem buildItem(final IsWidget widget) {
         return MenuUtils.buildItem(widget);
     }
 }

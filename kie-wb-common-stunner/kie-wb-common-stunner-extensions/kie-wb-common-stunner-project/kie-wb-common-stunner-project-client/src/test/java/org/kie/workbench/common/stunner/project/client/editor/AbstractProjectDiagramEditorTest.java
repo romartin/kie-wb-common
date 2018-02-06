@@ -155,6 +155,7 @@ public class AbstractProjectDiagramEditorTest {
                 return null;
             }
         };
+        presenter.init();
     }
 
     @Test
