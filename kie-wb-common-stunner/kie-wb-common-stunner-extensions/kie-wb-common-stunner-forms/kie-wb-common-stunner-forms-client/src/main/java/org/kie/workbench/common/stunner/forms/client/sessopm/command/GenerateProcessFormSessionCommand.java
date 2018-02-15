@@ -25,16 +25,16 @@ import org.kie.workbench.common.stunner.forms.client.gen.ClientFormGenerationMan
 import org.kie.workbench.common.stunner.forms.service.FormGenerationService;
 
 @Dependent
-public class GenerateDiagramFormsSessionCommand extends AbstractClientSessionCommand<ClientFullSession> {
+public class GenerateProcessFormSessionCommand extends AbstractClientSessionCommand<ClientFullSession> {
 
     private final ClientFormGenerationManager formGenerationManager;
 
-    protected GenerateDiagramFormsSessionCommand() {
+    protected GenerateProcessFormSessionCommand() {
         this(null);
     }
 
     @Inject
-    public GenerateDiagramFormsSessionCommand(final ClientFormGenerationManager formGenerationManager) {
+    public GenerateProcessFormSessionCommand(final ClientFormGenerationManager formGenerationManager) {
         super(true);
         this.formGenerationManager = formGenerationManager;
     }
@@ -46,6 +46,6 @@ public class GenerateDiagramFormsSessionCommand extends AbstractClientSessionCom
     }
 
     private void call(final FormGenerationService service) {
-        service.generateAllForms(getCanvasHandler().getDiagram());
+        service.generateProcessForm(getCanvasHandler().getDiagram());
     }
 }

@@ -36,11 +36,13 @@ import org.gwtbootstrap3.client.ui.constants.Toggle;
 import org.jboss.errai.ioc.client.api.ManagedInstance;
 import org.kie.workbench.common.stunner.bpmn.client.forms.util.ContextUtils;
 import org.kie.workbench.common.stunner.bpmn.factory.BPMNGraphFactory;
+import org.kie.workbench.common.stunner.bpmn.project.client.resources.BPMNClientConstants;
 import org.kie.workbench.common.stunner.bpmn.project.client.type.BPMNDiagramResourceType;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionPresenterFactory;
 import org.kie.workbench.common.stunner.core.client.annotation.DiagramEditor;
 import org.kie.workbench.common.stunner.core.client.api.SessionManager;
 import org.kie.workbench.common.stunner.core.client.error.DiagramClientErrorHandler;
+import org.kie.workbench.common.stunner.core.client.i18n.ClientTranslationService;
 import org.kie.workbench.common.stunner.core.client.service.ClientRuntimeError;
 import org.kie.workbench.common.stunner.core.client.session.command.AbstractClientSessionCommand;
 import org.kie.workbench.common.stunner.core.client.session.command.ClientSessionCommand;
@@ -49,6 +51,7 @@ import org.kie.workbench.common.stunner.core.client.session.impl.AbstractClientF
 import org.kie.workbench.common.stunner.core.client.session.impl.AbstractClientReadOnlySession;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
 import org.kie.workbench.common.stunner.forms.client.sessopm.command.GenerateDiagramFormsSessionCommand;
+import org.kie.workbench.common.stunner.forms.client.sessopm.command.GenerateProcessFormSessionCommand;
 import org.kie.workbench.common.stunner.forms.client.sessopm.command.GenerateSelectedFormsSessionCommand;
 import org.kie.workbench.common.stunner.project.client.editor.AbstractProjectDiagramEditor;
 import org.kie.workbench.common.stunner.project.client.editor.ProjectDiagramEditorMenuItemsBuilder;
@@ -85,8 +88,11 @@ public class BPMNDiagramEditor extends AbstractProjectDiagramEditor<BPMNDiagramR
 
     public static final String EDITOR_ID = "BPMNDiagramEditor";
 
+    private final ManagedInstance<GenerateProcessFormSessionCommand> generateProcessFormSessionCommands;
     private final ManagedInstance<GenerateDiagramFormsSessionCommand> generateDiagramFormsSessionCommands;
     private final ManagedInstance<GenerateSelectedFormsSessionCommand> generateSelectedFormsSessionCommands;
+
+    private final ClientTranslationService translationService;
 
     @Inject
     public BPMNDiagramEditor(final View view,
@@ -104,8 +110,10 @@ public class BPMNDiagramEditor extends AbstractProjectDiagramEditor<BPMNDiagramR
                              final Event<OnDiagramLoseFocusEvent> onDiagramLostFocusEvent,
                              final ProjectMessagesListener projectMessagesListener,
                              final DiagramClientErrorHandler diagramClientErrorHandler,
+                             final ManagedInstance<GenerateProcessFormSessionCommand> generateProcessFormSessionCommands,
                              final ManagedInstance<GenerateDiagramFormsSessionCommand> generateDiagramFormsSessionCommands,
-                             final ManagedInstance<GenerateSelectedFormsSessionCommand> generateSelectedFormsSessionCommands) {
+                             final ManagedInstance<GenerateSelectedFormsSessionCommand> generateSelectedFormsSessionCommands,
+                             final ClientTranslationService translationService) {
         super(view,
               placeManager,
               errorPopupPresenter,
@@ -121,8 +129,12 @@ public class BPMNDiagramEditor extends AbstractProjectDiagramEditor<BPMNDiagramR
               onDiagramLostFocusEvent,
               projectMessagesListener,
               diagramClientErrorHandler);
+
+        this.generateProcessFormSessionCommands = generateProcessFormSessionCommands;
         this.generateDiagramFormsSessionCommands = generateDiagramFormsSessionCommands;
         this.generateSelectedFormsSessionCommands = generateSelectedFormsSessionCommands;
+
+        this.translationService = translationService;
     }
 
     @OnStartup
@@ -135,6 +147,8 @@ public class BPMNDiagramEditor extends AbstractProjectDiagramEditor<BPMNDiagramR
     @Override
     protected void initializeCommands(final Map<Class, ClientSessionCommand> commands) {
         super.initializeCommands(commands);
+        commands.put(GenerateProcessFormSessionCommand.class,
+                     generateProcessFormSessionCommands.get());
         commands.put(GenerateDiagramFormsSessionCommand.class,
                      generateDiagramFormsSessionCommands.get());
         commands.put(GenerateSelectedFormsSessionCommand.class,
@@ -147,7 +161,8 @@ public class BPMNDiagramEditor extends AbstractProjectDiagramEditor<BPMNDiagramR
     protected void makeAdditionalStunnerMenus(final FileMenuBuilder fileMenuBuilder) {
         super.makeAdditionalStunnerMenus(fileMenuBuilder);
         fileMenuBuilder
-                .addNewTopLevelMenu(newFormsGenerationMenuItem(() -> executeFormsCommand(GenerateDiagramFormsSessionCommand.class),
+                .addNewTopLevelMenu(newFormsGenerationMenuItem(() -> executeFormsCommand(GenerateProcessFormSessionCommand.class),
+                                                               () -> executeFormsCommand(GenerateDiagramFormsSessionCommand.class),
                                                                () -> executeFormsCommand(GenerateSelectedFormsSessionCommand.class)));
     }
 
@@ -228,23 +243,30 @@ public class BPMNDiagramEditor extends AbstractProjectDiagramEditor<BPMNDiagramR
                 });
     }
 
-    // TODO: I18n.
     // TODO: Icons.
-    private static MenuItem newFormsGenerationMenuItem(final Command generateAllForms,
+    private MenuItem newFormsGenerationMenuItem(final Command generateProcessForm,
+                                                       final Command generateAllForms,
                                                        final Command generateSelectedForms) {
         final DropDownMenu menu = new DropDownMenu() {{
             setPull(Pull.RIGHT);
         }};
-        menu.add(new AnchorListItem("Generate all forms") {{
+
+        menu.add(new AnchorListItem(translationService.getKeyValue(BPMNClientConstants.EditorGenerateProcessForm)) {{
             setIcon(IconType.GEARS);
             setIconPosition(IconPosition.LEFT);
-            setTitle("Generate all forms");
+            setTitle(translationService.getKeyValue(BPMNClientConstants.EditorGenerateProcessForm));
+            addClickHandler(event -> generateProcessForm.execute());
+        }});
+        menu.add(new AnchorListItem(translationService.getKeyValue(BPMNClientConstants.EditorGenerateAllForms)) {{
+            setIcon(IconType.GEARS);
+            setIconPosition(IconPosition.LEFT);
+            setTitle(translationService.getKeyValue(BPMNClientConstants.EditorGenerateAllForms));
             addClickHandler(event -> generateAllForms.execute());
         }});
-        menu.add(new AnchorListItem("Generate forms for selection") {{
+        menu.add(new AnchorListItem(translationService.getKeyValue(BPMNClientConstants.EditorGenerateSelectionForms)) {{
             setIcon(IconType.GEARS);
             setIconPosition(IconPosition.LEFT);
-            setTitle("Generate forms for selection");
+            setTitle(translationService.getKeyValue(BPMNClientConstants.EditorGenerateSelectionForms));
             addClickHandler(event -> generateSelectedForms.execute());
         }});
         final IsWidget group = new ButtonGroup() {{
@@ -253,7 +275,7 @@ public class BPMNDiagramEditor extends AbstractProjectDiagramEditor<BPMNDiagramR
                 setDataToggle(Toggle.DROPDOWN);
                 setIcon(IconType.GEARS);
                 setSize(ButtonSize.SMALL);
-                setTitle("Form Generation");
+                setTitle(translationService.getKeyValue(BPMNClientConstants.EditorFormGenerationTitle));
             }});
             add(menu);
         }};

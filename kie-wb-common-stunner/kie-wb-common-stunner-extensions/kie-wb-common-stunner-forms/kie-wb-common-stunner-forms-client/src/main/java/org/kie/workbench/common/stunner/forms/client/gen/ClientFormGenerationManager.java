@@ -29,24 +29,29 @@ import org.jboss.errai.bus.client.api.messaging.Message;
 import org.jboss.errai.common.client.api.Caller;
 import org.jboss.errai.common.client.api.ErrorCallback;
 import org.jboss.errai.common.client.api.RemoteCallback;
+import org.kie.workbench.common.stunner.core.client.i18n.ClientTranslationService;
 import org.kie.workbench.common.stunner.core.client.service.ClientRuntimeError;
+import org.kie.workbench.common.stunner.forms.client.resources.i18n.BPMNFormsClientConstants;
 import org.kie.workbench.common.stunner.forms.service.FormGeneratedEvent;
+import org.kie.workbench.common.stunner.forms.service.FormGenerationFailureEvent;
 import org.kie.workbench.common.stunner.forms.service.FormGenerationService;
 import org.uberfire.mvp.Command;
 import org.uberfire.mvp.ParameterizedCommand;
 
-// TODO: I18n.
 @ApplicationScoped
 public class ClientFormGenerationManager {
 
+    private final ClientTranslationService translationService;
     private final Caller<FormGenerationService> formGenerationService;
 
     protected ClientFormGenerationManager() {
-        this(null);
+        this(null, null);
     }
 
     @Inject
-    public ClientFormGenerationManager(final Caller<FormGenerationService> formGenerationService) {
+    public ClientFormGenerationManager(final ClientTranslationService translationService,
+                                       final Caller<FormGenerationService> formGenerationService) {
+        this.translationService = translationService;
         this.formGenerationService = formGenerationService;
     }
 
@@ -57,9 +62,12 @@ public class ClientFormGenerationManager {
 
     // Listen for form generation events.
     void onFormGeneratedEvent(@Observes FormGeneratedEvent event) {
-        showNotification("Forms generation completed successfully for [" + event.getName() + "]");
+        showNotification(translationService.getKeyValue(BPMNFormsClientConstants.BPMNFormsGenerationSuccess, event.getName()));
     }
 
+    void onFormGenerationFailureEvent(@Observes FormGenerationFailureEvent event) {
+        showError(translationService.getKeyValue(BPMNFormsClientConstants.BPMNFormsGenerationFailure, event.getName()));
+    }
     private static RemoteCallback<Void> getRemoteCallback() {
         return getRemoteCallback(() -> {
         });

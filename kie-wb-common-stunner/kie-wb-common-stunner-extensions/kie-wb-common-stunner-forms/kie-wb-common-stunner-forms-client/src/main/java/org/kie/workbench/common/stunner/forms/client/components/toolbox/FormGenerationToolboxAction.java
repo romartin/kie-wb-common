@@ -27,6 +27,7 @@ import org.kie.workbench.common.stunner.core.client.shape.SvgDataUriGlyph;
 import org.kie.workbench.common.stunner.core.client.shape.view.event.MouseClickEvent;
 import org.kie.workbench.common.stunner.core.definition.shape.Glyph;
 import org.kie.workbench.common.stunner.forms.client.gen.ClientFormGenerationManager;
+import org.kie.workbench.common.stunner.forms.client.resources.i18n.BPMNFormsClientConstants;
 
 // TODO: I18n.
 // TODO: Icon.
@@ -35,6 +36,7 @@ public class FormGenerationToolboxAction implements ToolboxAction<AbstractCanvas
 
     private final ClientTranslationService translationService;
     private final ClientFormGenerationManager formGenerationManager;
+
     private static final SvgDataUriGlyph GLYPH =
             SvgDataUriGlyph.Builder.build(StunnerCommonImageResources.INSTANCE.edit().getSafeUri());
 
@@ -54,7 +56,7 @@ public class FormGenerationToolboxAction implements ToolboxAction<AbstractCanvas
     @Override
     public String getTitle(final AbstractCanvasHandler canvasHandler,
                            final String uuid) {
-        return translationService.getKeyValue("Generate forms");
+        return translationService.getKeyValue(BPMNFormsClientConstants.BPMNFormsGenerateTaskForm);
     }
 
     @Override
@@ -62,8 +64,8 @@ public class FormGenerationToolboxAction implements ToolboxAction<AbstractCanvas
     public ToolboxAction<AbstractCanvasHandler> onMouseClick(final AbstractCanvasHandler canvasHandler,
                                                              final String uuid,
                                                              final MouseClickEvent event) {
-        formGenerationManager.call(service -> service.generate(canvasHandler.getDiagram(),
-                                                               new String[]{uuid}));
+        formGenerationManager.call(service -> service.generateSelectedForms(canvasHandler.getDiagram(),
+                                                                            new String[]{uuid}));
         return this;
     }
 }
