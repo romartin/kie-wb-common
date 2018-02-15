@@ -69,8 +69,8 @@ public class GenerateSelectedFormsSessionCommand extends AbstractClientSessionCo
                         .map(Element::getUUID)
                         .toArray(String[]::new);
         if (selectedItems.length > 0) {
-            service.generate(getCanvasHandler().getDiagram(),
-                             selectedItems);
+            service.generateSelectedForms(getCanvasHandler().getDiagram(),
+                                          selectedItems);
         }
     }
 

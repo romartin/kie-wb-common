@@ -14,18 +14,13 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.stunner.forms.service;
+package org.kie.workbench.common.stunner.forms.client;
 
-import org.jboss.errai.bus.server.annotations.Remote;
-import org.kie.workbench.common.stunner.core.diagram.Diagram;
+import org.jboss.errai.ioc.client.api.EntryPoint;
+import org.jboss.errai.ui.shared.api.annotations.Bundle;
 
-@Remote
-public interface FormGenerationService {
+@EntryPoint
+@Bundle("resources/i18n/BPMNFormsClientConstants.properties")
+public class BPMNFormsClientEntryPoint {
 
-    public void generateProcessForm(Diagram diagram);
-
-    public void generateAllForms(Diagram diagram);
-
-    public void generateSelectedForms(Diagram diagram,
-                                      String[] ids);
 }

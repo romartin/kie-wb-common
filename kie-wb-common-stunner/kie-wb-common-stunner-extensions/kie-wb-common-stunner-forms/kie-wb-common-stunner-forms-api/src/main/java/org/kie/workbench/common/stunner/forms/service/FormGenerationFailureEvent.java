@@ -16,16 +16,26 @@
 
 package org.kie.workbench.common.stunner.forms.service;
 
-import org.jboss.errai.bus.server.annotations.Remote;
-import org.kie.workbench.common.stunner.core.diagram.Diagram;
+import org.jboss.errai.common.client.api.annotations.MapsTo;
+import org.jboss.errai.common.client.api.annotations.Portable;
 
-@Remote
-public interface FormGenerationService {
+@Portable
+public class FormGenerationFailureEvent {
 
-    public void generateProcessForm(Diagram diagram);
+    private final String uuid;
+    private final String name;
 
-    public void generateAllForms(Diagram diagram);
+    public FormGenerationFailureEvent(final @MapsTo("uuid") String uuid,
+                                      final @MapsTo("name") String name) {
+        this.uuid = uuid;
+        this.name = name;
+    }
 
-    public void generateSelectedForms(Diagram diagram,
-                                      String[] ids);
+    public String getName() {
+        return name;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
 }

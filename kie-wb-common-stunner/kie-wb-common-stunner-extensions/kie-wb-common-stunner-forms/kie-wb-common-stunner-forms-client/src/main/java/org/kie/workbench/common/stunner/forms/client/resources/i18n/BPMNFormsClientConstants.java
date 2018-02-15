@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.stunner.forms.service;
+package org.kie.workbench.common.stunner.forms.client.resources.i18n;
 
-import org.jboss.errai.bus.server.annotations.Remote;
-import org.kie.workbench.common.stunner.core.diagram.Diagram;
+import org.jboss.errai.ui.shared.api.annotations.TranslationKey;
 
-@Remote
-public interface FormGenerationService {
+public interface BPMNFormsClientConstants {
 
-    public void generateProcessForm(Diagram diagram);
+    @TranslationKey(defaultValue = "Forms generation completed successfully for [{0}]")
+    String BPMNFormsGenerationSuccess = "bpmn.forms.generationSuccess";
 
-    public void generateAllForms(Diagram diagram);
+    @TranslationKey(defaultValue = "Forms generation failed for [{0}]")
+    String BPMNFormsGenerationFailure = "bpmn.forms.generationFailure";
 
-    public void generateSelectedForms(Diagram diagram,
-                                      String[] ids);
+    @TranslationKey(defaultValue = "Generate forms")
+    String BPMNFormsGenerateTaskForm = "bpmn.forms.generateTaskForm";
 }

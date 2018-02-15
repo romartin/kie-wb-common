@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.stunner.forms.service;
+package org.kie.workbench.common.stunner.forms.backend.service;
 
-import org.jboss.errai.bus.server.annotations.Remote;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
 
-@Remote
-public interface FormGenerationService {
+public interface FormDefinitionGenerator {
 
-    public void generateProcessForm(Diagram diagram);
+    void generateProcessForm(Diagram diagram);
 
-    public void generateAllForms(Diagram diagram);
+    void generateSelectedForms(Diagram diagram, String... taskIds);
 
-    public void generateSelectedForms(Diagram diagram,
-                                      String[] ids);
+    void generateAllForms(Diagram diagram);
 }
