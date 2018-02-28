@@ -91,9 +91,7 @@ public class ClientFormGenerationManager {
     }
 
     private static RemoteCallback<Void> getRemoteCallback(final Command callback) {
-        return aVoid -> {
-            callback.execute();
-        };
+        return aVoid -> callback.execute();
     }
 
     private ErrorCallback<Message> getErrorCallback() {
@@ -114,21 +112,18 @@ public class ClientFormGenerationManager {
     }
 
     private static void showNotification(final String message) {
-        showNotification("[INFO] Form Generation",
-                         message,
+        showNotification(message,
                          IconType.CHECK);
     }
 
     private static void showError(final String message) {
-        showNotification("[ERROR] Form Generation",
-                         message,
+        showNotification(message,
                          IconType.EXCLAMATION);
     }
 
-    private static void showNotification(final String title,
-                                         final String message,
+    private static void showNotification(final String message,
                                          final IconType icon) {
-        Notify.notify(title,
+        Notify.notify("Form Generation",
                       buildHtmlEscapedText(message),
                       icon);
     }

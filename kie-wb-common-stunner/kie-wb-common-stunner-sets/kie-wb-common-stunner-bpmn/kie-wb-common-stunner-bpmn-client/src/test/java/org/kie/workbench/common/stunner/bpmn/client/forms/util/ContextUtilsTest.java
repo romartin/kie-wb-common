@@ -33,7 +33,7 @@ import org.kie.workbench.common.stunner.core.graph.impl.NodeImpl;
 public class ContextUtilsTest {
 
     @Test
-    public void testIsFormGenerationSupported() throws Exception {
+    public void testIsFormGenerationSupported() {
         Assert.assertTrue(ContextUtils.isFormGenerationSupported(createNode(new UserTask())));
         Assert.assertFalse(ContextUtils.isFormGenerationSupported(createNode(new ScriptTask())));
         Assert.assertFalse(ContextUtils.isFormGenerationSupported(createNode(new BusinessRuleTask())));

@@ -36,7 +36,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class BPMNFormGenerationModelProviderTest {
 
-    public static final String ID = "id";
+    private static final String ID = "id";
 
     @Mock
     private BPMNDiagramMarshaller bpmnDiagramMarshaller;
@@ -64,7 +64,7 @@ public class BPMNFormGenerationModelProviderTest {
     }
 
     @Test
-    public void testAccepts() throws Exception {
+    public void testAccepts() {
         assertTrue(tested.accepts(diagram));
     }
 

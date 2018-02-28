@@ -92,12 +92,11 @@ public class FormGenerationServiceImpl implements FormGenerationService {
             runnable.run();
 
             // Fire the form generated event.
-            formGeneratedEvent.fire(new FormGeneratedEvent(graphUUID,
-                                                           graphUUID));
+            formGeneratedEvent.fire(new FormGeneratedEvent(graphUUID, diagram.getName()));
 
             LOGGER.finest("Form generation completed successfully!");
         } catch (Throwable e) {
-            formGenerationFailureEvent.fire(new FormGenerationFailureEvent(graphUUID, graphUUID));
+            formGenerationFailureEvent.fire(new FormGenerationFailureEvent(graphUUID, diagram.getName()));
             LOGGER.severe("Error during Form Generation service: " + e.getMessage());
         }
     }

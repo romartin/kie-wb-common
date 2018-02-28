@@ -46,7 +46,6 @@ public class FormGenerationModelProvidersTest {
     private Diagram diagram2;
 
     private FormGenerationModelProviders tested;
-    private Collection<FormGenerationModelProvider<?>> providers;
 
     @Before
     public void init() {
@@ -54,7 +53,7 @@ public class FormGenerationModelProvidersTest {
         when(provider1.accepts(eq(diagram2))).thenReturn(false);
         when(provider2.accepts(eq(diagram1))).thenReturn(false);
         when(provider2.accepts(eq(diagram2))).thenReturn(true);
-        providers = Arrays.asList(provider1, provider2);
+        Collection<FormGenerationModelProvider<?>> providers = Arrays.asList(provider1, provider2);
         tested = new FormGenerationModelProviders(providers);
     }
 
