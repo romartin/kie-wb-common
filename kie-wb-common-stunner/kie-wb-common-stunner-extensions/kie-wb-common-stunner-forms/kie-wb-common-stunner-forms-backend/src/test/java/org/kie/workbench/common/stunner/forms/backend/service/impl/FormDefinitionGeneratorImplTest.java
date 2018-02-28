@@ -115,10 +115,6 @@ public class FormDefinitionGeneratorImplTest {
     @Mock
     private FormGenerationModelProviders formGenerationModelProviders;
 
-    private SimpleFileSystemProvider simpleFileSystemProvider;
-
-    private org.uberfire.java.nio.file.Path rootPath;
-
     @Mock
     private IOService ioService;
 
@@ -133,11 +129,8 @@ public class FormDefinitionGeneratorImplTest {
     @Mock
     private ClassLoader moduleClassLoader;
 
-    private BPMNFormModelGenerator bpmnFormModelGenerator;
-
     @Mock
     private FormDefinitionSerializer formDefinitionSerializer;
-    private FormModelHandlerManager formModelHandlerManager;
     @Mock
     private VFSFormFinderService formFinderService;
     @Mock
@@ -146,8 +139,6 @@ public class FormDefinitionGeneratorImplTest {
     private FormModelSynchronizationUtil synchronizationUtil;
     @Mock
     private DataObjectFinderService dataObjectFinderService;
-
-    private BPMNFormGeneratorService<Path> bpmnFormGeneratorService;
 
     private FormDefinitionGeneratorImpl generator;
 
@@ -160,8 +151,6 @@ public class FormDefinitionGeneratorImplTest {
     @Mock
     private Graph graph;
 
-    private Definitions processDefinitions;
-
     @Captor
     private ArgumentCaptor<JBPMFormModel> formModelArgumentCaptor;
 
@@ -171,32 +160,30 @@ public class FormDefinitionGeneratorImplTest {
     @Before
     public void init() throws Exception {
 
-        simpleFileSystemProvider = new SimpleFileSystemProvider();
+        SimpleFileSystemProvider simpleFileSystemProvider = new SimpleFileSystemProvider();
         simpleFileSystemProvider.forceAsDefault();
 
-        rootPath = simpleFileSystemProvider.getPath(this.getClass().getResource(RESOURCES_PATH).toURI());
-
-        processDefinitions = BPMN2Utils.getDefinitions(FormDefinitionGeneratorImplTest.class.getResourceAsStream(PROCESS_PATH));
+        Definitions processDefinitions = BPMN2Utils.getDefinitions(FormDefinitionGeneratorImplTest.class.getResourceAsStream(PROCESS_PATH));
 
         // Prepare BPMNFormModelGenerator
         when(kieModuleService.resolveModule(any())).thenReturn(module);
         when(module.getRootPath()).thenReturn(path);
         when(moduleClassLoaderHelper.getModuleClassLoader(module)).thenReturn(moduleClassLoader);
         when(moduleClassLoader.loadClass(anyString())).thenAnswer(invocation -> Object.class);
-        bpmnFormModelGenerator = spy(new BPMNFormModelGeneratorImpl(kieModuleService, moduleClassLoaderHelper));
+        BPMNFormModelGenerator bpmnFormModelGenerator = spy(new BPMNFormModelGeneratorImpl(kieModuleService, moduleClassLoaderHelper));
 
-        formModelHandlerManager = new TestFormModelHandlerManager(kieModuleService,
-                                                                  moduleClassLoaderHelper,
-                                                                  new TestFieldManager(),
-                                                                  dataObjectFinderService);
+        FormModelHandlerManager formModelHandlerManager = new TestFormModelHandlerManager(kieModuleService,
+                                                                                          moduleClassLoaderHelper,
+                                                                                          new TestFieldManager()
+        );
 
-        bpmnFormGeneratorService = new BPMNVFSFormDefinitionGeneratorService(new TestFieldManager(),
-                                                                             formModelHandlerManager,
-                                                                             formFinderService,
-                                                                             formDefinitionSerializer,
-                                                                             ioService,
-                                                                             commentedOptionFactory,
-                                                                             synchronizationUtil);
+        BPMNFormGeneratorService<Path> bpmnFormGeneratorService = new BPMNVFSFormDefinitionGeneratorService(new TestFieldManager(),
+                                                                                                            formModelHandlerManager,
+                                                                                                            formFinderService,
+                                                                                                            formDefinitionSerializer,
+                                                                                                            ioService,
+                                                                                                            commentedOptionFactory,
+                                                                                                            synchronizationUtil);
 
         generator = spy(new TestFormDefinitionGeneratorImpl(formGenerationModelProviders,
                                                             ioService,
@@ -356,18 +343,24 @@ public class FormDefinitionGeneratorImplTest {
 
         assertEquals(expectedFormModel, formDefinition.getModel());
 
-        VARIABLES.entrySet().forEach(entry -> {
-            FieldDefinition field = formDefinition.getFieldByBinding(entry.getKey());
-            if (entry.getKey().equals(STRING_VARIABLE)) {
-                checkStringField(field, readOnly);
-            } else if (entry.getKey().equals(INTEGER_VARIABLE)) {
-                checkIntegerField(field, readOnly);
-            } else if (entry.getKey().equals(BOOLEAN_VARIABLE)) {
-                checkBooleanField(field, readOnly);
-            } else if (entry.getKey().equals(FLOAT_VARIABLE)) {
-                checkFloatField(field, readOnly);
-            } else if (entry.getKey().equals(OBJECT_VARIABLE)) {
-                checkObjectField(field, readOnly);
+        VARIABLES.forEach((key, value) -> {
+            FieldDefinition field = formDefinition.getFieldByBinding(key);
+            switch (key) {
+                case STRING_VARIABLE:
+                    checkStringField(field, readOnly);
+                    break;
+                case INTEGER_VARIABLE:
+                    checkIntegerField(field, readOnly);
+                    break;
+                case BOOLEAN_VARIABLE:
+                    checkBooleanField(field, readOnly);
+                    break;
+                case FLOAT_VARIABLE:
+                    checkFloatField(field, readOnly);
+                    break;
+                case OBJECT_VARIABLE:
+                    checkObjectField(field, readOnly);
+                    break;
             }
         });
     }
@@ -402,7 +395,7 @@ public class FormDefinitionGeneratorImplTest {
                 .hasFieldOrPropertyWithValue("standaloneClassName", VARIABLES.get(fieldName));
     }
 
-    protected void checkProcessFormModel(BusinessProcessFormModel formModel) {
+    private void checkProcessFormModel(BusinessProcessFormModel formModel) {
         Assertions.assertThat(formModel)
                 .hasFieldOrPropertyWithValue("processId", PROCESS_ID)
                 .hasFieldOrPropertyWithValue("processName", PROCESS_NAME);
@@ -411,14 +404,14 @@ public class FormDefinitionGeneratorImplTest {
                 .isNotEmpty()
                 .hasSize(VARIABLES.size());
 
-        VARIABLES.entrySet().forEach(entry -> {
-            ModelProperty property = formModel.getProperty(entry.getKey());
+        VARIABLES.forEach((key, value) -> {
+            ModelProperty property = formModel.getProperty(key);
             assertNotNull(property);
-            assertEquals(entry.getValue(), property.getTypeInfo().getClassName());
+            assertEquals(value, property.getTypeInfo().getClassName());
         });
     }
 
-    protected void checkTaskFormModel(TaskFormModel formModel, String taskName, boolean readOnly) {
+    private void checkTaskFormModel(TaskFormModel formModel, String taskName, boolean readOnly) {
         Assertions.assertThat(formModel)
                 .hasFieldOrPropertyWithValue("processId", PROCESS_ID)
                 .hasFieldOrPropertyWithValue("taskName", taskName);
@@ -427,10 +420,10 @@ public class FormDefinitionGeneratorImplTest {
                 .isNotEmpty()
                 .hasSize(VARIABLES.size());
 
-        VARIABLES.entrySet().forEach(entry -> {
-            ModelProperty property = formModel.getProperty(entry.getKey());
+        VARIABLES.forEach((key, value) -> {
+            ModelProperty property = formModel.getProperty(key);
             assertNotNull(property);
-            assertEquals(entry.getValue(), property.getTypeInfo().getClassName());
+            assertEquals(value, property.getTypeInfo().getClassName());
 
             MetaDataEntry readOnlyEntry = property.getMetaData().getEntry(FieldReadOnlyEntry.NAME);
 

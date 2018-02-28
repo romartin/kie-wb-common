@@ -16,7 +16,6 @@
 
 package org.kie.workbench.common.stunner.forms.backend.service.impl;
 
-import org.kie.workbench.common.forms.data.modeller.service.DataObjectFinderService;
 import org.kie.workbench.common.forms.editor.service.backend.FormModelHandler;
 import org.kie.workbench.common.forms.editor.service.backend.FormModelHandlerManager;
 import org.kie.workbench.common.forms.jbpm.model.authoring.process.BusinessProcessFormModel;
@@ -36,22 +35,12 @@ public class TestFormModelHandlerManager implements FormModelHandlerManager {
 
     private FieldManager fieldManager;
 
-    private DataObjectFinderService finderService;
-
     public TestFormModelHandlerManager(KieModuleService projectService,
                                        ModuleClassLoaderHelper projectClassLoaderHelper,
-                                       FieldManager fieldManager,
-                                       DataObjectFinderService finderService) {
+                                       FieldManager fieldManager) {
         this.projectService = projectService;
         this.projectClassLoaderHelper = projectClassLoaderHelper;
         this.fieldManager = fieldManager;
-        this.finderService = finderService;
-    }
-
-    public TestFormModelHandlerManager(FieldManager fieldManager,
-                                       DataObjectFinderService finderService) {
-        this.fieldManager = fieldManager;
-        this.finderService = finderService;
     }
 
     @Override

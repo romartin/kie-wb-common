@@ -88,11 +88,14 @@ public class FormDefinitionGeneratorImpl implements FormDefinitionGenerator {
 
     @Override
     public void generateSelectedForms(Diagram diagram, String... taskIds) {
+        if (null != taskIds) {
+            generateSelectedFormsForTasks(diagram, taskIds);
+        }
+    }
 
+    private void generateSelectedFormsForTasks(Diagram diagram, String... taskIds) {
         try {
-            final String idsRaw = null != taskIds ?
-                    Arrays.stream(taskIds).collect(Collectors.joining(","))
-                    : "<empty>";
+            final String idsRaw = Arrays.stream(taskIds).collect(Collectors.joining(","));
 
             LOGGER.finest("Generating form for tasks " + idsRaw);
 

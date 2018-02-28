@@ -22,10 +22,10 @@ import org.kie.workbench.common.stunner.core.diagram.Diagram;
 @Remote
 public interface FormGenerationService {
 
-    public void generateProcessForm(Diagram diagram);
+    void generateProcessForm(Diagram diagram);
 
-    public void generateAllForms(Diagram diagram);
+    void generateAllForms(Diagram diagram);
 
-    public void generateSelectedForms(Diagram diagram,
+    void generateSelectedForms(Diagram diagram,
                                       String[] ids);
 }

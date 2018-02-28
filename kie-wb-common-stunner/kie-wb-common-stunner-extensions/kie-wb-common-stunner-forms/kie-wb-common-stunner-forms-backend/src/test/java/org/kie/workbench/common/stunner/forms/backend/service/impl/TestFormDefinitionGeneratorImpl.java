@@ -16,8 +16,6 @@
 
 package org.kie.workbench.common.stunner.forms.backend.service.impl;
 
-import java.io.IOException;
-
 import org.eclipse.bpmn2.Definitions;
 import org.kie.workbench.common.forms.jbpm.server.service.BPMNFormModelGenerator;
 import org.kie.workbench.common.forms.jbpm.server.service.formGeneration.BPMNFormGeneratorService;
@@ -37,7 +35,7 @@ public class TestFormDefinitionGeneratorImpl extends FormDefinitionGeneratorImpl
     }
 
     @Override
-    protected Definitions toDefinitions(Diagram diagram) throws IOException {
+    protected Definitions toDefinitions(Diagram diagram) {
         return definitions;
     }
 }
