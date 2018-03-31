@@ -16,15 +16,55 @@
 
 package org.kie.workbench.common.stunner.core.client.shape.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Function;
+
 import org.kie.workbench.common.stunner.core.client.shape.ShapeState;
 import org.kie.workbench.common.stunner.core.client.shape.impl.ShapeStateAttributeHandler.ShapeStateAttribute;
 import org.kie.workbench.common.stunner.core.client.shape.impl.ShapeStateAttributeHandler.ShapeStateAttributes;
 
 public class ShapeStateAttributesFactory {
 
-    static final String COLOR_SELECTED = "#0000FF";
-    static final String COLOR_HIGHLIGHT = "#3366CC";
-    static final String COLOR_INVALID = "#FF0000";
+    public static final String COLOR_SELECTED = "#0000FF";
+    public static final String COLOR_HIGHLIGHT = "#3366CC";
+    public static final String COLOR_INVALID = "#FF0000";
+
+    public static class Builder {
+
+        private final Map<ShapeState, ShapeStateAttributes> map;
+
+        public Builder() {
+            this.map = new HashMap<>(ShapeState.values().length);
+            for (final ShapeState state : ShapeState.values()) {
+                map.put(state, buildAttributes());
+            }
+        }
+
+        public Builder with(final ShapeState state,
+                            final Consumer<ShapeStateAttributes> attributes) {
+            attributes.accept(map.get(state));
+            return this;
+        }
+
+        public ShapeStatesAttributes build() {
+            return new ShapeStatesAttributes(new HashMap<>(map));
+        }
+    }
+
+    public static class ShapeStatesAttributes {
+
+        private final Map<ShapeState, ShapeStateAttributes> map;
+
+        private ShapeStatesAttributes(final Map<ShapeState, ShapeStateAttributes> map) {
+            this.map = map;
+        }
+
+        public Function<ShapeState, ShapeStateAttributes> attributes() {
+            return map::get;
+        }
+    }
 
     public static ShapeStateAttributes buildStrokeAttributes(final ShapeState state) {
         final String COLOR = getAttributeColorByState(state);
@@ -33,8 +73,8 @@ public class ShapeStateAttributesFactory {
         }
 
         return buildAttributes()
-                        .set(ShapeStateAttribute.STROKE_ALPHA, 1d)
-                        .set(ShapeStateAttribute.STROKE_COLOR, COLOR);
+                .set(ShapeStateAttribute.STROKE_ALPHA, 1d)
+                .set(ShapeStateAttribute.STROKE_COLOR, COLOR);
     }
 
     public static ShapeStateAttributes buildFillAttributes(final ShapeState state) {
@@ -44,8 +84,8 @@ public class ShapeStateAttributesFactory {
         }
 
         return buildAttributes()
-                        .set(ShapeStateAttribute.FILL_COLOR, COLOR)
-                        .set(ShapeStateAttribute.FILL_ALPHA, 1d);
+                .set(ShapeStateAttribute.FILL_COLOR, COLOR)
+                .set(ShapeStateAttribute.FILL_ALPHA, 1d);
     }
 
     private static String getAttributeColorByState(final ShapeState state) {

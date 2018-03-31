@@ -18,6 +18,7 @@ package org.kie.workbench.common.stunner.svg.gen.model.impl;
 
 import java.util.Collection;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import org.kie.workbench.common.stunner.svg.gen.model.PrimitiveDefinition;
 import org.kie.workbench.common.stunner.svg.gen.model.ViewDefinition;
@@ -29,17 +30,24 @@ public class SVGModelUtils {
     }
 
     public static void visit(final ViewDefinition<?> viewDefinition,
+                             final Predicate<PrimitiveDefinition> definitionPredicate,
                              final Consumer<PrimitiveDefinition> definitionConsumer) {
         definitionConsumer.accept(viewDefinition);
         visit(viewDefinition.getChildren(),
+              definitionPredicate,
               definitionConsumer);
     }
 
     public static void visit(final Collection<PrimitiveDefinition> definitions,
+                             final Predicate<PrimitiveDefinition> definitionPredicate,
                              final Consumer<PrimitiveDefinition> definitionConsumer) {
         for (final PrimitiveDefinition child : definitions) {
+            if (!definitionPredicate.test(child)) {
+                continue;
+            }
             if (child instanceof GroupDefinition) {
                 visit(((GroupDefinition) child).getChildren(),
+                      definitionPredicate,
                       definitionConsumer);
             } else {
                 definitionConsumer.accept(child);

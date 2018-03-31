@@ -20,8 +20,11 @@ import java.util.Optional;
 
 import org.kie.workbench.common.stunner.svg.gen.exception.TranslatorException;
 import org.kie.workbench.common.stunner.svg.gen.model.ShapeDefinition;
+import org.kie.workbench.common.stunner.svg.gen.model.ShapeStateDefinition;
 import org.kie.workbench.common.stunner.svg.gen.model.StyleDefinition;
 import org.kie.workbench.common.stunner.svg.gen.model.impl.AbstractShapeDefinition;
+import org.kie.workbench.common.stunner.svg.gen.model.impl.ShapeStateDefinitionImpl;
+import org.kie.workbench.common.stunner.svg.gen.translator.SVGDocumentTranslator;
 import org.kie.workbench.common.stunner.svg.gen.translator.SVGTranslatorContext;
 import org.w3c.dom.Element;
 
@@ -33,14 +36,8 @@ public abstract class AbstractSVGShapeTranslator<E extends Element, O extends Ab
                                                 O def,
                                                 SVGTranslatorContext context) throws TranslatorException {
         super.translatePrimitiveDefinition(element, def, context);
-        if (!def.isMain()) {
-            final String shapeStateRaw = getShapeStateAttributeValue(element);
-            if (isEmpty(shapeStateRaw)) {
-                def.setStateDefinition(Optional.empty());
-            } else {
-                def.setStateDefinition(Optional.of(ShapeDefinition.ShapeStateDefinition.valueOf(shapeStateRaw.toUpperCase())));
-            }
-        }
+        final Optional<ShapeStateDefinition> shapeStateDefinition = translateShapeStateDefinition(element);
+        def.setStateDefinition(shapeStateDefinition);
     }
 
     protected StyleDefinition translateStyles(final E element,
@@ -54,4 +51,32 @@ public abstract class AbstractSVGShapeTranslator<E extends Element, O extends Ab
         }
         return styleDefinition;
     }
+
+    private Optional<ShapeStateDefinition> translateShapeStateDefinition(E element) {
+        final String shapeStateBgRaw = getShapeStateBgAttributeValue(element);
+        final String shapeStateBorderRaw = getShapeStateBorderAttributeValue(element);
+        final boolean isBgStateActive = !isEmpty(shapeStateBgRaw);
+        final boolean isBorderStateActive = !isEmpty(shapeStateBorderRaw);
+        if (isBgStateActive || isBorderStateActive) {
+            final ShapeStateDefinition.Target target = isBgStateActive ?
+                    ShapeStateDefinition.Target.BACKGROUND :
+                    ShapeStateDefinition.Target.BORDER;
+            final ShapeStateDefinition.RenderType renderType =
+                    ShapeStateDefinition.RenderType.valueOf(isBgStateActive ? shapeStateBgRaw : shapeStateBorderRaw);
+            return Optional.of(new ShapeStateDefinitionImpl(target,
+                                                            renderType));
+        }
+        return Optional.empty();
+    }
+
+    private String getShapeStateBgAttributeValue(final E element) {
+        return element.getAttributeNS(SVGDocumentTranslator.STUNNER_URI,
+                                      SVGDocumentTranslator.STUNNER_ATTR_NS_STATE_BACKGROUND);
+    }
+
+    private String getShapeStateBorderAttributeValue(final E element) {
+        return element.getAttributeNS(SVGDocumentTranslator.STUNNER_URI,
+                                      SVGDocumentTranslator.STUNNER_ATTR_NS_STATE_BORDER);
+    }
+
 }

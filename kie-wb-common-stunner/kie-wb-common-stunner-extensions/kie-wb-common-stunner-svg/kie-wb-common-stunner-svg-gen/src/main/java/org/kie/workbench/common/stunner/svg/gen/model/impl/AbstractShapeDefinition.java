@@ -19,6 +19,7 @@ package org.kie.workbench.common.stunner.svg.gen.model.impl;
 import java.util.Optional;
 
 import org.kie.workbench.common.stunner.svg.gen.model.ShapeDefinition;
+import org.kie.workbench.common.stunner.svg.gen.model.ShapeStateDefinition;
 import org.kie.workbench.common.stunner.svg.gen.model.StyleDefinition;
 
 public abstract class AbstractShapeDefinition<V>

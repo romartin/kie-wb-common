@@ -36,6 +36,7 @@ import static org.mockito.Matchers.anyDouble;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -66,7 +67,9 @@ public class ShapeStateDefaultHandlerTest {
             return handler;
         }).when(handler).onComplete(any(Command.class));
         when(handler.getAttributesHandler()).thenReturn(delegateHandler);
-        tested = new ShapeStateDefaultHandler(handler);
+        // TODO
+        tested = new ShapeStateDefaultHandler(handler,
+                                              mock(ShapeStateAttributeAnimationHandler.class));
     }
 
     @Test

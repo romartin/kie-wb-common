@@ -27,10 +27,12 @@ import com.ait.lienzo.client.core.animation.IAnimationHandle;
 import com.ait.lienzo.client.core.shape.Shape;
 import org.kie.workbench.common.stunner.client.lienzo.shape.view.LienzoShapeView;
 import org.kie.workbench.common.stunner.client.lienzo.shape.view.MultipleAnimationHandle;
+import org.kie.workbench.common.stunner.client.lienzo.shape.view.wires.WiresShapeView;
 import org.kie.workbench.common.stunner.core.client.shape.ShapeState;
 import org.kie.workbench.common.stunner.core.client.shape.impl.ShapeStateAttributeHandler;
 import org.kie.workbench.common.stunner.core.client.shape.impl.ShapeStateAttributeHandler.ShapeStateAttributes;
 import org.kie.workbench.common.stunner.core.client.shape.impl.ShapeStateHandler;
+import org.kie.workbench.common.stunner.core.client.shape.view.ShapeView;
 import org.uberfire.mvp.Command;
 
 import static com.ait.lienzo.client.core.animation.AnimationProperty.Properties.FILL_ALPHA;
@@ -99,13 +101,15 @@ public class ShapeStateAttributeAnimationHandler<V extends LienzoShapeView>
     private void applyState(final V view,
                             final ShapeStateAttributes attributes) {
         final List<IAnimationHandle> handles = new LinkedList<>();
-        view.getDecorators().forEach(dec -> handles.add(animate((Shape<?>) dec,
+        view.getDecorators().forEach(dec -> handles.add(animate(view,
+                                                                (Shape<?>) dec,
                                                                 attributes,
                                                                 ANIMATION_DURATION)));
         setAnimationHandle(new MultipleAnimationHandle(handles));
     }
 
-    private IAnimationHandle animate(final com.ait.lienzo.client.core.shape.Shape<?> shape,
+    private IAnimationHandle animate(final V view,
+                                     final com.ait.lienzo.client.core.shape.Shape<?> shape,
                                      final ShapeStateAttributes attributes,
                                      final long duration) {
         final AnimationProperties properties = new AnimationProperties();
@@ -124,7 +128,7 @@ public class ShapeStateAttributeAnimationHandler<V extends LienzoShapeView>
                     properties.push(STROKE_ALPHA((double) value));
                     break;
                 case STROKE_WIDTH:
-                    properties.push(STROKE_WIDTH((double) value));
+                    properties.push(STROKE_WIDTH((double) value * computedStrokeWidthFactor(view)));
                     break;
             }
         });
@@ -143,6 +147,17 @@ public class ShapeStateAttributeAnimationHandler<V extends LienzoShapeView>
                         }
                     }
                 });
+    }
+
+    private static double computedStrokeWidthFactor(final ShapeView view) {
+        if (view instanceof WiresShapeView) {
+            final double sx = ((WiresShapeView) view).getShape().getAbsoluteTransform().getScaleX();
+            final double sy = ((WiresShapeView) view).getShape().getAbsoluteTransform().getScaleY();
+            final double scaleFactor = sx > sy ? sx : sy;
+            final double s = scaleFactor > 0 ? (1 / scaleFactor) : 1;
+            return s;
+        }
+        return 1;
     }
 
     void setAnimationHandle(final IAnimationHandle animationHandle) {

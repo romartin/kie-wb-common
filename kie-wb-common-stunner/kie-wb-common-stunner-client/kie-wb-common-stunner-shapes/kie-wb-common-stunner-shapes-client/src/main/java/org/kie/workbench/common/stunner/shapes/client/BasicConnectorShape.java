@@ -20,11 +20,30 @@ import org.kie.workbench.common.stunner.client.lienzo.shape.impl.ShapeStateDefau
 import org.kie.workbench.common.stunner.client.lienzo.shape.view.wires.ext.WiresConnectorViewExt;
 import org.kie.workbench.common.stunner.core.client.shape.ShapeState;
 import org.kie.workbench.common.stunner.core.client.shape.impl.ConnectorShape;
+import org.kie.workbench.common.stunner.core.client.shape.impl.ShapeStateAttributeHandler;
+import org.kie.workbench.common.stunner.core.client.shape.impl.ShapeStateAttributesFactory;
 import org.kie.workbench.common.stunner.core.client.shape.view.HasControlPoints;
 import org.kie.workbench.common.stunner.core.definition.shape.ShapeViewDef;
 
 public class BasicConnectorShape<W, D extends ShapeViewDef<W, V>, V extends WiresConnectorViewExt>
         extends ConnectorShape<W, D, V> {
+
+    public static ShapeStateAttributesFactory.Builder STROKE_ATTRIBUTES_BUILDER =
+            new ShapeStateAttributesFactory.Builder()
+                    .with(ShapeState.SELECTED,
+                          attrs -> attrs
+                                  .set(ShapeStateAttributeHandler.ShapeStateAttribute.STROKE_ALPHA, 1d))
+                    .with(ShapeState.HIGHLIGHT,
+                          attrs -> attrs
+                                  .set(ShapeStateAttributeHandler.ShapeStateAttribute.STROKE_COLOR, "#FFFFFF")
+                                  // .set(ShapeStateAttributeHandler.ShapeStateAttribute.STROKE_WIDTH, 1d)
+                                  .set(ShapeStateAttributeHandler.ShapeStateAttribute.STROKE_ALPHA, 1d))
+                    .with(ShapeState.INVALID,
+                          attrs -> attrs
+                                  .set(ShapeStateAttributeHandler.ShapeStateAttribute.STROKE_COLOR, ShapeStateAttributesFactory.COLOR_INVALID)
+                                  .set(ShapeStateAttributeHandler.ShapeStateAttribute.STROKE_ALPHA, 1d));
+
+    public static ShapeStateAttributesFactory.ShapeStatesAttributes STROKE_ATTRIBUTES = STROKE_ATTRIBUTES_BUILDER.build();
 
     @SuppressWarnings("unchecked")
     public BasicConnectorShape(D shapeDef,
@@ -32,7 +51,7 @@ public class BasicConnectorShape<W, D extends ShapeViewDef<W, V>, V extends Wire
         super(shapeDef,
               view,
               new ShapeStateDefaultHandler()
-                      .setRenderType(ShapeStateDefaultHandler.RenderType.STROKE)
+                      .useBorderAttributes(STROKE_ATTRIBUTES.attributes())
                       .setBorderShape(() -> view)
                       .setBackgroundShape(() -> view));
     }

@@ -16,11 +16,14 @@
 
 package org.kie.workbench.common.stunner.svg.gen.codegen.impl;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.kie.workbench.common.stunner.client.lienzo.shape.impl.ShapeStateDefaultHandler;
@@ -31,6 +34,7 @@ import org.kie.workbench.common.stunner.svg.gen.exception.GeneratorException;
 import org.kie.workbench.common.stunner.svg.gen.model.LayoutDefinition;
 import org.kie.workbench.common.stunner.svg.gen.model.PrimitiveDefinition;
 import org.kie.workbench.common.stunner.svg.gen.model.ShapeDefinition;
+import org.kie.workbench.common.stunner.svg.gen.model.ShapeStateDefinition;
 import org.kie.workbench.common.stunner.svg.gen.model.StyleSheetDefinition;
 import org.kie.workbench.common.stunner.svg.gen.model.ViewDefinition;
 import org.kie.workbench.common.stunner.svg.gen.model.ViewFactory;
@@ -97,33 +101,11 @@ public class SVGViewDefinitionGenerator
                                                        "for it exists in [" + viewFactory.getImplementedType() + "]");
                 }
             });
-
-            // Look for the state shape view.
-            final List<ShapeDefinition> stateViews = new LinkedList<>();
-            SVGModelUtils.visit(viewDefinition,
-                                p -> {
-                                    if (p instanceof ShapeDefinition &&
-                                            SVGPrimitiveGeneratorUtils.CAN_GENERATE_PRIMITIVE_CODE.test(p)) {
-                                        final ShapeDefinition shapeDefinition = (ShapeDefinition) p;
-                                        shapeDefinition.getStateDefinition()
-                                                .ifPresent(s -> stateViews.add((ShapeDefinition) p));
-                                    }
-                                });
-
-            final String stateViewIds = stateViews.isEmpty() ? "view" : stateViews.stream()
-                    .map(d -> SVGGeneratorFormatUtils.getValidInstanceId(d.getId()))
-                    .collect(Collectors.joining(","));
-            final String stateViewPolicyType = stateViews.isEmpty() ?
-                    ShapeStateDefaultHandler.RenderType.STROKE.name() :
-                    ((ShapeDefinition.ShapeStateDefinition) stateViews.get(0).getStateDefinition().get()).name();
-            final String stateViewPolicy = ShapeStateDefaultHandler.RenderType.class.getName().replace("$", ".") +
-                    "." + stateViewPolicyType.toUpperCase();
             // Generate the main shape.
             final PrimitiveDefinitionGenerator<PrimitiveDefinition<?>> mainGenerator = getGenerator(main);
             final StringBuffer mainBuffer = mainGenerator.generate(main);
             final LayoutDefinition mainLayoutDefinition = main.getLayoutDefinition();
             final String mainLayoutRaw = SVGPrimitiveGeneratorUtils.formatLayout(mainLayoutDefinition);
-
             // Generate the view's text styling stuff.
             final StyleSheetDefinition globalStyleSheetDefinition =
                     ((ViewDefinitionImpl) viewDefinition).getGlobalStyleSheetDefinition();
@@ -131,6 +113,8 @@ public class SVGViewDefinitionGenerator
                     SVGShapeTextCodeBuilder.generate("view",
                                                      viewId,
                                                      globalStyleSheetDefinition) : "";
+            // Look for the state shape parameters in the view definition and execute the code generation.
+            final ShapeStateTemplateParameters[] stateTemplateParameters = getShapeStateTemplateParameters(viewDefinition);
 
             // Populate the context and generate using the template.
             root.put("viewId",
@@ -147,12 +131,14 @@ public class SVGViewDefinitionGenerator
                      formatDouble(viewDefinition.getHeight()));
             root.put("text",
                      viewTextRaw);
-            root.put("stateViewIds",
-                     stateViewIds);
-            root.put("stateViewPolicy",
-                     stateViewPolicy);
+            root.put("stateBgViewIds",
+                     stateTemplateParameters[0].getIdentifiers());
+            root.put("stateBorderViewIds",
+                     stateTemplateParameters[1].getIdentifiers());
             root.put("children",
                      childrenRaw);
+            root.put("stateBorderRenderType",
+                     stateTemplateParameters[0].getRenderType());
             root.put("svgChildren",
                      svgChildrenRaw);
             try {
@@ -163,6 +149,97 @@ public class SVGViewDefinitionGenerator
         }
 
         return result;
+    }
+
+    private static ShapeStateTemplateParameters[] getShapeStateTemplateParameters(final ViewDefinition<SVGShapeView> viewDefinition) {
+        final ShapeStateTemplateParameters stateBgParameters =
+                new ShapeStateTemplateParameters(ShapeStateDefinition.Target.BACKGROUND);
+        final ShapeStateTemplateParameters stateBorderParameters =
+                new ShapeStateTemplateParameters(ShapeStateDefinition.Target.BACKGROUND);
+        SVGModelUtils.visit(viewDefinition,
+                            SVGViewDefinitionGenerator::canGenerateShapeCode,
+                            primitive -> consumeShapeStateParameters((ShapeDefinition) primitive,
+                                                                     stateBgParameters,
+                                                                     stateBorderParameters));
+        return new ShapeStateTemplateParameters[] {stateBgParameters, stateBorderParameters};
+    }
+
+    private static void consumeShapeStateParameters(final ShapeDefinition shapeDefinition,
+                                                     final ShapeStateTemplateParameters stateBgParameters,
+                                                     final ShapeStateTemplateParameters stateBorderParameters) {
+        Optional<ShapeStateDefinition> stateDefinition = shapeDefinition.getStateDefinition();
+        stateDefinition.ifPresent(def -> consumeShapeStateParameters(shapeDefinition.getId(),
+                                                                     def,
+                                                                     stateBgParameters,
+                                                                     stateBorderParameters));
+    }
+
+    private static void consumeShapeStateParameters(final String id,
+                                                    final ShapeStateDefinition stateDefinition,
+                                                    final ShapeStateTemplateParameters stateBgParameters,
+                                                    final ShapeStateTemplateParameters stateBorderParameters) {
+        final ShapeStateTemplateParameters target =
+                ShapeStateDefinition.Target.BACKGROUND.equals(stateDefinition.getTarget()) ?
+                    stateBgParameters :
+                    stateBorderParameters;
+        target.add(id);
+        if (!target.hasRenderTypeSet()) {
+            target.setRenderType(stateDefinition.getRenderType());
+        }
+    }
+
+    private static boolean canGenerateShapeCode(final PrimitiveDefinition primitive) {
+        return ShapeDefinition.class.isInstance(primitive) &&
+                SVGPrimitiveGeneratorUtils.CAN_GENERATE_PRIMITIVE_CODE.test(primitive);
+    }
+
+    private static class ShapeStateTemplateParameters {
+
+        private static final String DEFAULT_VIEW = "view";
+        private static final ShapeStateDefinition.RenderType DEFAULT_RENDER_TYPE = ShapeStateDefinition.RenderType.STROKE;
+
+        private final ShapeStateDefinition.Target target;
+        private final Collection<String> ids;
+        private ShapeStateDefinition.RenderType renderType;
+
+        private ShapeStateTemplateParameters(final ShapeStateDefinition.Target target) {
+            this.target = target;
+            this.ids = new LinkedHashSet<>();
+        }
+
+        ShapeStateTemplateParameters setRenderType(final ShapeStateDefinition.RenderType renderType) {
+            this.renderType = renderType;
+            return this;
+        }
+
+        boolean hasRenderTypeSet() {
+            return null != renderType;
+        }
+
+        ShapeStateTemplateParameters add(final String id) {
+            this.ids.add(id);
+            return this;
+        }
+
+        ShapeStateDefinition.Target getTarget() {
+            return target;
+        }
+
+        String getIdentifiers() {
+            return ids.isEmpty() ?
+                    DEFAULT_VIEW :
+                    ids.stream()
+                    .collect(Collectors.joining(","));
+        }
+
+        String getRenderType() {
+            return generateRenderTypeArgument(null != renderType ? renderType : DEFAULT_RENDER_TYPE);
+        }
+    }
+
+    private static String generateRenderTypeArgument(final ShapeStateDefinition.RenderType renderType) {
+        return ShapeStateDefaultHandler.RenderType.class.getName().replace("$", ".") +
+                "." + renderType.name().toUpperCase();
     }
 
     @SuppressWarnings("unchecked")

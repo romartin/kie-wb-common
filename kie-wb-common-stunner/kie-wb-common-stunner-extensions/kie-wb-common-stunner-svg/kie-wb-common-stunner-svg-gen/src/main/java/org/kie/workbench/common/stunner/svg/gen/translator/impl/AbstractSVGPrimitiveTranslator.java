@@ -95,11 +95,6 @@ public abstract class AbstractSVGPrimitiveTranslator<E extends Element, O extend
                                       SVGDocumentTranslator.STUNNER_ATTR_NS_SHAPE);
     }
 
-    String getShapeStateAttributeValue(final E element) {
-        return element.getAttributeNS(SVGDocumentTranslator.STUNNER_URI,
-                                      SVGDocumentTranslator.STUNNER_ATTR_NS_STATE);
-    }
-
     protected void translateTransformDefinition(final E element, final O def) {
         boolean result = true;
         Node candidate = element;
