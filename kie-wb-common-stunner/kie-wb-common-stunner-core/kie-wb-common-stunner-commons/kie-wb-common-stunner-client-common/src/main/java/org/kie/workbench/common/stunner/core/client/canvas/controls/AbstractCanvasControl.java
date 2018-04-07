@@ -24,6 +24,8 @@ public abstract class AbstractCanvasControl<C extends AbstractCanvas> implements
 
     protected abstract void doDisable();
 
+    protected abstract void doDestroy();
+
     @Override
     public void enable(final C canvas) {
         this.canvas = canvas;
@@ -32,6 +34,11 @@ public abstract class AbstractCanvasControl<C extends AbstractCanvas> implements
     @Override
     public void disable() {
         doDisable();
+    }
+
+    @Override
+    public void destroy() {
+        doDestroy();
         this.canvas = null;
     }
 }

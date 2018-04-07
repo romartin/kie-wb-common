@@ -22,19 +22,14 @@ import javax.inject.Inject;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import org.kie.workbench.common.stunner.bpmn.factory.BPMNGraphFactory;
-import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionPresenterFactory;
+import org.kie.workbench.common.stunner.client.widgets.presenters.session.impl.SessionEditorPresenter;
 import org.kie.workbench.common.stunner.cm.project.client.type.CaseManagementDiagramResourceType;
-import org.kie.workbench.common.stunner.cm.qualifiers.CaseManagementEditor;
 import org.kie.workbench.common.stunner.core.client.annotation.DiagramEditor;
-import org.kie.workbench.common.stunner.core.client.api.SessionManager;
 import org.kie.workbench.common.stunner.core.client.error.DiagramClientErrorHandler;
 import org.kie.workbench.common.stunner.core.client.i18n.ClientTranslationService;
-import org.kie.workbench.common.stunner.core.client.session.command.impl.SessionCommandFactory;
-import org.kie.workbench.common.stunner.core.client.session.impl.AbstractClientFullSession;
-import org.kie.workbench.common.stunner.core.client.session.impl.AbstractClientReadOnlySession;
-import org.kie.workbench.common.stunner.core.diagram.Diagram;
+import org.kie.workbench.common.stunner.core.client.session.impl.EditorSession;
 import org.kie.workbench.common.stunner.project.client.editor.AbstractProjectDiagramEditor;
-import org.kie.workbench.common.stunner.project.client.editor.ProjectDiagramEditorMenuItemsBuilder;
+import org.kie.workbench.common.stunner.project.client.editor.ProjectEditorMenuSessionItems;
 import org.kie.workbench.common.stunner.project.client.editor.event.OnDiagramFocusEvent;
 import org.kie.workbench.common.stunner.project.client.editor.event.OnDiagramLoseFocusEvent;
 import org.kie.workbench.common.stunner.project.client.screens.ProjectMessagesListener;
@@ -74,10 +69,8 @@ public class CaseManagementDiagramEditor extends AbstractProjectDiagramEditor<Ca
                                        final SavePopUpPresenter savePopUpPresenter,
                                        final CaseManagementDiagramResourceType resourceType,
                                        final ClientProjectDiagramService projectDiagramServices,
-                                       final SessionManager sessionManager,
-                                       final @CaseManagementEditor SessionPresenterFactory<Diagram, AbstractClientReadOnlySession, AbstractClientFullSession> sessionPresenterFactory,
-                                       final @CaseManagementEditor SessionCommandFactory sessionCommandFactory,
-                                       final ProjectDiagramEditorMenuItemsBuilder menuItemsBuilder,
+                                       final SessionEditorPresenter<EditorSession> presenter,
+                                       final ProjectEditorMenuSessionItems menuSessionItems,
                                        final Event<OnDiagramFocusEvent> onDiagramFocusEvent,
                                        final Event<OnDiagramLoseFocusEvent> onDiagramLostFocusEvent,
                                        final ProjectMessagesListener projectMessagesListener,
@@ -90,10 +83,8 @@ public class CaseManagementDiagramEditor extends AbstractProjectDiagramEditor<Ca
               savePopUpPresenter,
               resourceType,
               projectDiagramServices,
-              sessionManager,
-              sessionPresenterFactory,
-              sessionCommandFactory,
-              menuItemsBuilder,
+              presenter,
+              menuSessionItems,
               onDiagramFocusEvent,
               onDiagramLostFocusEvent,
               projectMessagesListener,

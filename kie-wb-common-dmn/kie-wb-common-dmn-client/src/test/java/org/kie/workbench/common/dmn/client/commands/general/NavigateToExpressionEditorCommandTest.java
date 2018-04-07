@@ -71,7 +71,7 @@ public class NavigateToExpressionEditorCommandTest extends BaseNavigationCommand
                      command.getCanvasCommand(canvasHandler).undo(canvasHandler));
 
         verify(layer).enableHandlers();
-        verify(session).resume();
+        verify(session).open();
         verify(command).hidePaletteWidget(eq(false));
         verify(command).addDRGEditorToCanvasWidget();
         verify(sessionPresenterView).setCanvasWidget(view);

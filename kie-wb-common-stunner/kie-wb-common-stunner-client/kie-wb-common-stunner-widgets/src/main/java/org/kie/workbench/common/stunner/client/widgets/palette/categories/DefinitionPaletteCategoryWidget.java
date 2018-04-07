@@ -151,5 +151,7 @@ public class DefinitionPaletteCategoryWidget implements DefinitionPaletteCategor
     public void destroy() {
         definitionPaletteItemWidgetInstance.destroyAll();
         definitionPaletteGroupWidgetInstance.destroyAll();
+        category = null;
+        itemMouseDownCallback = null;
     }
 }

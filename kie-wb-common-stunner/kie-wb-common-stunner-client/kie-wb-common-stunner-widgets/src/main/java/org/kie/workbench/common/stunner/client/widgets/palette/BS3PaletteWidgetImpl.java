@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
@@ -269,13 +268,17 @@ public class BS3PaletteWidgetImpl
                      canvasFocusedEvent);
     }
 
-    @PreDestroy
     @Override
     protected void doDestroy() {
+        shapeGlyphDragHandler.destroy();
+        view.destroy();
         categoryWidgetInstances.destroyAll();
         definitionPaletteItemWidgetInstances.destroyAll();
-        view.destroy();
-        this.itemDropCallback = null;
+        itemDragStartCallback = null;
+        itemDragUpdateCallback = null;
+        itemDropCallback = null;
+        closeCallback = null;
+        paletteDefinition = null;
     }
 
     @Override

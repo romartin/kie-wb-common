@@ -53,9 +53,13 @@ import org.kie.workbench.common.stunner.core.diagram.Diagram;
  * @param <D> The diagram type.
  */
 public interface SessionPresenter<S extends ClientSession, H extends CanvasHandler, D extends Diagram>
-        extends Viewer<S, H, SessionPresenter.View, SessionPresenter.SessionPresenterCallback<S, D>> {
+        extends Viewer<S, H, SessionPresenter.View, SessionPresenter.SessionPresenterCallback<D>> {
 
-    interface SessionPresenterCallback<S extends ClientSession, D extends Diagram> extends DiagramViewer.DiagramViewerCallback<D> {
+    interface SessionPresenterCallback<D extends Diagram> extends DiagramViewer.DiagramViewerCallback<D> {
+
+        @Override
+        default void onOpen(D diagram) {
+        }
 
         void afterSessionOpened();
     }
@@ -105,8 +109,11 @@ public interface SessionPresenter<S extends ClientSession, H extends CanvasHandl
     SessionPresenter<S, H, D> hideNotifications();
 
     void open(final D diagram,
-              final S session,
-              final SessionPresenter.SessionPresenterCallback<S, D> callback);
+              final SessionPresenter.SessionPresenterCallback<D> callback);
+
+    void pause();
+
+    void resume();
 
     Toolbar<S> getToolbar();
 

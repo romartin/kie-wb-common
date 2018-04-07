@@ -25,34 +25,23 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionPresenter;
-import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionPresenterFactory;
-import org.kie.workbench.common.stunner.core.client.api.AbstractClientSessionManager;
+import org.kie.workbench.common.stunner.client.widgets.presenters.session.impl.SessionEditorPresenter;
+import org.kie.workbench.common.stunner.core.client.api.SessionManager;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
 import org.kie.workbench.common.stunner.core.client.error.DiagramClientErrorHandler;
 import org.kie.workbench.common.stunner.core.client.i18n.ClientTranslationService;
 import org.kie.workbench.common.stunner.core.client.service.ClientRuntimeError;
 import org.kie.workbench.common.stunner.core.client.service.ServiceCallback;
-import org.kie.workbench.common.stunner.core.client.session.ClientFullSession;
-import org.kie.workbench.common.stunner.core.client.session.ClientSessionFactory;
 import org.kie.workbench.common.stunner.core.client.session.command.ClientSessionCommand;
-import org.kie.workbench.common.stunner.core.client.session.command.impl.ClearSessionCommand;
-import org.kie.workbench.common.stunner.core.client.session.command.impl.DeleteSelectionSessionCommand;
-import org.kie.workbench.common.stunner.core.client.session.command.impl.RedoSessionCommand;
-import org.kie.workbench.common.stunner.core.client.session.command.impl.SessionCommandFactory;
-import org.kie.workbench.common.stunner.core.client.session.command.impl.SwitchGridSessionCommand;
-import org.kie.workbench.common.stunner.core.client.session.command.impl.UndoSessionCommand;
 import org.kie.workbench.common.stunner.core.client.session.command.impl.ValidateSessionCommand;
-import org.kie.workbench.common.stunner.core.client.session.command.impl.VisitGraphSessionCommand;
-import org.kie.workbench.common.stunner.core.client.session.impl.AbstractClientFullSession;
-import org.kie.workbench.common.stunner.core.client.session.impl.AbstractClientReadOnlySession;
-import org.kie.workbench.common.stunner.core.client.session.impl.ClientFullSessionImpl;
+import org.kie.workbench.common.stunner.core.client.session.impl.EditorSession;
 import org.kie.workbench.common.stunner.core.definition.exception.DefinitionNotFoundException;
-import org.kie.workbench.common.stunner.core.diagram.Diagram;
 import org.kie.workbench.common.stunner.project.client.editor.event.OnDiagramFocusEvent;
 import org.kie.workbench.common.stunner.project.client.editor.event.OnDiagramLoseFocusEvent;
 import org.kie.workbench.common.stunner.project.client.resources.i18n.StunnerProjectClientConstants;
 import org.kie.workbench.common.stunner.project.client.screens.ProjectMessagesListener;
 import org.kie.workbench.common.stunner.project.client.service.ClientProjectDiagramService;
+import org.kie.workbench.common.stunner.project.client.session.EditorSessionCommands;
 import org.kie.workbench.common.stunner.project.diagram.ProjectDiagram;
 import org.kie.workbench.common.stunner.project.diagram.ProjectMetadata;
 import org.kie.workbench.common.widgets.client.resources.i18n.CommonConstants;
@@ -70,6 +59,7 @@ import org.uberfire.client.workbench.widgets.common.ErrorPopupPresenter;
 import org.uberfire.ext.editor.commons.client.file.popups.SavePopUpPresenter;
 import org.uberfire.ext.editor.commons.client.history.VersionRecordManager;
 import org.uberfire.mocks.EventSourceMock;
+import org.uberfire.mvp.Command;
 import org.uberfire.mvp.ParameterizedCommand;
 import org.uberfire.mvp.PlaceRequest;
 import org.uberfire.mvp.impl.PathPlaceRequest;
@@ -124,46 +114,25 @@ public class ProjectDiagramEditorTest {
     private ClientProjectDiagramService projectDiagramServices;
 
     @Mock
-    private AbstractClientSessionManager clientSessionManager;
+    private SessionManager clientSessionManager;
 
     @Mock
-    private SessionPresenterFactory<Diagram, AbstractClientReadOnlySession, AbstractClientFullSession> presenterFactory;
-
-    @Mock
-    private SessionPresenter presenter;
+    private SessionEditorPresenter presenter;
 
     @Mock
     private SessionPresenter.View presenterView;
 
     @Mock
-    private SessionCommandFactory sessionCommandFactory;
+    private ProjectEditorMenuSessionItems sessionItems;
 
     @Mock
-    private ProjectDiagramEditorMenuItemsBuilder menuItemsBuilder;
-
-    @Mock
-    private VisitGraphSessionCommand sessionVisitGraphCommand;
-
-    @Mock
-    private SwitchGridSessionCommand sessionSwitchGridCommand;
-
-    @Mock
-    private ClearSessionCommand sessionClearCommand;
-
-    @Mock
-    private DeleteSelectionSessionCommand sessionDeleteSelectionCommand;
-
-    @Mock
-    private UndoSessionCommand sessionUndoCommand;
-
-    @Mock
-    private RedoSessionCommand sessionRedoCommand;
+    private EditorSessionCommands editorSessionCommands;
 
     @Mock
     private ValidateSessionCommand sessionValidateCommand;
 
     @Mock
-    private ClientFullSessionImpl fullSession;
+    private EditorSession fullSession;
 
     @Mock
     private ObservablePath path;
@@ -176,9 +145,6 @@ public class ProjectDiagramEditorTest {
 
     @Mock
     private OverviewWidgetPresenter overviewWidgetMock;
-
-    @Mock
-    private ClientSessionFactory<ClientFullSession> clientSessionFactory;
 
     @Mock
     private AbstractCanvasHandler canvasHandler;
@@ -214,23 +180,11 @@ public class ProjectDiagramEditorTest {
     public void setup() {
         VersionRecordManager versionRecordManagerMock = versionRecordManager;
         when(versionRecordManager.getCurrentPath()).thenReturn(path);
-        when(sessionCommandFactory.newClearCommand()).thenReturn(sessionClearCommand);
-        when(sessionCommandFactory.newVisitGraphCommand()).thenReturn(sessionVisitGraphCommand);
-        when(sessionCommandFactory.newSwitchGridCommand()).thenReturn(sessionSwitchGridCommand);
-        when(sessionCommandFactory.newDeleteSelectedElementsCommand()).thenReturn(sessionDeleteSelectionCommand);
-        when(sessionCommandFactory.newUndoCommand()).thenReturn(sessionUndoCommand);
-        when(sessionCommandFactory.newRedoCommand()).thenReturn(sessionRedoCommand);
-        when(sessionCommandFactory.newValidateCommand()).thenReturn(sessionValidateCommand);
-        when(presenterFactory.newPresenterEditor()).thenReturn(presenter);
-        when(clientSessionManager.getCurrentSession()).thenReturn(fullSession);
-        when(clientSessionManager.getSessionFactory(metadata,
-                                                    ClientFullSession.class)).thenReturn(clientSessionFactory);
-        doAnswer(invocationOnMock -> {
-            final Consumer<ClientFullSessionImpl> sessionConsumer = (Consumer<ClientFullSessionImpl>) invocationOnMock.getArguments()[1];
-            sessionConsumer.accept(fullSession);
-            return null;
-        }).when(clientSessionFactory).newSession(eq(metadata),
-                                                 any(Consumer.class));
+        when(sessionItems.setErrorConsumer(any(Consumer.class))).thenReturn(sessionItems);
+        when(sessionItems.setLoadingStarts(any(Command.class))).thenReturn(sessionItems);
+        when(sessionItems.setLoadingCompleted(any(Command.class))).thenReturn(sessionItems);
+        when(sessionItems.getCommands()).thenReturn(editorSessionCommands);
+        when(editorSessionCommands.getValidateSessionCommand()).thenReturn(sessionValidateCommand);
         when(presenter.getInstance()).thenReturn(fullSession);
         when(presenter.withToolbar(anyBoolean())).thenReturn(presenter);
         when(presenter.withPalette(anyBoolean())).thenReturn(presenter);
@@ -250,10 +204,8 @@ public class ProjectDiagramEditorTest {
                                                    savePopUpPresenter,
                                                    resourceType,
                                                    projectDiagramServices,
-                                                   clientSessionManager,
-                                                   presenterFactory,
-                                                   sessionCommandFactory,
-                                                   menuItemsBuilder,
+                                                   presenter,
+                                                   sessionItems,
                                                    onDiagramFocusEvent,
                                                    onDiagramLostFocusEven,
                                                    projectMessagesListener,
@@ -277,19 +229,7 @@ public class ProjectDiagramEditorTest {
     public void testInit() {
         verify(view,
                times(1)).init(eq(tested));
-        verify(sessionVisitGraphCommand,
-               times(0)).bind(eq(fullSession));
-        verify(sessionSwitchGridCommand,
-               times(0)).bind(eq(fullSession));
-        verify(sessionClearCommand,
-               times(0)).bind(eq(fullSession));
-        verify(sessionDeleteSelectionCommand,
-               times(0)).bind(eq(fullSession));
-        verify(sessionUndoCommand,
-               times(0)).bind(eq(fullSession));
-        verify(sessionRedoCommand,
-               times(0)).bind(eq(fullSession));
-        verify(sessionValidateCommand,
+        verify(sessionItems,
                times(0)).bind(eq(fullSession));
     }
 

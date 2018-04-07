@@ -193,7 +193,7 @@ public final class MapSelectionControl<H extends AbstractCanvasHandler>
                 final boolean isSelected = isSelected(shape.getUUID());
                 if (isSelected && isReadonly()) {
                     shape.applyState(ShapeState.HIGHLIGHT);
-                }else if(isSelected) {
+                } else if (isSelected) {
                     shape.applyState(ShapeState.SELECTED);
                 } else {
                     shape.applyState(ShapeState.NONE);
@@ -211,7 +211,17 @@ public final class MapSelectionControl<H extends AbstractCanvasHandler>
                 && null != getCanvas().getLayer()) {
             getCanvas().getLayer().removeHandler(layerClickHandler);
             this.layerClickHandler = null;
+            items.clear();
         }
+    }
+
+    @Override
+    protected void doDestroy() {
+        if (null != layerClickHandler) {
+            getCanvas().getLayer().removeHandler(layerClickHandler);
+            this.layerClickHandler = null;
+        }
+        items.clear();
     }
 
     public void onShapeRemoved(final CanvasShapeRemovedEvent shapeRemovedEvent) {

@@ -73,6 +73,17 @@ public abstract class AbstractClientSessionCommand<S extends ClientSession> impl
         return enabled;
     }
 
+    @Override
+    public final void destroy() {
+        doDestroy();
+        enabled = false;
+        session = null;
+        statusCallback = null;
+    }
+
+    protected void doDestroy() {
+    }
+
     protected void setEnabled(final boolean enabled) {
         this.enabled = enabled;
     }

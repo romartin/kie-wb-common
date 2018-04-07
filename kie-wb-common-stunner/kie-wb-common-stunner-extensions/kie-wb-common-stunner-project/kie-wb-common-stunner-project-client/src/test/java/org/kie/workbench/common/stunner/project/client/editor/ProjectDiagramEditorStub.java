@@ -18,14 +18,10 @@ package org.kie.workbench.common.stunner.project.client.editor;
 
 import javax.enterprise.event.Event;
 
-import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionPresenterFactory;
-import org.kie.workbench.common.stunner.core.client.api.SessionManager;
+import org.kie.workbench.common.stunner.client.widgets.presenters.session.impl.SessionEditorPresenter;
 import org.kie.workbench.common.stunner.core.client.error.DiagramClientErrorHandler;
 import org.kie.workbench.common.stunner.core.client.i18n.ClientTranslationService;
-import org.kie.workbench.common.stunner.core.client.session.command.impl.SessionCommandFactory;
-import org.kie.workbench.common.stunner.core.client.session.impl.AbstractClientFullSession;
-import org.kie.workbench.common.stunner.core.client.session.impl.AbstractClientReadOnlySession;
-import org.kie.workbench.common.stunner.core.diagram.Diagram;
+import org.kie.workbench.common.stunner.core.client.session.impl.EditorSession;
 import org.kie.workbench.common.stunner.project.client.editor.event.OnDiagramFocusEvent;
 import org.kie.workbench.common.stunner.project.client.editor.event.OnDiagramLoseFocusEvent;
 import org.kie.workbench.common.stunner.project.client.screens.ProjectMessagesListener;
@@ -47,10 +43,8 @@ class ProjectDiagramEditorStub extends AbstractProjectDiagramEditor<ClientResour
                                     SavePopUpPresenter savePopUpPresenter,
                                     ClientResourceType resourceType,
                                     ClientProjectDiagramService projectDiagramServices,
-                                    SessionManager sessionManager,
-                                    SessionPresenterFactory<Diagram, AbstractClientReadOnlySession, AbstractClientFullSession> sessionPresenterFactory,
-                                    SessionCommandFactory sessionCommandFactory,
-                                    ProjectDiagramEditorMenuItemsBuilder menuItemsBuilder,
+                                    SessionEditorPresenter<EditorSession> presenter,
+                                    ProjectEditorMenuSessionItems menuSessionItems,
                                     Event<OnDiagramFocusEvent> onDiagramFocusEvent,
                                     Event<OnDiagramLoseFocusEvent> onDiagramLostFocusEvent,
                                     ProjectMessagesListener projectMessagesListener,
@@ -63,10 +57,8 @@ class ProjectDiagramEditorStub extends AbstractProjectDiagramEditor<ClientResour
               savePopUpPresenter,
               resourceType,
               projectDiagramServices,
-              sessionManager,
-              sessionPresenterFactory,
-              sessionCommandFactory,
-              menuItemsBuilder,
+              presenter,
+              menuSessionItems,
               onDiagramFocusEvent,
               onDiagramLostFocusEvent,
               projectMessagesListener,

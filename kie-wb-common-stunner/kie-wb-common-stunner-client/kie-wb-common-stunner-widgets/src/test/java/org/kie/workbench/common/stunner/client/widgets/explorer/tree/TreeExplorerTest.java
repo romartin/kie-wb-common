@@ -23,6 +23,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwtmockito.GwtMockitoTestRunner;
 import org.jboss.errai.common.client.api.IsElement;
 import org.jboss.errai.common.client.ui.ElementWrapperWidget;
+import org.jboss.errai.ioc.client.api.ManagedInstance;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -60,6 +61,7 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyBoolean;
 import static org.mockito.Mockito.anyDouble;
 import static org.mockito.Mockito.anyObject;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -88,6 +90,9 @@ public class TreeExplorerTest {
 
     @Mock
     TreeExplorerView view;
+
+    @Mock
+    ManagedInstance<TreeExplorer.View> views;
 
     @Mock
     DOMGlyphRenderers domGlyphRenderers;
@@ -132,6 +137,7 @@ public class TreeExplorerTest {
     @Before
     @SuppressWarnings("unchecked")
     public void setup() {
+        when(views.get()).thenReturn(view);
         when(canvasHandler.getDiagram()).thenReturn(diagram);
         when(canvasHandler.getDiagram().getGraph()).thenReturn(graph);
         when(diagram.getMetadata()).thenReturn(metadata);
@@ -147,6 +153,7 @@ public class TreeExplorerTest {
         when(domGlyphRenderers.render(eq(glyph),
                                       anyDouble(),
                                       anyDouble())).thenReturn(isElement);
+        when(graph.nodes()).thenReturn(getMockNodes());
 
         this.childrenTraverseProcessor = spy(new ChildrenTraverseProcessorImpl(new TreeWalkTraverseProcessorImpl()));
 
@@ -156,7 +163,7 @@ public class TreeExplorerTest {
                                            definitionUtils,
                                            shapeManager,
                                            domGlyphRenderers,
-                                           view) {
+                                           views) {
 
             @Override
             ElementWrapperWidget<?> wrapIconElement(final IsElement icon) {
@@ -166,21 +173,16 @@ public class TreeExplorerTest {
     }
 
     @Test
-    public void testInit() {
-        testedTree.init();
-        verify(view,
-               times(1)).init(eq(testedTree));
-    }
-
-    @Test
     public void testClear() {
+        testedTree.show(canvasHandler);
         testedTree.clear();
         verify(view,
-               times(1)).clear();
+               atLeastOnce()).clear();
     }
 
     @Test
     public void testDestroy() {
+        testedTree.show(canvasHandler);
         testedTree.destroy();
         verify(view,
                times(1)).destroy();
@@ -189,10 +191,9 @@ public class TreeExplorerTest {
     @Test
     @SuppressWarnings("unchecked")
     public void testShow() {
-        when(graph.nodes()).thenReturn(getMockNodes());
-
         testedTree.show(canvasHandler);
-
+        verify(view,
+               times(1)).init(eq(testedTree));
         verify(childrenTraverseProcessor,
                times(1)).traverse(eq(graph),
                                   any(AbstractChildrenTraverseCallback.class));

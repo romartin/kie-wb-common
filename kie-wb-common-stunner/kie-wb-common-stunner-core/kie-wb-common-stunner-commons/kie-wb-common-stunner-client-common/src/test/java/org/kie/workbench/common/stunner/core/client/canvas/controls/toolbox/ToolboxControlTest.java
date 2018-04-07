@@ -137,7 +137,7 @@ public class ToolboxControlTest {
         final CanvasClearSelectionEvent event = new CanvasClearSelectionEvent(canvasHandler);
         tested.onCanvasClearSelectionEvent(event);
         verify(delegated,
-               times(1)).destroy();
+               times(1)).destroyToolboxes();
         verify(delegated,
                never()).show(any(Element.class));
         verify(delegated,
@@ -154,7 +154,7 @@ public class ToolboxControlTest {
                                                                           shape);
         tested.onCanvasShapeRemovedEvent(event);
         verify(delegated,
-               times(1)).destroy();
+               times(1)).destroyToolboxes();
         verify(delegated,
                never()).show(any(Element.class));
         verify(delegated,

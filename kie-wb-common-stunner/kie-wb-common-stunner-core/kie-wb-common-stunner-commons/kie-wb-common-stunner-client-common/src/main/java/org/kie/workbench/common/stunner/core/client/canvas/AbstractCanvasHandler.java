@@ -400,9 +400,7 @@ public abstract class AbstractCanvasHandler<D extends Diagram, C extends Abstrac
      */
     @Override
     public void destroy() {
-        if (null != getCanvas()) {
-            getCanvas().destroy();
-        }
+        getCanvas().destroy();
         doDestroy();
         listeners.clear();
     }

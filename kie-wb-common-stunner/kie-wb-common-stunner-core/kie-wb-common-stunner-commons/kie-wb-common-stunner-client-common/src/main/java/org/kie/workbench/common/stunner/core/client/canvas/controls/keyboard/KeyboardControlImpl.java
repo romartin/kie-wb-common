@@ -17,6 +17,7 @@
 package org.kie.workbench.common.stunner.core.client.canvas.controls.keyboard;
 
 import javax.enterprise.context.Dependent;
+import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 
 import org.kie.workbench.common.stunner.core.client.api.SessionManager;
@@ -31,7 +32,10 @@ import org.kie.workbench.common.stunner.core.client.session.ClientSession;
  * session bind to this component.
  */
 @Dependent
-public class KeyboardControlImpl extends AbstractCanvasControl<AbstractCanvas> implements KeyboardControl<AbstractCanvas, ClientSession> {
+@Default
+public class KeyboardControlImpl
+        extends AbstractCanvasControl<AbstractCanvas>
+        implements KeyboardControl<AbstractCanvas, ClientSession> {
 
     private final SessionManager clientSessionManager;
     private final KeyEventHandler keyEventHandler;
@@ -59,6 +63,12 @@ public class KeyboardControlImpl extends AbstractCanvasControl<AbstractCanvas> i
     @Override
     protected void doDisable() {
         this.keyEventHandler.setEnabled(false);
+    }
+
+    @Override
+    protected void doDestroy() {
+        keyEventHandler.clear();
+        session = null;
     }
 
     @Override

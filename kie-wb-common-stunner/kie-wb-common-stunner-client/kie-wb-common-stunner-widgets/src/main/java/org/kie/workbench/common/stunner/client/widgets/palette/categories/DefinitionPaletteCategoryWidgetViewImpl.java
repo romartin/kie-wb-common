@@ -16,6 +16,7 @@
 
 package org.kie.workbench.common.stunner.client.widgets.palette.categories;
 
+import javax.annotation.PreDestroy;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
@@ -34,7 +35,6 @@ import org.jboss.errai.ui.shared.api.annotations.Templated;
 import org.kie.workbench.common.stunner.client.widgets.components.glyph.DOMGlyphRenderers;
 import org.kie.workbench.common.stunner.client.widgets.palette.categories.group.DefinitionPaletteGroupWidget;
 import org.kie.workbench.common.stunner.client.widgets.palette.categories.items.DefinitionPaletteItemWidget;
-import org.kie.workbench.common.stunner.core.client.components.palette.DefaultPaletteCategory;
 import org.kie.workbench.common.stunner.core.definition.shape.Glyph;
 
 @Templated
@@ -77,7 +77,6 @@ public class DefinitionPaletteCategoryWidgetViewImpl implements DefinitionPalett
     public void render(Glyph glyph,
                        double width,
                        double height) {
-        DefaultPaletteCategory category = presenter.getCategory();
         final org.jboss.errai.common.client.api.IsElement glyphElement =
                 domGlyphRenderers.render(glyph,
                                          width,
@@ -128,5 +127,14 @@ public class DefinitionPaletteCategoryWidgetViewImpl implements DefinitionPalett
     @EventHandler("closeCategoryButton")
     public void onClose(ClickEvent mouseClickEvent) {
         presenter.onClose();
+    }
+
+    @PreDestroy
+    public void destroy() {
+        DOMUtil.removeAllChildren(listGroupItem);
+        DOMUtil.removeAllChildren(categoryIcon);
+        DOMUtil.removeAllChildren(floatingPanel);
+        DOMUtil.removeAllChildren(closeCategoryButton);
+        presenter = null;
     }
 }

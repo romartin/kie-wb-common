@@ -45,6 +45,8 @@ public abstract class AbstractAcceptorControl
 
     protected abstract void onDisable(final WiresCanvas.View view);
 
+    protected abstract void onDestroy(final WiresCanvas.View view);
+
     @Override
     public void enable(final AbstractCanvasHandler canvasHandler) {
         this.canvasHandler = canvasHandler;
@@ -57,6 +59,15 @@ public abstract class AbstractAcceptorControl
         if (null != canvasHandler && null != canvasHandler.getCanvas()) {
             final WiresCanvas.View canvasView = (WiresCanvas.View) canvasHandler.getAbstractCanvas().getView();
             onDisable(canvasView);
+            this.canvasHandler = null;
+        }
+    }
+
+    @Override
+    public void destroy() {
+        if (null != canvasHandler && null != canvasHandler.getCanvas()) {
+            final WiresCanvas.View canvasView = (WiresCanvas.View) canvasHandler.getAbstractCanvas().getView();
+            onDestroy(canvasView);
         }
         this.canvasHandler = null;
         this.commandManagerProvider = null;

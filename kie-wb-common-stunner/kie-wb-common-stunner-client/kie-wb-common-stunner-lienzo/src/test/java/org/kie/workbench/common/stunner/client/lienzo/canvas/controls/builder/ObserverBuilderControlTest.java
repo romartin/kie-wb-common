@@ -36,7 +36,6 @@ import org.kie.workbench.common.stunner.core.client.canvas.controls.builder.Buil
 import org.kie.workbench.common.stunner.core.client.canvas.controls.builder.impl.ObserverBuilderControl;
 import org.kie.workbench.common.stunner.core.client.canvas.controls.builder.request.ElementBuildRequest;
 import org.kie.workbench.common.stunner.core.client.canvas.controls.exceptions.ElementOutOfBoundsException;
-import org.kie.workbench.common.stunner.core.client.canvas.util.CanvasLayoutUtils;
 import org.kie.workbench.common.stunner.core.client.command.CanvasCommand;
 import org.kie.workbench.common.stunner.core.client.command.CanvasCommandFactory;
 import org.kie.workbench.common.stunner.core.client.command.CanvasCommandManager;
@@ -89,7 +88,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-
 @RunWith(MockitoJUnitRunner.class)
 public class ObserverBuilderControlTest {
 
@@ -110,9 +108,6 @@ public class ObserverBuilderControlTest {
 
     @Mock
     GraphBoundsIndexer graphBoundsIndexer;
-
-    @Mock
-    CanvasLayoutUtils canvasLayoutUtils;
 
     @Mock
     GraphIndexBuilder graphIndexBuilder;
@@ -194,7 +189,7 @@ public class ObserverBuilderControlTest {
         when(shapeManager.getShapeSet(anyString())).thenReturn(shapeSet);
         when(shapeManager.getDefaultShapeSet(anyString())).thenReturn(shapeSet);
 
-        tested = new ObserverBuilderControl(clientDefinitionManager, clientFactoryServices, graphUtils, ruleManager, canvasCommandFactory, graphBoundsIndexer, canvasLayoutUtils, mock(Event.class));
+        tested = new ObserverBuilderControl(clientDefinitionManager, clientFactoryServices, ruleManager, canvasCommandFactory, graphBoundsIndexer, mock(Event.class));
 
         Diagram diagram = mock(Diagram.class);
         Metadata metadata = mock(Metadata.class);
@@ -209,12 +204,22 @@ public class ObserverBuilderControlTest {
         when(index.getGraph()).thenReturn(graph);
 
         when(graphIndexBuilder.build(any(Graph.class))).thenReturn(index);
-        canvasHandler = new CanvasHandlerImpl(clientDefinitionManager, canvasCommandFactory, clientFactoryServices, ruleManager, graphUtils, graphIndexBuilder, shapeManager, mock(TextPropertyProviderFactory.class), mock(Event.class), null, null, null);
+        canvasHandler = new CanvasHandlerImpl(clientDefinitionManager,
+                                              canvasCommandFactory,
+                                              clientFactoryServices,
+                                              ruleManager,
+                                              graphUtils,
+                                              graphIndexBuilder,
+                                              shapeManager,
+                                              mock(TextPropertyProviderFactory.class),
+                                              mock(Event.class),
+                                              null,
+                                              null,
+                                              null);
         canvasHandler.handle(mock(AbstractCanvas.class));
         canvasHandler.draw(diagram, mock(ParameterizedCommand.class));
         when(diagram.getGraph()).thenReturn(graph);
         when(graph.nodes()).thenReturn(Collections.emptyList());
-
 
         CanvasCommandManager commandManager = mock(CanvasCommandManager.class);
 

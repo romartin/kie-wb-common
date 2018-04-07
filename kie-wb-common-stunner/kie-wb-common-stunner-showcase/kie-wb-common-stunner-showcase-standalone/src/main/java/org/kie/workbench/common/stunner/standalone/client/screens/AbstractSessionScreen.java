@@ -24,7 +24,7 @@ import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler
 import org.kie.workbench.common.stunner.core.client.session.ClientSession;
 import org.kie.workbench.common.stunner.core.client.session.event.SessionDestroyedEvent;
 import org.kie.workbench.common.stunner.core.client.session.event.SessionOpenedEvent;
-import org.kie.workbench.common.stunner.core.client.session.impl.AbstractClientSession;
+import org.kie.workbench.common.stunner.core.client.session.impl.AbstractSession;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
 
 import static org.kie.soup.commons.validation.PortablePreconditions.checkNotNull;
@@ -91,8 +91,8 @@ public abstract class AbstractSessionScreen {
         return null != session ? session.getCanvas() : null;
     }
 
-    protected AbstractClientSession getSession() {
-        return (AbstractClientSession) session;
+    protected AbstractSession getSession() {
+        return (AbstractSession) session;
     }
 
     private void updateTitle() {

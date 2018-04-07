@@ -20,6 +20,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
@@ -118,6 +119,12 @@ public class FormPropertiesWidget implements IsElement,
     public FormPropertiesWidget unbind() {
         formSessionHandler.unbind();
         return this;
+    }
+
+    @PreDestroy
+    public void destroy() {
+        formSessionHandler.destroy();
+        formsContainer.destroyAll();
     }
 
     public void show() {

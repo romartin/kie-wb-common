@@ -137,7 +137,8 @@ public class ShapeStateAttributeAnimationHandler<V extends LienzoShapeView>
                     public void onClose(final IAnimation animation,
                                         final IAnimationHandle handle) {
                         super.onClose(animation, handle);
-                        if (!animationHandle.isRunning()) {
+                        if (null != animationHandle &&
+                                !animationHandle.isRunning()) {
                             setAnimationHandle(null);
                             completeCallback.execute();
                         }

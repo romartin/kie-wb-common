@@ -34,7 +34,7 @@ import org.kie.workbench.common.stunner.bpmn.client.forms.fields.model.VariableR
 import org.kie.workbench.common.stunner.bpmn.client.forms.util.ListBoxValues;
 import org.kie.workbench.common.stunner.bpmn.client.forms.util.StringUtils;
 import org.kie.workbench.common.stunner.bpmn.forms.model.VariablesEditorFieldDefinition;
-import org.kie.workbench.common.stunner.core.client.api.AbstractClientSessionManager;
+import org.kie.workbench.common.stunner.core.client.api.SessionManager;
 import org.kie.workbench.common.stunner.core.graph.Graph;
 import org.uberfire.client.workbench.widgets.common.ErrorPopupPresenter;
 
@@ -42,7 +42,7 @@ import org.uberfire.client.workbench.widgets.common.ErrorPopupPresenter;
 public class VariablesEditorFieldRenderer extends FieldRenderer<VariablesEditorFieldDefinition, DefaultFormGroup>
         implements VariablesEditorWidgetView.Presenter {
 
-    private final AbstractClientSessionManager sessionManager;
+    private final SessionManager sessionManager;
     private final BPMNProcessVariableDeleteHandler deleteHandler;
     Map<String, String> mapDataTypeNamesToDisplayNames = null;
     Map<String, String> mapDataTypeDisplayNamesToNames = null;
@@ -58,7 +58,7 @@ public class VariablesEditorFieldRenderer extends FieldRenderer<VariablesEditorF
 
     @Inject
     public VariablesEditorFieldRenderer(final VariablesEditorWidgetView variablesEditor,
-                                        AbstractClientSessionManager sessionManager,
+                                        final SessionManager sessionManager,
                                         final BPMNProcessVariableDeleteHandler deleteHandler) {
         this.view = variablesEditor;
         this.sessionManager = sessionManager;

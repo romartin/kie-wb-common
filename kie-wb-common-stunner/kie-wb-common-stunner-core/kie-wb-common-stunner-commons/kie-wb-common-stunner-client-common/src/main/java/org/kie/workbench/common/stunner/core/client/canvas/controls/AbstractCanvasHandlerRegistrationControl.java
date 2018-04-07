@@ -73,6 +73,7 @@ public abstract class AbstractCanvasHandlerRegistrationControl<H extends Abstrac
                     .forEach(handlerFunction);
         }
     }
+
     private Consumer<Shape> disableEventHandler() {
         return shape -> {
             ViewHandler<?> eventHandler = handlers.get(shape.getUUID());
@@ -89,11 +90,15 @@ public abstract class AbstractCanvasHandlerRegistrationControl<H extends Abstrac
         };
     }
 
-    public void deregisterAll() {
+    @Override
+    protected void doDestroy() {
         new HashSet<>(handlers.keySet())
                 .stream()
                 .forEach(this::deregister);
         handlers.clear();
+        new HashSet<>(disabledHandlers.keySet())
+                .stream()
+                .forEach(this::deregister);
         disabledHandlers.clear();
     }
 

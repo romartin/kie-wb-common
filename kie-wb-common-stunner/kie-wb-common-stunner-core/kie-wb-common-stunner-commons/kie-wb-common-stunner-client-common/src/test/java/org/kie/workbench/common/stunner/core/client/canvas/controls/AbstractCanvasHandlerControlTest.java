@@ -95,5 +95,15 @@ public class AbstractCanvasHandlerControlTest {
         protected void doDisable() {
 
         }
+
+        @Override
+        protected void doDestroy() {
+
+        }
+
+        @Override
+        public void enable(Object context) {
+
+        }
     }
 }

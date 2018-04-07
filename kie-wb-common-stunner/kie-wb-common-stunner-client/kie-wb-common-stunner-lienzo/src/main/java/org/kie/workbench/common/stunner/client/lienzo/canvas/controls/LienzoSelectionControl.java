@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 
 import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
+import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
@@ -43,6 +44,7 @@ import org.kie.workbench.common.stunner.core.graph.Element;
 
 @Dependent
 @SingleSelection
+@Default
 public final class LienzoSelectionControl<H extends AbstractCanvasHandler>
         extends AbstractSelectionControl<H> {
 
@@ -114,6 +116,14 @@ public final class LienzoSelectionControl<H extends AbstractCanvasHandler>
                        "Check missing handlers to deregister on some elements!");
             handlers.clear();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        new HashSet<>(handlers.keySet())
+                .forEach(this::deregister);
+        handlers.clear();
     }
 
     private void registerHandler(final String uuid,

@@ -23,7 +23,6 @@ import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 
 import org.kie.workbench.common.stunner.core.client.api.ClientDefinitionManager;
-import org.kie.workbench.common.stunner.core.client.api.ShapeManager;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
 import org.kie.workbench.common.stunner.core.client.canvas.controls.AbstractCanvasHandlerControl;
 import org.kie.workbench.common.stunner.core.client.canvas.controls.builder.NodeBuilderControl;
@@ -49,27 +48,20 @@ import org.kie.workbench.common.stunner.core.graph.content.view.View;
 import org.kie.workbench.common.stunner.core.graph.content.view.ViewConnector;
 
 @Dependent
-public class NodeBuilderControlImpl extends AbstractCanvasHandlerControl<AbstractCanvasHandler> implements NodeBuilderControl<AbstractCanvasHandler> {
+@Default
+public class NodeBuilderControlImpl
+        extends AbstractCanvasHandlerControl<AbstractCanvasHandler>
+        implements NodeBuilderControl<AbstractCanvasHandler> {
 
     private final ClientDefinitionManager clientDefinitionManager;
-    private final ShapeManager shapeManager;
     private final CanvasCommandFactory<AbstractCanvasHandler> commandFactory;
     private final AbstractElementBuilderControl elementBuilderControl;
 
-    protected NodeBuilderControlImpl() {
-        this(null,
-             null,
-             null,
-             null);
-    }
-
     @Inject
     public NodeBuilderControlImpl(final ClientDefinitionManager clientDefinitionManager,
-                                  final ShapeManager shapeManager,
                                   final CanvasCommandFactory<AbstractCanvasHandler> commandFactory,
                                   final @Default @Element AbstractElementBuilderControl elementBuilderControl) {
         this.clientDefinitionManager = clientDefinitionManager;
-        this.shapeManager = shapeManager;
         this.commandFactory = commandFactory;
         this.elementBuilderControl = elementBuilderControl;
     }
@@ -83,6 +75,11 @@ public class NodeBuilderControlImpl extends AbstractCanvasHandlerControl<Abstrac
     @Override
     protected void doDisable() {
         this.elementBuilderControl.disable();
+    }
+
+    @Override
+    protected void doDestroy() {
+        this.elementBuilderControl.destroy();
     }
 
     @Override

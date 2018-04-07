@@ -20,6 +20,7 @@ import java.util.Objects;
 
 import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Observes;
+import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
@@ -29,16 +30,17 @@ import org.kie.workbench.common.stunner.core.client.canvas.event.command.CanvasU
 import org.kie.workbench.common.stunner.core.client.command.CanvasViolation;
 import org.kie.workbench.common.stunner.core.client.command.SessionCommandManager;
 import org.kie.workbench.common.stunner.core.client.event.keyboard.KeyboardEvent;
-import org.kie.workbench.common.stunner.core.client.session.ClientFullSession;
 import org.kie.workbench.common.stunner.core.client.session.Session;
 import org.kie.workbench.common.stunner.core.client.session.command.AbstractClientSessionCommand;
+import org.kie.workbench.common.stunner.core.client.session.impl.EditorSession;
 import org.kie.workbench.common.stunner.core.command.CommandResult;
 import org.kie.workbench.common.stunner.core.command.util.CommandUtils;
 
 import static org.kie.soup.commons.validation.PortablePreconditions.checkNotNull;
 
 @Dependent
-public class UndoSessionCommand extends AbstractClientSessionCommand<ClientFullSession> {
+@Default
+public class UndoSessionCommand extends AbstractClientSessionCommand<EditorSession> {
 
     private final SessionCommandManager<AbstractCanvasHandler> sessionCommandManager;
 
@@ -53,7 +55,7 @@ public class UndoSessionCommand extends AbstractClientSessionCommand<ClientFullS
     }
 
     @Override
-    public void bind(final ClientFullSession session) {
+    public void bind(final EditorSession session) {
         super.bind(session);
         session.getKeyboardControl().addKeyShortcutCallback(keys -> {
             if (isUndoShortcut(keys)) {

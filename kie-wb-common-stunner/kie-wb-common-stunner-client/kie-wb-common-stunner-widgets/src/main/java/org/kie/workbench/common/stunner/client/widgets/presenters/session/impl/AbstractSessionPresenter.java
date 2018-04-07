@@ -16,6 +16,7 @@
 
 package org.kie.workbench.common.stunner.client.widgets.presenters.session.impl;
 
+import java.lang.annotation.Annotation;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -29,21 +30,22 @@ import org.kie.workbench.common.stunner.client.widgets.palette.PaletteWidget;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionPresenter;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionViewer;
 import org.kie.workbench.common.stunner.client.widgets.toolbar.Toolbar;
-import org.kie.workbench.common.stunner.client.widgets.toolbar.ToolbarFactory;
 import org.kie.workbench.common.stunner.core.client.api.SessionManager;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
 import org.kie.workbench.common.stunner.core.client.components.palette.PaletteDefinition;
 import org.kie.workbench.common.stunner.core.client.service.ClientRuntimeError;
-import org.kie.workbench.common.stunner.core.client.session.impl.AbstractClientReadOnlySession;
+import org.kie.workbench.common.stunner.core.client.session.impl.AbstractSession;
+import org.kie.workbench.common.stunner.core.client.session.impl.EditorSession;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
+import org.kie.workbench.common.stunner.core.util.DefinitionUtils;
 
 public abstract class AbstractSessionPresenter<D extends Diagram, H extends AbstractCanvasHandler,
-        S extends AbstractClientReadOnlySession, E extends SessionViewer<S, H, D>>
+        S extends AbstractSession, E extends SessionViewer<S, H, D>>
         implements SessionPresenter<S, H, D> {
 
+    private final DefinitionUtils definitionUtils;
     private final SessionManager sessionManager;
-    private final Optional<ToolbarFactory<S>> toolbarFactory;
-    private final Optional<DefaultPaletteFactory<H>> paletteFactory;
+    private final DefaultPaletteFactory<H> paletteFactory;
     private final SessionPresenter.View view;
     private final NotificationsObserver notificationsObserver;
 
@@ -55,13 +57,13 @@ public abstract class AbstractSessionPresenter<D extends Diagram, H extends Abst
     private Optional<Predicate<Notification.Type>> typePredicate;
 
     @SuppressWarnings("unchecked")
-    protected AbstractSessionPresenter(final SessionManager sessionManager,
+    protected AbstractSessionPresenter(final DefinitionUtils definitionUtils,
+                                       final SessionManager sessionManager,
                                        final SessionPresenter.View view,
-                                       final Optional<? extends ToolbarFactory<S>> toolbarFactory,
-                                       final Optional<DefaultPaletteFactory<H>> paletteFactory,
+                                       final DefaultPaletteFactory<H> paletteFactory,
                                        final NotificationsObserver notificationsObserver) {
+        this.definitionUtils = definitionUtils;
         this.sessionManager = sessionManager;
-        this.toolbarFactory = (Optional<ToolbarFactory<S>>) toolbarFactory;
         this.paletteFactory = paletteFactory;
         this.notificationsObserver = notificationsObserver;
         this.view = view;
@@ -72,33 +74,49 @@ public abstract class AbstractSessionPresenter<D extends Diagram, H extends Abst
 
     public abstract E getDisplayer();
 
+    protected abstract Toolbar<S> newToolbar(Annotation qualifier);
+
+    protected abstract void destroyToolbarInstace(Toolbar<S> toolbar);
+
     @Override
+    @SuppressWarnings("unchecked")
     public void open(final D diagram,
-                     final S session,
-                     final SessionPresenterCallback<S, D> callback) {
+                     final SessionPresenterCallback<D> callback) {
         this.diagram = diagram;
         notificationsObserver.onCommandExecutionFailed(this::showCommandError);
         notificationsObserver.onValidationSuccess(this::showNotificationMessage);
         notificationsObserver.onValidationFailed(this::showValidationError);
-        open(session,
-             callback);
+        sessionManager.newSession(diagram.getMetadata(),
+                                  EditorSession.class,
+                                  session -> open((S) session,
+                                                  callback));
     }
 
-    public void open(final S item,
-                     final SessionPresenterCallback<S, D> callback) {
-        beforeOpen(item);
-        getDisplayer().open(item,
-                            new SessionViewer.SessionViewerCallback<S, D>() {
+    @Override
+    public void resume() {
+        getSession().ifPresent(sessionManager::open);
+    }
+
+    @Override
+    public void pause() {
+        getSession().ifPresent(s -> sessionManager.pause());
+    }
+
+    public void open(final S session,
+                     final SessionPresenterCallback<D> callback) {
+        beforeOpen(session);
+        getDisplayer().open(session,
+                            new SessionViewer.SessionViewerCallback<D>() {
                                 @Override
                                 public void afterCanvasInitialized() {
                                     callback.afterCanvasInitialized();
-                                    sessionManager.open(getInstance());
+                                    sessionManager.open(session);
                                     callback.afterSessionOpened();
                                 }
 
                                 @Override
                                 public void onSuccess() {
-                                    onSessionOpened(item);
+                                    onSessionOpened(session);
                                     callback.onSuccess();
                                 }
 
@@ -110,25 +128,25 @@ public abstract class AbstractSessionPresenter<D extends Diagram, H extends Abst
                             });
     }
 
-    public void open(final S item,
+    public void open(final S session,
                      final int width,
                      final int height,
-                     final SessionPresenterCallback<S, D> callback) {
-        beforeOpen(item);
-        getDisplayer().open(item,
+                     final SessionPresenterCallback<D> callback) {
+        beforeOpen(session);
+        getDisplayer().open(session,
                             width,
                             height,
-                            new SessionViewer.SessionViewerCallback<S, D>() {
+                            new SessionViewer.SessionViewerCallback<D>() {
                                 @Override
                                 public void afterCanvasInitialized() {
                                     callback.afterCanvasInitialized();
-                                    sessionManager.open(getInstance());
+                                    sessionManager.open(session);
                                     callback.afterSessionOpened();
                                 }
 
                                 @Override
                                 public void onSuccess() {
-                                    onSessionOpened(item);
+                                    onSessionOpened(session);
                                     callback.onSuccess();
                                 }
 
@@ -171,11 +189,11 @@ public abstract class AbstractSessionPresenter<D extends Diagram, H extends Abst
     }
 
     public void clear() {
-        if (null != getPalette()) {
-            getPalette().unbind();
+        if (null != palette) {
+            palette.unbind();
         }
-        if (null != getToolbar()) {
-            getToolbar().clear();
+        if (null != toolbar) {
+            destroyToolbar();
         }
         getDisplayer().clear();
         diagram = null;
@@ -185,7 +203,7 @@ public abstract class AbstractSessionPresenter<D extends Diagram, H extends Abst
     public void destroy() {
         destroyToolbar();
         destroyPalette();
-        sessionManager.destroy();
+        getSession().ifPresent(sessionManager::destroy);
         getDisplayer().destroy();
         getView().destroy();
         diagram = null;
@@ -193,6 +211,10 @@ public abstract class AbstractSessionPresenter<D extends Diagram, H extends Abst
 
     public S getInstance() {
         return getDisplayer().getInstance();
+    }
+
+    private Optional<S> getSession() {
+        return Optional.ofNullable(getInstance());
     }
 
     @Override
@@ -214,6 +236,10 @@ public abstract class AbstractSessionPresenter<D extends Diagram, H extends Abst
         return getDisplayer().getHandler();
     }
 
+    protected D getDiagram() {
+        return diagram;
+    }
+
     protected void beforeOpen(final S item) {
         getView().showLoading(true);
     }
@@ -223,12 +249,14 @@ public abstract class AbstractSessionPresenter<D extends Diagram, H extends Abst
         destroyToolbar();
         destroyPalette();
         if (hasToolbar) {
-            toolbar = buildToolbar(session);
+            initToolbar(session);
             getView().setToolbarWidget(toolbar.getView());
         }
         if (hasPalette) {
-            this.palette = (PaletteWidget<PaletteDefinition>) buildPalette(session);
-            getView().setPaletteWidget(getPalette());
+            palette = (PaletteWidget<PaletteDefinition>) initPalette(session);
+            if (null != palette) {
+                getView().setPaletteWidget(palette);
+            }
         }
         getView().setCanvasWidget(getDisplayer().getView());
         getView().showLoading(false);
@@ -259,33 +287,35 @@ public abstract class AbstractSessionPresenter<D extends Diagram, H extends Abst
         }
     }
 
-    private Toolbar<S> buildToolbar(final S session) {
-        if (!toolbarFactory.isPresent()) {
-            throw new UnsupportedOperationException("This session presenter with type [" + this.getClass().getName() + "] does not supports the toolbar.");
+    private void initToolbar(final S session) {
+        final Annotation qualifier =
+                definitionUtils.getQualifier(session.getCanvasHandler().getDiagram().getMetadata().getDefinitionSetId());
+        toolbar = newToolbar(qualifier);
+        if (null != toolbar) {
+            toolbar.load(session);
         }
-        return toolbarFactory.get().build(session);
     }
 
     @SuppressWarnings("unchecked")
-    private PaletteWidget<? extends PaletteDefinition> buildPalette(final S session) {
-        if (!paletteFactory.isPresent()) {
-            throw new UnsupportedOperationException("This session presenter with type [" + this.getClass().getName() + "] does not supports the palette.");
+    private PaletteWidget<? extends PaletteDefinition> initPalette(final S session) {
+        if (null != paletteFactory) {
+            return paletteFactory.newPalette((H) session.getCanvasHandler());
         }
-        return paletteFactory.get()
-                .newPalette((H) session.getCanvasHandler());
+        return null;
     }
 
     private void destroyToolbar() {
-        if (null != getToolbar()) {
-            getToolbar().destroy();
+        if (null != toolbar) {
+            toolbar.destroy();
+            destroyToolbarInstace(toolbar);
             toolbar = null;
         }
     }
 
     private void destroyPalette() {
-        if (null != getPalette()) {
-            getPalette().unbind();
-            getPalette().destroy();
+        if (null != palette) {
+            palette.destroy();
+            palette = null;
         }
     }
 
@@ -318,14 +348,6 @@ public abstract class AbstractSessionPresenter<D extends Diagram, H extends Abst
         } catch (final ClassCastException e) {
             return false;
         }
-    }
-
-    protected D getDiagram() {
-        return diagram;
-    }
-
-    protected SessionManager getSessionManager() {
-        return sessionManager;
     }
 
     private boolean isDisplayNotifications() {

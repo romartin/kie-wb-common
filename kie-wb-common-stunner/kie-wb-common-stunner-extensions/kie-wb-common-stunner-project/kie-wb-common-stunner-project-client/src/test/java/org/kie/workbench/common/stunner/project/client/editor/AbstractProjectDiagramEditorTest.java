@@ -30,30 +30,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionPresenter;
-import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionPresenterFactory;
+import org.kie.workbench.common.stunner.client.widgets.presenters.session.impl.SessionEditorPresenter;
 import org.kie.workbench.common.stunner.core.client.api.SessionManager;
 import org.kie.workbench.common.stunner.core.client.error.DiagramClientErrorHandler;
 import org.kie.workbench.common.stunner.core.client.i18n.ClientTranslationService;
-import org.kie.workbench.common.stunner.core.client.session.ClientFullSession;
-import org.kie.workbench.common.stunner.core.client.session.ClientSessionFactory;
-import org.kie.workbench.common.stunner.core.client.session.command.impl.ClearSessionCommand;
-import org.kie.workbench.common.stunner.core.client.session.command.impl.ClearStatesSessionCommand;
-import org.kie.workbench.common.stunner.core.client.session.command.impl.CopySelectionSessionCommand;
-import org.kie.workbench.common.stunner.core.client.session.command.impl.CutSelectionSessionCommand;
-import org.kie.workbench.common.stunner.core.client.session.command.impl.DeleteSelectionSessionCommand;
-import org.kie.workbench.common.stunner.core.client.session.command.impl.ExportToBpmnSessionCommand;
-import org.kie.workbench.common.stunner.core.client.session.command.impl.ExportToJpgSessionCommand;
-import org.kie.workbench.common.stunner.core.client.session.command.impl.ExportToPdfSessionCommand;
-import org.kie.workbench.common.stunner.core.client.session.command.impl.ExportToPngSessionCommand;
-import org.kie.workbench.common.stunner.core.client.session.command.impl.ExportToSvgSessionCommand;
-import org.kie.workbench.common.stunner.core.client.session.command.impl.PasteSelectionSessionCommand;
-import org.kie.workbench.common.stunner.core.client.session.command.impl.RedoSessionCommand;
-import org.kie.workbench.common.stunner.core.client.session.command.impl.SessionCommandFactory;
-import org.kie.workbench.common.stunner.core.client.session.command.impl.SwitchGridSessionCommand;
-import org.kie.workbench.common.stunner.core.client.session.command.impl.UndoSessionCommand;
-import org.kie.workbench.common.stunner.core.client.session.command.impl.ValidateSessionCommand;
-import org.kie.workbench.common.stunner.core.client.session.command.impl.VisitGraphSessionCommand;
-import org.kie.workbench.common.stunner.core.client.session.impl.AbstractClientFullSession;
+import org.kie.workbench.common.stunner.core.client.session.impl.EditorSession;
 import org.kie.workbench.common.stunner.project.client.editor.event.OnDiagramFocusEvent;
 import org.kie.workbench.common.stunner.project.client.editor.event.OnDiagramLoseFocusEvent;
 import org.kie.workbench.common.stunner.project.client.screens.ProjectMessagesListener;
@@ -125,7 +106,10 @@ public class AbstractProjectDiagramEditorTest {
     protected SessionManager sessionManager;
 
     @Mock
-    protected SessionPresenterFactory sessionPresenterFactory;
+    protected SessionEditorPresenter<EditorSession> sessionEditorPresenter;
+
+    @Mock
+    protected ProjectEditorMenuSessionItems menuSessionItems;
 
     @Mock
     protected EventSourceMock<OnDiagramFocusEvent> onDiagramFocusEvent;
@@ -144,16 +128,10 @@ public class AbstractProjectDiagramEditorTest {
     protected FileMenuBuilderImpl fileMenuBuilder;
 
     @Mock
-    protected ProjectDiagramEditorMenuItemsBuilder projectMenuItemsBuilder;
-
-    @Mock
     protected ProjectController projectController;
 
     @Mock
     protected WorkspaceProjectContext workbenchContext;
-
-    @Mock
-    protected SessionCommandFactory sessionCommandFactory;
 
     @Mock
     protected ProjectMessagesListener projectMessagesListener;
@@ -170,64 +148,10 @@ public class AbstractProjectDiagramEditorTest {
     protected AlertsButtonMenuItemBuilder alertsButtonMenuItemBuilder;
 
     @Mock
-    protected MenuItem alertsButtonMenuItem;
-
-    @Mock
-    private ClearStatesSessionCommand clearStatesSessionCommand;
-
-    @Mock
-    protected SwitchGridSessionCommand switchGridSessionCommand;
-
-    @Mock
-    protected VisitGraphSessionCommand visitGraphSessionCommand;
-
-    @Mock
-    protected ClearSessionCommand clearSessionCommand;
-
-    @Mock
-    protected DeleteSelectionSessionCommand deleteSelectionSessionCommand;
-
-    @Mock
-    protected UndoSessionCommand undoSessionCommand;
-
-    @Mock
-    protected RedoSessionCommand redoSessionCommand;
-
-    @Mock
-    protected ValidateSessionCommand validateSessionCommand;
-
-    @Mock
-    protected ExportToPngSessionCommand exportToPngSessionCommand;
-
-    @Mock
-    protected ExportToJpgSessionCommand exportToJpgSessionCommand;
-
-    @Mock
-    protected ExportToPdfSessionCommand exportToPdfSessionCommand;
-
-    @Mock
-    protected ExportToBpmnSessionCommand exportToBpmnSessionCommand;
-
-    @Mock
-    protected CopySelectionSessionCommand copySelectionSessionCommand;
-
-    @Mock
-    protected PasteSelectionSessionCommand pasteSelectionSessionCommand;
-
-    @Mock
-    protected CutSelectionSessionCommand cutSelectionSessionCommand;
-
-    @Mock
-    protected ExportToSvgSessionCommand exportToSvgSessionCommand;
-
-    @Mock
-    protected SessionPresenter sessionPresenter;
-
-    @Mock
     protected SessionPresenter.View sessionPresenterView;
 
     @Mock
-    protected AbstractClientFullSession clientFullSession;
+    protected EditorSession clientFullSession;
 
     @Mock
     protected ObservablePath filePath;
@@ -239,7 +163,7 @@ public class AbstractProjectDiagramEditorTest {
     protected OverviewWidgetPresenter overviewWidget;
 
     @Captor
-    private ArgumentCaptor<Consumer<ClientFullSession>> clientSessionConsumerCaptor;
+    private ArgumentCaptor<Consumer<EditorSession>> clientSessionConsumerCaptor;
 
     @Captor
     private ArgumentCaptor<SessionPresenter.SessionPresenterCallback> clientSessionPresenterCallbackCaptor;
@@ -253,48 +177,15 @@ public class AbstractProjectDiagramEditorTest {
     @Before
     @SuppressWarnings("unchecked")
     public void setUp() {
-        doReturn(clearStatesSessionCommand).when(sessionCommandFactory).newClearStatesCommand();
-        doReturn(switchGridSessionCommand).when(sessionCommandFactory).newSwitchGridCommand();
-        doReturn(visitGraphSessionCommand).when(sessionCommandFactory).newVisitGraphCommand();
-        doReturn(clearSessionCommand).when(sessionCommandFactory).newClearCommand();
-        doReturn(deleteSelectionSessionCommand).when(sessionCommandFactory).newDeleteSelectedElementsCommand();
-        doReturn(undoSessionCommand).when(sessionCommandFactory).newUndoCommand();
-        doReturn(redoSessionCommand).when(sessionCommandFactory).newRedoCommand();
-        doReturn(validateSessionCommand).when(sessionCommandFactory).newValidateCommand();
-        doReturn(exportToPngSessionCommand).when(sessionCommandFactory).newExportToPngSessionCommand();
-        doReturn(exportToJpgSessionCommand).when(sessionCommandFactory).newExportToJpgSessionCommand();
-        doReturn(exportToSvgSessionCommand).when(sessionCommandFactory).newExportToSvgSessionCommand();
-        doReturn(exportToPdfSessionCommand).when(sessionCommandFactory).newExportToPdfSessionCommand();
-        doReturn(exportToBpmnSessionCommand).when(sessionCommandFactory).newExportToBpmnSessionCommand();
-        doReturn(copySelectionSessionCommand).when(sessionCommandFactory).newCopySelectionCommand();
-        doReturn(pasteSelectionSessionCommand).when(sessionCommandFactory).newPasteSelectionCommand();
-        doReturn(cutSelectionSessionCommand).when(sessionCommandFactory).newCutSelectionCommand();
-
-        when(sessionPresenterFactory.newPresenterEditor()).thenReturn(sessionPresenter);
-        when(sessionPresenter.getInstance()).thenReturn(clientFullSession);
-        when(sessionPresenter.withToolbar(anyBoolean())).thenReturn(sessionPresenter);
-        when(sessionPresenter.withPalette(anyBoolean())).thenReturn(sessionPresenter);
-        when(sessionPresenter.displayNotifications(any(Predicate.class))).thenReturn(sessionPresenter);
-        when(sessionPresenter.getView()).thenReturn(sessionPresenterView);
-
-        doReturn(mock(MenuItem.class)).when(projectMenuItemsBuilder).newClearItem(any(Command.class));
-        doReturn(mock(MenuItem.class)).when(projectMenuItemsBuilder).newVisitGraphItem(any(Command.class));
-        doReturn(mock(MenuItem.class)).when(projectMenuItemsBuilder).newSwitchGridItem(any(Command.class));
-        doReturn(mock(MenuItem.class)).when(projectMenuItemsBuilder).newDeleteSelectionItem(any(Command.class));
-        doReturn(mock(MenuItem.class)).when(projectMenuItemsBuilder).newUndoItem(any(Command.class));
-        doReturn(mock(MenuItem.class)).when(projectMenuItemsBuilder).newRedoItem(any(Command.class));
-        doReturn(mock(MenuItem.class)).when(projectMenuItemsBuilder).newValidateItem(any(Command.class));
-        doReturn(mock(MenuItem.class)).when(projectMenuItemsBuilder).newExportsItem(any(Command.class),
-                                                                                    any(Command.class),
-                                                                                    any(Command.class),
-                                                                                    any(Command.class),
-                                                                                    any(Command.class));
-        doReturn(mock(MenuItem.class)).when(projectMenuItemsBuilder).newPasteItem(any(Command.class));
-        doReturn(mock(MenuItem.class)).when(projectMenuItemsBuilder).newCopyItem(any(Command.class));
-        doReturn(mock(MenuItem.class)).when(projectMenuItemsBuilder).newCutItem(any(Command.class));
-
-        when(alertsButtonMenuItemBuilder.build()).thenReturn(alertsButtonMenuItem);
+        when(sessionEditorPresenter.getInstance()).thenReturn(clientFullSession);
+        when(sessionEditorPresenter.withToolbar(anyBoolean())).thenReturn(sessionEditorPresenter);
+        when(sessionEditorPresenter.withPalette(anyBoolean())).thenReturn(sessionEditorPresenter);
+        when(sessionEditorPresenter.displayNotifications(any(Predicate.class))).thenReturn(sessionEditorPresenter);
+        when(sessionEditorPresenter.getView()).thenReturn(sessionPresenterView);
         when(versionRecordManager.getPathToLatest()).thenReturn(filePath);
+        when(menuSessionItems.setErrorConsumer(any(Consumer.class))).thenReturn(menuSessionItems);
+        when(menuSessionItems.setLoadingCompleted(any(Command.class))).thenReturn(menuSessionItems);
+        when(menuSessionItems.setLoadingStarts(any(Command.class))).thenReturn(menuSessionItems);
 
         resourceType = mockResourceType();
         presenter = createDiagramEditor();
@@ -321,10 +212,8 @@ public class AbstractProjectDiagramEditorTest {
                                                                             savePopUpPresenter,
                                                                             (ClientResourceTypeMock) getResourceType(),
                                                                             clientProjectDiagramService,
-                                                                            sessionManager,
-                                                                            sessionPresenterFactory,
-                                                                            sessionCommandFactory,
-                                                                            projectMenuItemsBuilder,
+                                                                            sessionEditorPresenter,
+                                                                            menuSessionItems,
                                                                             onDiagramFocusEvent,
                                                                             onDiagramLostFocusEvent,
                                                                             projectMessagesListener,
@@ -364,6 +253,7 @@ public class AbstractProjectDiagramEditorTest {
 
         presenter.makeMenuBar();
 
+        verify(menuSessionItems).populateMenu(eq(fileMenuBuilder));
         verify(fileMenuBuilder).addSave(any(MenuItem.class));
         verify(fileMenuBuilder).addCopy(any(Path.class),
                                         any(AssetUpdateValidator.class));
@@ -371,7 +261,6 @@ public class AbstractProjectDiagramEditorTest {
                                           any(AssetUpdateValidator.class));
         verify(fileMenuBuilder).addDelete(any(Path.class),
                                           any(AssetUpdateValidator.class));
-        verify(fileMenuBuilder).addNewTopLevelMenu(alertsButtonMenuItem);
     }
 
     @Test
@@ -381,6 +270,7 @@ public class AbstractProjectDiagramEditorTest {
 
         presenter.makeMenuBar();
 
+        verify(menuSessionItems).populateMenu(eq(fileMenuBuilder));
         verify(fileMenuBuilder,
                never()).addSave(any(MenuItem.class));
         verify(fileMenuBuilder,
@@ -392,7 +282,6 @@ public class AbstractProjectDiagramEditorTest {
         verify(fileMenuBuilder,
                never()).addDelete(any(Path.class),
                                   any(AssetUpdateValidator.class));
-        verify(fileMenuBuilder).addNewTopLevelMenu(alertsButtonMenuItem);
     }
 
     @Test
@@ -409,31 +298,19 @@ public class AbstractProjectDiagramEditorTest {
     public void testOpen() {
         final ProjectMetadata metadata = mock(ProjectMetadata.class);
         final Overview overview = mock(Overview.class);
-        final ClientSessionFactory clientSessionFactory = mock(ClientSessionFactory.class);
-
         when(diagram.getMetadata()).thenReturn(metadata);
         when(metadata.getTitle()).thenReturn(TITLE);
         when(metadata.getOverview()).thenReturn(overview);
-        when(sessionManager.getSessionFactory(eq(metadata), eq(ClientFullSession.class))).thenReturn(clientSessionFactory);
-        when(sessionPresenterFactory.newPresenterEditor()).thenReturn(sessionPresenter);
 
         presenter.open(diagram);
 
         verify(view).showLoading();
         verify(presenter).setOriginalHash(anyInt());
-
-        verify(clientSessionFactory).newSession(eq(metadata),
-                                                clientSessionConsumerCaptor.capture());
-
-        final Consumer<ClientFullSession> clientSessionConsumer = clientSessionConsumerCaptor.getValue();
-        clientSessionConsumer.accept(clientFullSession);
-
         verify(view).setWidget(eq(sessionPresenterView));
-        verify(sessionPresenter).withToolbar(eq(false));
-        verify(sessionPresenter).withPalette(eq(true));
-        verify(sessionPresenter).open(eq(diagram),
-                                      eq(clientFullSession),
-                                      clientSessionPresenterCallbackCaptor.capture());
+        verify(sessionEditorPresenter).withToolbar(eq(false));
+        verify(sessionEditorPresenter).withPalette(eq(true));
+        verify(sessionEditorPresenter).open(eq(diagram),
+                                            clientSessionPresenterCallbackCaptor.capture());
 
         final SessionPresenter.SessionPresenterCallback clientSessionPresenterCallback = clientSessionPresenterCallbackCaptor.getValue();
         clientSessionPresenterCallback.onSuccess();
@@ -455,24 +332,10 @@ public class AbstractProjectDiagramEditorTest {
     @SuppressWarnings("unchecked")
     public void testCloseEditor() {
         SessionPresenter sessionPresenter = mock(SessionPresenter.class);
-        presenter.setSessionPresenter(sessionPresenter);
+        presenter.setSessionPresenter(sessionEditorPresenter);
         presenter.doClose();
-        verify(clearStatesSessionCommand, times(1)).unbind();
-        verify(switchGridSessionCommand, times(1)).unbind();
-        verify(visitGraphSessionCommand, times(1)).unbind();
-        verify(clearSessionCommand, times(1)).unbind();
-        verify(deleteSelectionSessionCommand, times(1)).unbind();
-        verify(undoSessionCommand, times(1)).unbind();
-        verify(redoSessionCommand, times(1)).unbind();
-        verify(validateSessionCommand, times(1)).unbind();
-        verify(exportToPngSessionCommand, times(1)).unbind();
-        verify(exportToJpgSessionCommand, times(1)).unbind();
-        verify(exportToPdfSessionCommand, times(1)).unbind();
-        verify(exportToSvgSessionCommand, times(1)).unbind();
-        verify(copySelectionSessionCommand, times(1)).unbind();
-        verify(pasteSelectionSessionCommand, times(1)).unbind();
-        verify(cutSelectionSessionCommand, times(1)).unbind();
+        verify(menuSessionItems, times(1)).destroy();
+        verify(sessionEditorPresenter, times(1)).destroy();
         verify(sessionPresenter, never()).clear();
-        verify(sessionPresenter, times(1)).destroy();
     }
 }

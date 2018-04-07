@@ -19,23 +19,24 @@ package org.kie.workbench.common.stunner.client.widgets.explorer.tree;
 import java.util.List;
 import java.util.function.Predicate;
 
-import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
+import javax.enterprise.inject.Any;
 import javax.inject.Inject;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import org.jboss.errai.common.client.api.IsElement;
 import org.jboss.errai.common.client.ui.ElementWrapperWidget;
+import org.jboss.errai.ioc.client.api.ManagedInstance;
 import org.kie.workbench.common.stunner.client.widgets.components.glyph.DOMGlyphRenderers;
 import org.kie.workbench.common.stunner.core.client.api.ShapeManager;
 import org.kie.workbench.common.stunner.core.client.canvas.Canvas;
 import org.kie.workbench.common.stunner.core.client.canvas.CanvasHandler;
 import org.kie.workbench.common.stunner.core.client.canvas.controls.actions.TextPropertyProvider;
 import org.kie.workbench.common.stunner.core.client.canvas.controls.actions.TextPropertyProviderFactory;
-import org.kie.workbench.common.stunner.core.client.canvas.event.AbstractCanvasEvent;
 import org.kie.workbench.common.stunner.core.client.canvas.event.AbstractCanvasHandlerEvent;
 import org.kie.workbench.common.stunner.core.client.canvas.event.CanvasClearEvent;
 import org.kie.workbench.common.stunner.core.client.canvas.event.registration.CanvasElementAddedEvent;
@@ -59,7 +60,7 @@ import org.uberfire.client.mvp.UberView;
 @Dependent
 public class TreeExplorer implements IsWidget {
 
-    static final String NO_NAME = "- No name -";
+    static final String NO_NAME = "-- No name --";
 
     private final int icoHeight = 16;
     private final int icoWidth = 16;
@@ -68,11 +69,12 @@ public class TreeExplorer implements IsWidget {
     private final DefinitionUtils definitionUtils;
     private final ShapeManager shapeManager;
     private final Event<CanvasSelectionEvent> selectionEvent;
-    private final View view;
+    private final ManagedInstance<View> views;
     private final DOMGlyphRenderers domGlyphRenderers;
 
     private String selectedItemCanvasUuid;
     private CanvasHandler canvasHandler;
+    private View view;
 
     @Inject
     public TreeExplorer(final ChildrenTraverseProcessor childrenTraverseProcessor,
@@ -81,24 +83,20 @@ public class TreeExplorer implements IsWidget {
                         final DefinitionUtils definitionUtils,
                         final ShapeManager shapeManager,
                         final DOMGlyphRenderers domGlyphRenderers,
-                        final View view) {
+                        final @Any ManagedInstance<View> views) {
         this.childrenTraverseProcessor = childrenTraverseProcessor;
         this.textPropertyProviderFactory = textPropertyProviderFactory;
         this.selectionEvent = selectionEvent;
         this.definitionUtils = definitionUtils;
         this.shapeManager = shapeManager;
         this.domGlyphRenderers = domGlyphRenderers;
-        this.view = view;
-    }
-
-    @PostConstruct
-    public void init() {
-        view.init(this);
+        this.views = views;
     }
 
     @SuppressWarnings("unchecked")
     public void show(final CanvasHandler canvasHandler) {
         this.canvasHandler = canvasHandler;
+        initView();
         if (null != canvasHandler && null != canvasHandler.getDiagram()) {
             doShow(canvasHandler.getDiagram().getGraph());
         }
@@ -175,9 +173,11 @@ public class TreeExplorer implements IsWidget {
         view.clear();
     }
 
+    @PreDestroy
     public void destroy() {
-        this.selectedItemCanvasUuid = null;
-        view.destroy();
+        destroyView();
+        selectedItemCanvasUuid = null;
+        canvasHandler = null;
     }
 
     void onSelect(final String uuid) {
@@ -379,10 +379,18 @@ public class TreeExplorer implements IsWidget {
         return canvasHandler != null && canvasHandler.equals(_canvasHandler);
     }
 
-    private boolean checkEventContext(final AbstractCanvasEvent canvasEvent) {
-        final Canvas canvas = canvasEvent.getCanvas();
-        return null != canvasHandler && null != canvasHandler.getCanvas()
-                && canvasHandler.getCanvas().equals(canvas);
+    private void initView() {
+        if (null != view) {
+            destroyView();
+        }
+        view = views.get();
+        view.init(this);
+    }
+
+    private void destroyView() {
+        view.destroy();
+        views.destroy(view);
+        view = null;
     }
 
     private String getShapeSetId() {

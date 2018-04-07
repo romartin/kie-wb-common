@@ -25,6 +25,7 @@ import org.kie.workbench.common.stunner.core.client.canvas.controls.select.Selec
 import org.kie.workbench.common.stunner.core.client.canvas.controls.zoom.ZoomControl;
 import org.kie.workbench.common.stunner.core.client.command.CanvasCommandFactory;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
+import org.kie.workbench.common.stunner.core.graph.Element;
 
 /**
  * An abstract DiagramViewer type that opens the diagram in a viewer which is scaled
@@ -36,14 +37,22 @@ public abstract class DiagramPreviewProxy<D extends Diagram> extends AbstractDia
     private final DiagramViewerProxy<D> viewer;
 
     @SuppressWarnings("unchecked")
-    public DiagramPreviewProxy(final WidgetWrapperView view,
-                               final SelectionControl<AbstractCanvasHandler, ?> selectionControl) {
+    public DiagramPreviewProxy(final WidgetWrapperView view) {
         this.viewer =
-                new DiagramViewerProxy<D>(view,
-                                          selectionControl) {
+                new DiagramViewerProxy<D>(view) {
+                    @Override
+                    public SelectionControl<AbstractCanvasHandler, Element> getSelectionControl() {
+                        return DiagramPreviewProxy.this.getSelectionControl();
+                    }
+
                     @Override
                     public <C extends Canvas> ZoomControl<C> getZoomControl() {
                         return (ZoomControl<C>) DiagramPreviewProxy.this.getZoomControl();
+                    }
+
+                    @Override
+                    protected void onOpen(final D diagram) {
+                        DiagramPreviewProxy.this.onOpen(diagram);
                     }
 
                     @Override
@@ -67,6 +76,11 @@ public abstract class DiagramPreviewProxy<D extends Diagram> extends AbstractDia
                     }
 
                     @Override
+                    protected void destroyInstances() {
+                        DiagramPreviewProxy.this.destroyInstances();
+                    }
+
+                    @Override
                     protected BaseCanvasHandler<D, ?> getCanvasHandler() {
                         return DiagramPreviewProxy.this.getCanvasHandler();
                     }
@@ -77,6 +91,8 @@ public abstract class DiagramPreviewProxy<D extends Diagram> extends AbstractDia
                     }
                 };
     }
+
+    protected abstract void onOpen(D diagram);
 
     protected abstract AbstractCanvas getCanvas();
 
@@ -90,13 +106,10 @@ public abstract class DiagramPreviewProxy<D extends Diagram> extends AbstractDia
 
     protected abstract void destroyControls();
 
+    protected abstract void destroyInstances();
+
     @Override
     public DiagramViewerProxy<D> getViewer() {
         return viewer;
-    }
-
-    @Override
-    public SelectionControl<AbstractCanvasHandler, ?> getSelectionControl() {
-        return getViewer().getSelectionControl();
     }
 }

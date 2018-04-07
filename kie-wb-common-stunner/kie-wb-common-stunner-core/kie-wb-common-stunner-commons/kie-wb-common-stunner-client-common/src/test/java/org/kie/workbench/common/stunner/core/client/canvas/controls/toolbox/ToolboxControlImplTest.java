@@ -248,7 +248,7 @@ public class ToolboxControlImplTest {
         verify(toolbox,
                times(1)).show();
         verify(toolbox,
-               never()).destroy();
+               times(1)).destroy();
         verify(toolbox,
                never()).hide();
     }

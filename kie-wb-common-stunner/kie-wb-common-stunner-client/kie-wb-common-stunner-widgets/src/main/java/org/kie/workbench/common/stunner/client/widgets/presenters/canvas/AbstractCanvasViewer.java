@@ -73,6 +73,10 @@ public abstract class AbstractCanvasViewer<T, H extends AbstractCanvasHandler, V
     @Override
     public void destroy() {
         destroyControls();
+        destroyInstances();
+    }
+
+    protected void destroyInstances() {
         getHandler().destroy();
         getView().clear();
     }

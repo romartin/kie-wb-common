@@ -54,7 +54,7 @@ public class NavigateToDRGEditorCommandTest extends BaseNavigationCommandTest {
                      command.getCanvasCommand(canvasHandler).execute(canvasHandler));
 
         verify(layer).enableHandlers();
-        verify(session).resume();
+        verify(session).open();
         verify(command).hidePaletteWidget(eq(false));
         verify(command).addDRGEditorToCanvasWidget();
         verify(sessionPresenterView).setCanvasWidget(view);

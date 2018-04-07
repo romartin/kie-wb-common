@@ -71,6 +71,11 @@ public class CaseManagementContainmentAcceptorControlImpl extends AbstractAccept
     }
 
     @Override
+    protected void onDestroy(final WiresCanvas.View view) {
+        view.setContainmentAcceptor(IContainmentAcceptor.NONE);
+    }
+
+    @Override
     public boolean allow(final Element parent,
                          final Node[] children) {
         return evaluate(parent,
