@@ -38,22 +38,23 @@ public class ContextUtils {
 
     @SuppressWarnings("unchecked")
     public static boolean isFormGenerationSupported(final Element<?> element) {
-        return null != element.asNode() &&
-                element.getContent() instanceof View &&
-                ((Element<View<?>>) element)
-                        .getContent()
-                        .getDefinition()
-                        .getClass()
-                        .equals(UserTask.class);
+        return isElementNodeBeanType(element,
+                                     UserTask.class);
     }
 
     public static boolean isExpandSupported(final Element<?> element) {
+        return isElementNodeBeanType(element,
+                                     Lane.class);
+    }
+
+    private static boolean isElementNodeBeanType(final Element<?> element,
+                                                 final Class<?> type) {
         return null != element.asNode() &&
                 element.getContent() instanceof View &&
                 ((Element<View<?>>) element)
                         .getContent()
                         .getDefinition()
                         .getClass()
-                        .equals(Lane.class);
+                        .equals(type);
     }
 }

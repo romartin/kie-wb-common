@@ -29,8 +29,6 @@ import org.kie.workbench.common.stunner.bpmn.definition.UserTask;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.ActionsToolboxView;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.CommonActionsToolboxFactory;
-import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.ExpandHorizontalNodeAction;
-import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.ExpandVerticalNodeAction;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.ToolboxAction;
 import org.kie.workbench.common.stunner.core.graph.Node;
 import org.kie.workbench.common.stunner.core.graph.content.view.BoundsImpl;
@@ -43,7 +41,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(GwtMockitoTestRunner.class)
@@ -80,11 +77,12 @@ public class BPMNCommonActionsToolboxFactoryTest {
         when(views.get()).thenReturn(view);
         when(commonActionToolbox.getActions(eq(canvasHandler),
                                             eq(element))).thenReturn(Collections.singletonList(action1));
+        // TODO
         tested = new BPMNCommonActionsToolboxFactory(commonActionToolbox,
-                                                     generateFormsActions,
-                                                     () -> mock(ExpandHorizontalNodeAction.class),
-                                                     () -> mock(ExpandVerticalNodeAction.class),
-                                                     views);
+                                                     null,
+                                                     null,
+                                                     null,
+                                                     null);
     }
 
     @Test

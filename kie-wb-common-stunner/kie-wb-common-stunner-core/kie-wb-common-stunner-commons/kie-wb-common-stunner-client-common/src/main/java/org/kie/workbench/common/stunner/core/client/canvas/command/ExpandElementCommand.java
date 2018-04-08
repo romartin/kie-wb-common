@@ -31,7 +31,7 @@ import org.kie.workbench.common.stunner.core.graph.content.view.View;
 
 public class ExpandElementCommand extends AbstractCanvasCommand {
 
-    private static final double PADDING = 50;
+    private static final double PADDING = 25;
 
     public enum Direction {
         HORIZONTAL,

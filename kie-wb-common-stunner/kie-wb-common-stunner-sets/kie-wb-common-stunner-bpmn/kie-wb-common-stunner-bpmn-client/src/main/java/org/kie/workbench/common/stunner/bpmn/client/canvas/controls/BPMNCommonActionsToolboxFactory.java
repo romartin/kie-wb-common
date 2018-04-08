@@ -33,7 +33,6 @@ import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.A
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.ActionsToolboxFactory;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.ActionsToolboxView;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.CommonActionsToolbox;
-import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.CommonActionsToolboxFactory;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.ExpandHorizontalNodeAction;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.ExpandVerticalNodeAction;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.ToolboxAction;
@@ -70,18 +69,6 @@ public class BPMNCommonActionsToolboxFactory extends AbstractActionsToolboxFacto
         this.expandHorizontalNodeActions = expandHorizontalNodeActions::get;
         this.expandVerticalNodeActions = expandVerticalNodeActions::get;
         this.views = views::get;
-    }
-
-    BPMNCommonActionsToolboxFactory(final ActionsToolboxFactory commonActionToolbox,
-                                    final Supplier<FormGenerationToolboxAction> generateFormsActions,
-                                    final Supplier<ExpandHorizontalNodeAction> expandHorizontalNodeActions,
-                                    final Supplier<ExpandVerticalNodeAction> expandVerticalNodeActions,
-                                    final Supplier<ActionsToolboxView> views) {
-        this.commonActionToolbox = commonActionToolbox;
-        this.generateFormsActions = generateFormsActions;
-        this.expandHorizontalNodeActions = expandHorizontalNodeActions;
-        this.expandVerticalNodeActions = expandVerticalNodeActions;
-        this.views = views;
     }
 
     @Override
