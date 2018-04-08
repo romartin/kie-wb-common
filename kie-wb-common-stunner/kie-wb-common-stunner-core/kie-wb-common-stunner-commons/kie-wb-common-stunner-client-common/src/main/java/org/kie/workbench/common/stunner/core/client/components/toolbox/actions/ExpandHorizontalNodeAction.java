@@ -29,31 +29,23 @@ import org.kie.workbench.common.stunner.core.client.shape.SvgDataUriGlyph;
 import org.kie.workbench.common.stunner.core.client.shape.view.event.MouseClickEvent;
 import org.kie.workbench.common.stunner.core.definition.shape.Glyph;
 import org.kie.workbench.common.stunner.core.graph.Edge;
-import org.kie.workbench.common.stunner.core.graph.Graph;
 import org.kie.workbench.common.stunner.core.graph.Node;
-import org.kie.workbench.common.stunner.core.graph.content.Bounds;
-import org.kie.workbench.common.stunner.core.graph.content.definition.DefinitionSet;
-import org.kie.workbench.common.stunner.core.graph.content.view.Point2D;
 import org.kie.workbench.common.stunner.core.graph.content.view.View;
 import org.kie.workbench.common.stunner.core.i18n.CoreTranslationMessages;
 
-// TODO: Support for expand direction (V/H/Both)
-
 @Dependent
-public class ExpandNodeAction implements ToolboxAction<AbstractCanvasHandler> {
-
-    private static final double PADDING = 25;
+public class ExpandHorizontalNodeAction implements ToolboxAction<AbstractCanvasHandler> {
 
     private final ClientTranslationService translationService;
     private final SessionCommandManager<AbstractCanvasHandler> sessionCommandManager;
     private final CanvasCommandFactory<AbstractCanvasHandler> commandFactory;
     private static final SvgDataUriGlyph GLYPH =
-            SvgDataUriGlyph.Builder.build(StunnerCommonImageResources.INSTANCE.expand().getSafeUri());
+            SvgDataUriGlyph.Builder.build(StunnerCommonImageResources.INSTANCE.expandHorizontal().getSafeUri());
 
     @Inject
-    public ExpandNodeAction(final ClientTranslationService translationService,
-                            final @Session SessionCommandManager<AbstractCanvasHandler> sessionCommandManager,
-                            final CanvasCommandFactory<AbstractCanvasHandler> commandFactory) {
+    public ExpandHorizontalNodeAction(final ClientTranslationService translationService,
+                                      final @Session SessionCommandManager<AbstractCanvasHandler> sessionCommandManager,
+                                      final CanvasCommandFactory<AbstractCanvasHandler> commandFactory) {
         this.translationService = translationService;
         this.sessionCommandManager = sessionCommandManager;
         this.commandFactory = commandFactory;
@@ -68,7 +60,8 @@ public class ExpandNodeAction implements ToolboxAction<AbstractCanvasHandler> {
     @Override
     public String getTitle(final AbstractCanvasHandler canvasHandler,
                            final String uuid) {
-        return translationService.getValue(CoreTranslationMessages.EXPAND);
+        return translationService.getValue(CoreTranslationMessages.EXPAND) + " " +
+                translationService.getValue(CoreTranslationMessages.WIDTH);
     }
 
     @Override
@@ -80,23 +73,8 @@ public class ExpandNodeAction implements ToolboxAction<AbstractCanvasHandler> {
                 (Node<View<?>, Edge>) AbstractToolboxAction.getElement(canvasHandler,
                                                                        uuid)
                         .asNode();
-        final Bounds nodeBounds = node.getContent().getBounds();
-        final Graph<DefinitionSet, ? extends Node> graph = canvasHandler.getDiagram().getGraph();
-        final Bounds bounds = graph.getContent().getBounds();
-        final Double minX = bounds.getUpperLeft().getX();
-        final Double maxX = bounds.getLowerRight().getX();
-        final Double minY = nodeBounds.getUpperLeft().getY();
-        final Double maxY = nodeBounds.getLowerRight().getY();
-        final Double x = minX + PADDING;
-        final Double y = minY;
-        final Point2D location = new Point2D(minX + PADDING, y);
-        final double width = (maxX - PADDING) - x;
-        final double height = maxY - minY;
         sessionCommandManager.execute(canvasHandler,
-                                      commandFactory.resize(node,
-                                                            location,
-                                                            width,
-                                                            height));
+                                      commandFactory.expandHorizontal(node));
         return this;
     }
 }

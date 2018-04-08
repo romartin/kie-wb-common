@@ -26,10 +26,10 @@ import org.kie.workbench.common.stunner.core.rule.RuleViolation;
 
 public class ResizeElementCommand extends AbstractCanvasGraphCommand {
 
-    protected final Node<View<?>, Edge> element;
-    protected final Point2D location;
-    protected final double width;
-    protected final double height;
+    private final Node<View<?>, Edge> element;
+    private final Point2D location;
+    private final double width;
+    private final double height;
 
     public ResizeElementCommand(final Node<View<?>, Edge> element,
                                 final Point2D location,

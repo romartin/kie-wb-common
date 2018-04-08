@@ -100,6 +100,10 @@ public interface CanvasCommandFactory<H extends CanvasHandler> {
                             final double width,
                             final double height);
 
+    CanvasCommand<H> expandHorizontal(final Node<View<?>, Edge> element);
+
+    CanvasCommand<H> expandVertical(final Node<View<?>, Edge> element);
+
     CanvasCommand<H> updatePropertyValue(final Element element,
                                          final String propertyId,
                                          final Object value);

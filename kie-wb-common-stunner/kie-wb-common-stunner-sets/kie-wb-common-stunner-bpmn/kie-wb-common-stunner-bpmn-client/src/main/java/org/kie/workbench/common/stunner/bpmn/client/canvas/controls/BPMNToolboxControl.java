@@ -41,13 +41,6 @@ public class BPMNToolboxControl extends AbstractToolboxControl {
     private final ActionsToolboxFactory bpmnCommonActionsToolboxFactory;
     private List<ActionsToolboxFactory> factories;
 
-    // CDI proxy.
-    public BPMNToolboxControl() {
-        this(null,
-             null,
-             null);
-    }
-
     @Inject
     public BPMNToolboxControl(final @FlowActionsToolbox ActionsToolboxFactory flowActionsToolboxFactory,
                               final @MorphActionsToolbox ActionsToolboxFactory morphActionsToolboxFactory,
@@ -59,7 +52,7 @@ public class BPMNToolboxControl extends AbstractToolboxControl {
 
     @PostConstruct
     public void init() {
-        factories = new ArrayList<ActionsToolboxFactory>(2) {{
+        factories = new ArrayList<ActionsToolboxFactory>(3) {{
             add(flowActionsToolboxFactory);
             add(morphActionsToolboxFactory);
             add(bpmnCommonActionsToolboxFactory);

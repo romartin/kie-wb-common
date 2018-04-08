@@ -211,6 +211,18 @@ public class DefaultCanvasCommandFactory implements CanvasCommandFactory<Abstrac
     }
 
     @Override
+    public CanvasCommand<AbstractCanvasHandler> expandHorizontal(final Node<View<?>, Edge> element) {
+        return new ExpandElementCommand(element,
+                                        ExpandElementCommand.Direction.HORIZONTAL);
+    }
+
+    @Override
+    public CanvasCommand<AbstractCanvasHandler> expandVertical(final Node<View<?>, Edge> element) {
+        return new ExpandElementCommand(element,
+                                        ExpandElementCommand.Direction.VERTICAL);
+    }
+
+    @Override
     public CanvasCommand<AbstractCanvasHandler> updatePropertyValue(final Element element,
                                                                     final String propertyId,
                                                                     final Object value) {

@@ -17,6 +17,7 @@
 package org.kie.workbench.common.stunner.bpmn.client.forms.util;
 
 import org.kie.workbench.common.forms.dynamic.service.shared.FormRenderingContext;
+import org.kie.workbench.common.stunner.bpmn.definition.Lane;
 import org.kie.workbench.common.stunner.bpmn.definition.UserTask;
 import org.kie.workbench.common.stunner.core.graph.Element;
 import org.kie.workbench.common.stunner.core.graph.content.view.View;
@@ -44,5 +45,15 @@ public class ContextUtils {
                         .getDefinition()
                         .getClass()
                         .equals(UserTask.class);
+    }
+
+    public static boolean isExpandSupported(final Element<?> element) {
+        return null != element.asNode() &&
+                element.getContent() instanceof View &&
+                ((Element<View<?>>) element)
+                        .getContent()
+                        .getDefinition()
+                        .getClass()
+                        .equals(Lane.class);
     }
 }

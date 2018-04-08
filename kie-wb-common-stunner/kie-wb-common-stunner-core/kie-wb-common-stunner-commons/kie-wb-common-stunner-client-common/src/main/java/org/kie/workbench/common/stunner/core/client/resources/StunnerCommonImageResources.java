@@ -41,7 +41,15 @@ public interface StunnerCommonImageResources extends ClientBundleWithLookup {
     @DataResource.MimeType("image/svg+xml")
     DataResource gears();
 
-    @ClientBundle.Source("images/expand.svg")
+    @ClientBundle.Source("images/expand-both.svg")
     @DataResource.MimeType("image/svg+xml")
-    DataResource expand();
+    DataResource expandBoth();
+
+    @ClientBundle.Source("images/expand-horizontal.svg")
+    @DataResource.MimeType("image/svg+xml")
+    DataResource expandHorizontal();
+
+    @ClientBundle.Source("images/expand-vertical.svg")
+    @DataResource.MimeType("image/svg+xml")
+    DataResource expandVertical();
 }
