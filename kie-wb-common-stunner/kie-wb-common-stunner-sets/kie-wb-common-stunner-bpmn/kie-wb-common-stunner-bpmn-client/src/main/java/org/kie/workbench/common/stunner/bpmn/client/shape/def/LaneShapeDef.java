@@ -40,13 +40,14 @@ public class LaneShapeDef extends BaseDimensionedShapeDef
 
     @Override
     public SizeHandler<Lane, SVGShapeView> newSizeHandler() {
+        // TODO: Allow not seting min/max size constraints
         return newSizeHandlerBuilder()
                 .width(e -> e.getDimensionsSet().getWidth().getValue())
                 .height(e -> e.getDimensionsSet().getHeight().getValue())
                 .minWidth(task -> 200d)
-                .maxWidth(task -> 1200d)
+                .maxWidth(task -> 5000d)
                 .minHeight(task -> 200d)
-                .maxHeight(task -> 1200d)
+                .maxHeight(task -> 5000d)
                 .build();
     }
 

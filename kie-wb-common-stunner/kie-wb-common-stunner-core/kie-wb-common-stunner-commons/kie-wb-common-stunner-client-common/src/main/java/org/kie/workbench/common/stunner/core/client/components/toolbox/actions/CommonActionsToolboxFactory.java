@@ -43,29 +43,35 @@ public class CommonActionsToolboxFactory
 
     private final CanvasCommandFactory<AbstractCanvasHandler> commandFactory;
     private final Supplier<DeleteNodeAction> deleteNodeActions;
+    private final Supplier<ExpandNodeAction> expandNodeActions;
     private final Supplier<ActionsToolboxView> views;
 
     // CDI proxy.
     protected CommonActionsToolboxFactory() {
-        this(null,
-             (Supplier) null,
-             (Supplier) null);
+        this.commandFactory = null;
+        this.deleteNodeActions = null;
+        this.expandNodeActions = null;
+        this.views = null;
     }
 
     @Inject
     public CommonActionsToolboxFactory(final CanvasCommandFactory<AbstractCanvasHandler> commandFactory,
                                        final @Any ManagedInstance<DeleteNodeAction> deleteNodeActions,
+                                       final @Any ManagedInstance<ExpandNodeAction> expandNodeActions,
                                        final @CommonActionsToolbox ManagedInstance<ActionsToolboxView> views) {
         this(commandFactory,
              deleteNodeActions::get,
+             expandNodeActions::get,
              views::get);
     }
 
     CommonActionsToolboxFactory(final CanvasCommandFactory<AbstractCanvasHandler> commandFactory,
                                 final Supplier<DeleteNodeAction> deleteNodeActions,
+                                final Supplier<ExpandNodeAction> expandNodeActions,
                                 final Supplier<ActionsToolboxView> views) {
         this.commandFactory = commandFactory;
         this.deleteNodeActions = deleteNodeActions;
+        this.expandNodeActions = expandNodeActions;
         this.views = views;
     }
 
@@ -83,6 +89,7 @@ public class CommonActionsToolboxFactory
                         e)) {
             actions.add(deleteNodeActions.get());
         }
+        actions.add(expandNodeActions.get());
         return actions;
     }
 

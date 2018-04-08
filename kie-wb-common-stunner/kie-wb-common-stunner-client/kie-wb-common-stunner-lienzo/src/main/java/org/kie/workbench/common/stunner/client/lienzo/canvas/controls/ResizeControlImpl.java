@@ -237,6 +237,8 @@ public class ResizeControlImpl extends AbstractCanvasHandlerRegistrationControl<
         }
     }
 
+    // TODO: Refactor by the use of the ResizeElementCommand!
+
     @SuppressWarnings("unchecked")
     private CommandResult<CanvasViolation> doResize(final Element<? extends View<?>> element,
                                                     final Double x,

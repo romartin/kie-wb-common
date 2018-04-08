@@ -121,6 +121,16 @@ public class GraphCommandFactory {
                                                 location);
     }
 
+    public ResizeElementCommand resize(final Node<? extends View<?>, Edge> element,
+                                       final Point2D location,
+                                       final double width,
+                                       final double height) {
+        return new ResizeElementCommand(element,
+                                        location,
+                                        width,
+                                        height);
+    }
+
     @SuppressWarnings("unchecked")
     public UpdateElementPropertyValueCommand updatePropertyValue(final Node element,
                                                                  final String propertyId,
@@ -179,7 +189,7 @@ public class GraphCommandFactory {
         return new ClearGraphCommand(rootUUID);
     }
 
-    public AddControlPointCommand addControlPoint(Edge edge, ControlPoint... controlPoints){
+    public AddControlPointCommand addControlPoint(Edge edge, ControlPoint... controlPoints) {
         return new AddControlPointCommand(edge, controlPoints);
     }
 }

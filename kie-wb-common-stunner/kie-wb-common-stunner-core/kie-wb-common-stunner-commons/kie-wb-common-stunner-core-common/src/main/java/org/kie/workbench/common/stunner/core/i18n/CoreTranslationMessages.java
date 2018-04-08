@@ -33,6 +33,8 @@ public class CoreTranslationMessages {
 
     public static final String DELETE = CORE_PREF + "delete";
 
+    public static final String EXPAND = CORE_PREF + "expand";
+
     public static final String EDIT = CORE_PREF + "edit";
 
     public static final String ARE_YOU_SURE = CORE_PREF + "areYouSure";

@@ -95,6 +95,11 @@ public interface CanvasCommandFactory<H extends CanvasHandler> {
     CanvasCommand<H> updatePosition(final Node<View<?>, Edge> element,
                                     final Point2D location);
 
+    CanvasCommand<H> resize(final Node<View<?>, Edge> element,
+                            final Point2D location,
+                            final double width,
+                            final double height);
+
     CanvasCommand<H> updatePropertyValue(final Element element,
                                          final String propertyId,
                                          final Object value);

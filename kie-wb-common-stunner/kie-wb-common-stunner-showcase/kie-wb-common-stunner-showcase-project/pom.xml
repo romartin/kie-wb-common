@@ -1157,6 +1157,11 @@
           <module>org.kie.workbench.common.stunner.project.StunnerProjectShowcase</module>
           <logLevel>INFO</logLevel>
           <noServer>false</noServer>
+
+          <skip>true</skip>
+
+
+
           <server>org.jboss.errai.cdi.server.gwt.EmbeddedWildFlyLauncher</server>
           <disableCastChecking>true</disableCastChecking>
           <runTarget>stunner.html</runTarget>

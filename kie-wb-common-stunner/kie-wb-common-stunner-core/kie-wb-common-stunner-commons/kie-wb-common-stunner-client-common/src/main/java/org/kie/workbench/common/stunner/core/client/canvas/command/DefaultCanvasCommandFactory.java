@@ -154,7 +154,7 @@ public class DefaultCanvasCommandFactory implements CanvasCommandFactory<Abstrac
     public CanvasCommand<AbstractCanvasHandler> updateDockNode(final Node parent,
                                                                final Node candidate,
                                                                final boolean adjustPosition) {
-        return new UpdateDockNodeCommand(parent,candidate, adjustPosition);
+        return new UpdateDockNodeCommand(parent, candidate, adjustPosition);
     }
 
     @Override
@@ -197,6 +197,17 @@ public class DefaultCanvasCommandFactory implements CanvasCommandFactory<Abstrac
                                                                final Point2D location) {
         return new UpdateElementPositionCommand(element,
                                                 location);
+    }
+
+    @Override
+    public CanvasCommand<AbstractCanvasHandler> resize(final Node<View<?>, Edge> element,
+                                                       final Point2D location,
+                                                       final double width,
+                                                       final double height) {
+        return new ResizeElementCommand(element,
+                                        location,
+                                        width,
+                                        height);
     }
 
     @Override
