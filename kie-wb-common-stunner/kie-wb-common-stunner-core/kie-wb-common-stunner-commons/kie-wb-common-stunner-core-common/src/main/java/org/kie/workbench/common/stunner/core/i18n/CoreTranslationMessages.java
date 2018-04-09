@@ -35,9 +35,9 @@ public class CoreTranslationMessages {
 
     public static final String EXPAND = CORE_PREF + "expand";
 
-    public static final String WIDTH = CORE_PREF + "width";
+    public static final String HORIZONTAL = CORE_PREF + "horizontal";
 
-    public static final String HEIGHT = CORE_PREF + "height";
+    public static final String VERTICAL = CORE_PREF + "vertical";
 
     public static final String EDIT = CORE_PREF + "edit";
 

@@ -45,7 +45,7 @@ import org.kie.workbench.common.stunner.core.util.HashUtil;
 @Portable
 @Bindable
 @Definition(graphFactory = NodeFactory.class, builder = BPMNDiagramImpl.BPMNDiagramBuilder.class)
-@CanContain(roles = {"all"})
+@CanContain(roles = {"all", "canContainArtifacts"})
 @FormDefinition(
         startElement = "diagramSet",
         policy = FieldPolicy.ONLY_MARKED

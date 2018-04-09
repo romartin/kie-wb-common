@@ -61,7 +61,7 @@ public class ExpandHorizontalNodeAction implements ToolboxAction<AbstractCanvasH
     public String getTitle(final AbstractCanvasHandler canvasHandler,
                            final String uuid) {
         return translationService.getValue(CoreTranslationMessages.EXPAND) + " " +
-                translationService.getValue(CoreTranslationMessages.WIDTH);
+                translationService.getValue(CoreTranslationMessages.HORIZONTAL);
     }
 
     @Override

@@ -61,7 +61,7 @@ public class ExpandVerticalNodeAction implements ToolboxAction<AbstractCanvasHan
     public String getTitle(final AbstractCanvasHandler canvasHandler,
                            final String uuid) {
         return translationService.getValue(CoreTranslationMessages.EXPAND) + " " +
-                translationService.getValue(CoreTranslationMessages.HEIGHT);
+                translationService.getValue(CoreTranslationMessages.VERTICAL);
     }
 
     @Override

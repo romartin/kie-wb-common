@@ -71,7 +71,6 @@ public class Lane implements BPMNViewDefinition {
 
     @Labels
     private final Set<String> labels = new HashSet<String>() {{
-        add("all");
         add("PoolChild");
         add("fromtoall");
         add("canContainArtifacts");

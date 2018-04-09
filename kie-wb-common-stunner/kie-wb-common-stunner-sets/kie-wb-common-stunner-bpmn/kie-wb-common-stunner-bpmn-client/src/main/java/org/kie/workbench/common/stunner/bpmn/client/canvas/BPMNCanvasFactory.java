@@ -77,7 +77,7 @@ public class BPMNCanvasFactory extends DefaultCanvasFactory {
                              final ManagedInstance<DockingAcceptorControl> dockingAcceptorControls,
                              final ManagedInstance<CanvasInPlaceTextEditorControl> inPlaceTextEditorControls,
                              final @MultipleSelection ManagedInstance<SelectionControl> selectionControls,
-                             final ManagedInstance<LocationControl> locationControls,
+                             final @BPMN ManagedInstance<LocationControl> locationControls,
                              final @BPMN ManagedInstance<ToolboxControl> toolboxControls,
                              final @Default @Observer ManagedInstance<ElementBuilderControl> elementBuilderControls,
                              final ManagedInstance<NodeBuilderControl> nodeBuilderControls,

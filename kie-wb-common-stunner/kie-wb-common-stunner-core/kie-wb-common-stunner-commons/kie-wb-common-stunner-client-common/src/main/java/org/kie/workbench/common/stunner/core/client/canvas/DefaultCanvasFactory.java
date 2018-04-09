@@ -102,7 +102,7 @@ public class DefaultCanvasFactory
                                 final ManagedInstance<DockingAcceptorControl> dockingAcceptorControls,
                                 final ManagedInstance<CanvasInPlaceTextEditorControl> inPlaceTextEditorControls,
                                 final @MultipleSelection ManagedInstance<SelectionControl> selectionControls,
-                                final ManagedInstance<LocationControl> locationControls,
+                                final @Default ManagedInstance<LocationControl> locationControls,
                                 final @Default ManagedInstance<ToolboxControl> toolboxControls,
                                 final @Default @Observer ManagedInstance<ElementBuilderControl> elementBuilderControls,
                                 final ManagedInstance<NodeBuilderControl> nodeBuilderControls,

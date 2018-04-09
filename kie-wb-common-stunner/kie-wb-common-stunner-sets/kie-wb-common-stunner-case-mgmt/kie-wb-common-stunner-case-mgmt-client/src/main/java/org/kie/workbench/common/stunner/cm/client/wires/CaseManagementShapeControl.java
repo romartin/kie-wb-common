@@ -42,7 +42,8 @@ public class CaseManagementShapeControl
         shapeControl = new WiresShapeControlImpl(parentPicker,
                                                  new WiresMagnetsControlImpl(shape),
                                                  null,
-                                                 new CaseManagementContainmentControl(parentPicker, state));
+                                                 new CaseManagementContainmentControl(parentPicker, state),
+                                                 null);
     }
 
     @Override

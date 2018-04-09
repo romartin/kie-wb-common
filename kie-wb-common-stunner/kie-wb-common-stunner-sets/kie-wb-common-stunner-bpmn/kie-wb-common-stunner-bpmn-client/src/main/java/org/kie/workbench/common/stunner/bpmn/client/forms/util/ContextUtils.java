@@ -47,8 +47,8 @@ public class ContextUtils {
                                      Lane.class);
     }
 
-    private static boolean isElementNodeBeanType(final Element<?> element,
-                                                 final Class<?> type) {
+    public static boolean isElementNodeBeanType(final Element<?> element,
+                                                final Class<?> type) {
         return null != element.asNode() &&
                 element.getContent() instanceof View &&
                 ((Element<View<?>>) element)

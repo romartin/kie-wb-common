@@ -28,12 +28,14 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
+import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 
 import com.ait.lienzo.client.core.shape.wires.ILocationAcceptor;
 import com.ait.lienzo.client.core.shape.wires.WiresContainer;
 import com.ait.lienzo.client.core.shape.wires.WiresManager;
 import com.ait.lienzo.client.core.types.BoundingBox;
+import com.ait.tooling.common.api.java.util.function.BiPredicate;
 import org.kie.workbench.common.stunner.client.lienzo.canvas.wires.WiresCanvas;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvas;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
@@ -76,6 +78,7 @@ import org.kie.workbench.common.stunner.core.graph.util.GraphUtils;
 import static org.kie.soup.commons.validation.PortablePreconditions.checkNotNull;
 
 @Dependent
+@Default
 public class LocationControlImpl
         extends AbstractCanvasHandlerRegistrationControl<AbstractCanvasHandler>
         implements LocationControl<AbstractCanvasHandler, Element> {
@@ -88,6 +91,7 @@ public class LocationControlImpl
 
     private final CanvasCommandFactory<AbstractCanvasHandler> canvasCommandFactory;
     private final Event<ShapeLocationsChangedEvent> shapeLocationsChangedEvent;
+    private BiPredicate<Element, Element> siblingAllowed;
     private CommandManagerProvider<AbstractCanvasHandler> commandManagerProvider;
     private double[] boundsConstraint;
     private final Collection<String> selectedIDs = new LinkedList<>();
@@ -102,6 +106,7 @@ public class LocationControlImpl
                                final Event<ShapeLocationsChangedEvent> shapeLocationsChangedEvent) {
         this.canvasCommandFactory = canvasCommandFactory;
         this.shapeLocationsChangedEvent = shapeLocationsChangedEvent;
+        this.siblingAllowed = null;
     }
 
     @Override
@@ -110,64 +115,9 @@ public class LocationControlImpl
         session.getKeyboardControl().addKeyShortcutCallback(this::onKeyDownEvent);
     }
 
-    private void onKeyDownEvent(final KeyboardEvent.Key... keys) {
-        if (KeysMatcher.doKeysMatch(keys,
-                                    KeyboardEvent.Key.ESC)) {
-            getWiresManager().resetContext();
-        }
-
-        handleArrowKeys(keys);
-    }
-
-    private void handleArrowKeys(final KeyboardEvent.Key... keys) {
-
-        final int selectedIDsCount = selectedIDs.size();
-
-        if (selectedIDsCount == 0) {
-            return;
-        }
-
-        double movementDistance = NORMAL_DISTANCE;
-
-        if (KeysMatcher.isKeyMatch(keys, KeyboardEvent.Key.CONTROL)) {
-            movementDistance = LARGE_DISTANCE;
-        } else if (KeysMatcher.isKeyMatch(keys, KeyboardEvent.Key.SHIFT)) {
-            movementDistance = SHORT_DISTANCE;
-        }
-
-        double horizontalDistance = 0d;
-        double verticalDistance = 0d;
-
-        if (KeysMatcher.isKeyMatch(keys, KeyboardEvent.Key.ARROW_LEFT)) {
-            horizontalDistance = -movementDistance;
-        } else if (KeysMatcher.isKeyMatch(keys, KeyboardEvent.Key.ARROW_RIGHT)) {
-            horizontalDistance = movementDistance;
-        }
-
-        if (KeysMatcher.isKeyMatch(keys, KeyboardEvent.Key.ARROW_UP)) {
-            verticalDistance = -movementDistance;
-        } else if (KeysMatcher.isKeyMatch(keys, KeyboardEvent.Key.ARROW_DOWN)) {
-            verticalDistance = movementDistance;
-        }
-
-        if (verticalDistance == 0 && horizontalDistance == 0) {
-            return;
-        }
-
-        List<Element> moveNodes = new ArrayList<>();
-        List<Point2D> movePositions = new ArrayList<>();
-
-        for (String uuid : selectedIDs) {
-            final Node<View<?>, Edge> node = canvasHandler.getGraphIndex().getNode(uuid);
-            if (node != null) {
-                final Point2D nodePosition = GraphUtils.getPosition(node.getContent());
-                final Point2D movePosition = new Point2D(nodePosition.getX() + horizontalDistance, nodePosition.getY() + verticalDistance);
-                moveNodes.add(node);
-                movePositions.add(movePosition);
-            }
-        }
-
-        move(moveNodes.toArray(new Element[]{}), movePositions.toArray(new Point2D[]{}));
+    public LocationControlImpl setSiblingAllowed(final BiPredicate<Element, Element> siblingAllowed) {
+        this.siblingAllowed = siblingAllowed;
+        return this;
     }
 
     @Override
@@ -311,6 +261,78 @@ public class LocationControlImpl
     }
 
     @SuppressWarnings("unchecked")
+    private boolean isSiblingAllowed(final Element parent,
+                                     final Element candidate) {
+        if (null != siblingAllowed &&
+                null != parent &&
+                null != candidate) {
+            return siblingAllowed.test(parent,
+                                       candidate);
+        }
+        return false;
+    }
+
+    private void onKeyDownEvent(final KeyboardEvent.Key... keys) {
+        if (KeysMatcher.doKeysMatch(keys,
+                                    KeyboardEvent.Key.ESC)) {
+            getWiresManager().resetContext();
+        }
+
+        handleArrowKeys(keys);
+    }
+
+    private void handleArrowKeys(final KeyboardEvent.Key... keys) {
+
+        final int selectedIDsCount = selectedIDs.size();
+
+        if (selectedIDsCount == 0) {
+            return;
+        }
+
+        double movementDistance = NORMAL_DISTANCE;
+
+        if (KeysMatcher.isKeyMatch(keys, KeyboardEvent.Key.CONTROL)) {
+            movementDistance = LARGE_DISTANCE;
+        } else if (KeysMatcher.isKeyMatch(keys, KeyboardEvent.Key.SHIFT)) {
+            movementDistance = SHORT_DISTANCE;
+        }
+
+        double horizontalDistance = 0d;
+        double verticalDistance = 0d;
+
+        if (KeysMatcher.isKeyMatch(keys, KeyboardEvent.Key.ARROW_LEFT)) {
+            horizontalDistance = -movementDistance;
+        } else if (KeysMatcher.isKeyMatch(keys, KeyboardEvent.Key.ARROW_RIGHT)) {
+            horizontalDistance = movementDistance;
+        }
+
+        if (KeysMatcher.isKeyMatch(keys, KeyboardEvent.Key.ARROW_UP)) {
+            verticalDistance = -movementDistance;
+        } else if (KeysMatcher.isKeyMatch(keys, KeyboardEvent.Key.ARROW_DOWN)) {
+            verticalDistance = movementDistance;
+        }
+
+        if (verticalDistance == 0 && horizontalDistance == 0) {
+            return;
+        }
+
+        List<Element> moveNodes = new ArrayList<>();
+        List<Point2D> movePositions = new ArrayList<>();
+
+        for (String uuid : selectedIDs) {
+            final Node<View<?>, Edge> node = canvasHandler.getGraphIndex().getNode(uuid);
+            if (node != null) {
+                final Point2D nodePosition = GraphUtils.getPosition(node.getContent());
+                final Point2D movePosition = new Point2D(nodePosition.getX() + horizontalDistance, nodePosition.getY() + verticalDistance);
+                moveNodes.add(node);
+                movePositions.add(movePosition);
+            }
+        }
+
+        move(moveNodes.toArray(new Element[]{}), movePositions.toArray(new Point2D[]{}));
+    }
+
+    @SuppressWarnings("unchecked")
     private CanvasCommand<AbstractCanvasHandler> createMoveCommand(final Element element,
                                                                    final Point2D location) {
         return canvasCommandFactory.updatePosition((Node<View<?>, Edge>) element,
@@ -347,13 +369,9 @@ public class LocationControlImpl
             final Point2D[] locations = new Point2D[points.length];
             int i = 0;
             for (final WiresContainer container : wiresContainers) {
-                if (container instanceof ShapeView) {
-                    final ShapeView shapeView = (ShapeView) container;
-                    final String uuid = shapeView.getUUID();
-                    elements[i] = canvasHandler.getGraphIndex().get(uuid);
-                    locations[i] = new Point2D(points[i].getX(),
-                                               points[i].getY());
-                }
+                elements[i] = getElement(container);
+                locations[i] = new Point2D(points[i].getX(),
+                                           points[i].getY());
                 i++;
             }
             if (elements.length > 0) {
@@ -366,6 +384,32 @@ public class LocationControlImpl
                 }
             }
             return true;
+        }
+
+        @Override
+        public boolean sibling(final WiresContainer parent,
+                               final WiresContainer candiadte) {
+            final Element parentElement = getElement(parent);
+            final Element candidateElement = getElement(candiadte);
+            return isSiblingAllowed(parentElement,
+                                    candidateElement);
+        }
+
+        private Element getElement(final WiresContainer container) {
+            final String uuid = getShapeUUID(container);
+            return getElement(uuid);
+        }
+
+        private Element getElement(final String uuid) {
+            return canvasHandler.getGraphIndex().get(uuid);
+        }
+
+        private String getShapeUUID(final WiresContainer container) {
+            if (container instanceof ShapeView) {
+                final ShapeView shapeView = (ShapeView) container;
+                return shapeView.getUUID();
+            }
+            return null;
         }
     };
 

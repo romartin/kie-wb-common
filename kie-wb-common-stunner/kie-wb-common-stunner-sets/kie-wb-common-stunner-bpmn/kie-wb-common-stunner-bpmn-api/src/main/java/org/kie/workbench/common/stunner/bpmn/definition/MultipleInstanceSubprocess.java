@@ -45,7 +45,7 @@ import org.kie.workbench.common.stunner.core.util.HashUtil;
 
 @Portable
 @Bindable
-@CanContain(roles = {"all"})
+@CanContain(roles = {"all", "canContainArtifacts"})
 @CanDock(roles = {"IntermediateEventOnSubprocessBoundary"})
 @Definition(graphFactory = NodeFactory.class, builder = MultipleInstanceSubprocess.MultipleInstanceSubprocessBuilder.class)
 @Morph(base = BaseSubprocess.class)
