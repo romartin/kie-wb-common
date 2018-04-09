@@ -32,7 +32,7 @@ import org.kie.workbench.common.stunner.core.graph.content.view.View;
 public class ExpandElementCommand extends AbstractCanvasCommand {
 
     // Reduce padding when fixing floating palette on top issue.
-    private static final double PADDING = 50;
+    private static final double PADDING = 75;
 
     public enum Direction {
         HORIZONTAL,
