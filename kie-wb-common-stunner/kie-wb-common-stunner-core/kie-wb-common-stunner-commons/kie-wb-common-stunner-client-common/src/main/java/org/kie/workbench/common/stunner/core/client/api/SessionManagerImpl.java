@@ -102,10 +102,8 @@ public class SessionManagerImpl implements SessionManager {
     public <S extends ClientSession> void open(final S session) {
         checkNotNull("session",
                      session);
-        if (null != current && !current.equals(session)) {
-            pause();
-        }
         if (!session.equals(current)) {
+            pause();
             this.current = (AbstractSession) session;
             current.open();
             sessionOpenedEvent.fire(new SessionOpenedEvent(current));

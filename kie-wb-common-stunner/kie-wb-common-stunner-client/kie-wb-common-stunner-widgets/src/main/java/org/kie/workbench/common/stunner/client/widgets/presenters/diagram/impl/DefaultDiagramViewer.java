@@ -38,7 +38,7 @@ import org.kie.workbench.common.stunner.core.util.DefinitionUtils;
 /**
  * A generic DiagramViewer implementation.
  * It opens a diagram instance in a new canvas and handler instances for read-only purposes.,
- * It provides a zoom and selection control that third parties can interacti with, but it does not provide
+ * It provides a zoom and selection control that third parties can interacting with, but it does not provide
  * any controls that allow the diagram's authoring.
  */
 @Dependent

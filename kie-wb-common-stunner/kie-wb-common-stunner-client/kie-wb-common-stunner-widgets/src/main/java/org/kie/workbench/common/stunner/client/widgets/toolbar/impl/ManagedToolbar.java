@@ -40,8 +40,8 @@ import org.kie.workbench.common.stunner.core.util.DefinitionUtils;
 public class ManagedToolbar<S extends ClientSession> implements Toolbar<S> {
 
     private final DefinitionUtils definitionUtils;
-    private final ManagedInstance<ToolbarCommand> commandIntances;
-    private final ManagedInstance<AbstractToolbarItem<S>> itemIntances;
+    private final ManagedInstance<ToolbarCommand> commandInstances;
+    private final ManagedInstance<AbstractToolbarItem<S>> itemInstances;
     private final List<Class<? extends ToolbarCommand>> commandTypes;
     private final List<ToolbarCommand> commands;
     private final List<AbstractToolbarItem<S>> items;
@@ -49,12 +49,12 @@ public class ManagedToolbar<S extends ClientSession> implements Toolbar<S> {
 
     @Inject
     public ManagedToolbar(final DefinitionUtils definitionUtils,
-                          final @Any ManagedInstance<ToolbarCommand> commandIntances,
-                          final @Any ManagedInstance<AbstractToolbarItem<S>> itemIntances,
+                          final @Any ManagedInstance<ToolbarCommand> commandInstances,
+                          final @Any ManagedInstance<AbstractToolbarItem<S>> itemInstances,
                           final ToolbarView<Toolbar<S>> view) {
         this.definitionUtils = definitionUtils;
-        this.commandIntances = commandIntances;
-        this.itemIntances = itemIntances;
+        this.commandInstances = commandInstances;
+        this.itemInstances = itemInstances;
         this.view = view;
         this.commands = new LinkedList<>();
         this.commandTypes = new LinkedList<>();
@@ -136,13 +136,13 @@ public class ManagedToolbar<S extends ClientSession> implements Toolbar<S> {
 
     private void registerCommand(final ToolbarCommand command) {
         commands.add(command);
-        final AbstractToolbarItem<S> item = itemIntances.get();
+        final AbstractToolbarItem<S> item = itemInstances.get();
         items.add(item);
     }
 
     private ToolbarCommand loadCommand(final Class<? extends ToolbarCommand> type,
                                        final Annotation qualifier) {
-        return InstanceUtils.lookup(commandIntances,
+        return InstanceUtils.lookup(commandInstances,
                                     type,
                                     qualifier);
     }
@@ -153,11 +153,11 @@ public class ManagedToolbar<S extends ClientSession> implements Toolbar<S> {
 
     private void destroyCommand(final ToolbarCommand command) {
         command.destroy();
-        commandIntances.destroy(command);
+        commandInstances.destroy(command);
     }
 
     private void destroyItem(final AbstractToolbarItem<S> item) {
         item.destroy();
-        itemIntances.destroy(item);
+        itemInstances.destroy(item);
     }
 }
