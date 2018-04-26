@@ -85,28 +85,28 @@ public class DefaultCanvasElementListener implements CanvasElementListener {
     private void fireRegistrationListeners(final CanvasControl<AbstractCanvasHandler> control,
                                            final Element element,
                                            final boolean add) {
-        if (null != control && null != element && control instanceof CanvasRegistationControl) {
-            final CanvasRegistationControl<AbstractCanvasHandler, Element> registationControl =
+        if (null != element && control instanceof CanvasRegistationControl) {
+            final CanvasRegistationControl<AbstractCanvasHandler, Element> registrationControl =
                     (CanvasRegistationControl<AbstractCanvasHandler, Element>) control;
             if (add) {
-                registationControl.register(element);
+                registrationControl.register(element);
             } else {
-                registationControl.deregister(element);
+                registrationControl.deregister(element);
             }
         }
     }
 
     private void fireRegistrationUpdateListeners(final CanvasControl<AbstractCanvasHandler> control,
                                                  final Element element) {
-        if (null != control && null != element && control instanceof AbstractCanvasHandlerRegistrationControl) {
-            final AbstractCanvasHandlerRegistrationControl registationControl =
+        if (null != element && control instanceof AbstractCanvasHandlerRegistrationControl) {
+            final AbstractCanvasHandlerRegistrationControl registrationControl =
                     (AbstractCanvasHandlerRegistrationControl) control;
-            registationControl.update(element);
+            registrationControl.update(element);
         }
     }
 
     private void fireRegistrationClearListeners(final CanvasControl<AbstractCanvasHandler> control) {
-        if (null != control && control instanceof AbstractCanvasHandlerRegistrationControl) {
+        if (control instanceof AbstractCanvasHandlerRegistrationControl) {
             final AbstractCanvasHandlerRegistrationControl registationControl =
                     (AbstractCanvasHandlerRegistrationControl) control;
             registationControl.destroy();

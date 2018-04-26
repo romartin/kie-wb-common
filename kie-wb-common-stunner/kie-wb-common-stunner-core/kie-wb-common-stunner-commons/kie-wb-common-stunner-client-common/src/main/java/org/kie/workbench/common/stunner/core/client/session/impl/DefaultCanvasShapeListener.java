@@ -66,13 +66,13 @@ public class DefaultCanvasShapeListener implements CanvasShapeListener {
     private void fireRegistrationListeners(final CanvasControl<AbstractCanvas> control,
                                            final Shape shape,
                                            final boolean add) {
-        if (null != control && null != shape && control instanceof CanvasRegistationControl) {
-            final CanvasRegistationControl<AbstractCanvas, Shape> registationControl =
+        if (null != shape && control instanceof CanvasRegistationControl) {
+            final CanvasRegistationControl<AbstractCanvas, Shape> registrationControl =
                     (CanvasRegistationControl<AbstractCanvas, Shape>) control;
             if (add) {
-                registationControl.register(shape);
+                registrationControl.register(shape);
             } else {
-                registationControl.deregister(shape);
+                registrationControl.deregister(shape);
             }
         }
     }
@@ -82,10 +82,10 @@ public class DefaultCanvasShapeListener implements CanvasShapeListener {
     }
 
     private void fireRegistrationClearListeners(final CanvasControl<AbstractCanvas> control) {
-        if (null != control && control instanceof AbstractCanvasHandlerRegistrationControl) {
-            final AbstractCanvasHandlerRegistrationControl registationControl =
+        if (control instanceof AbstractCanvasHandlerRegistrationControl) {
+            final AbstractCanvasHandlerRegistrationControl registrationControl =
                     (AbstractCanvasHandlerRegistrationControl) control;
-            registationControl.destroy();
+            registrationControl.destroy();
         }
     }
 }
