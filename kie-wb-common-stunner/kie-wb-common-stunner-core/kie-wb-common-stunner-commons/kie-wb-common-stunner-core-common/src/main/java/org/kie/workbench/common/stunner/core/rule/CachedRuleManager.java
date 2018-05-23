@@ -123,9 +123,7 @@ public class CachedRuleManager implements RuleManager {
                                 final Rule rule) {
             return RuleManagerImpl.isRuleExtension().test(rule) ||
                     handlers.stream()
-                            .filter(handler -> RuleManagerImpl.isRuleTypeAllowed().test(rule, handler))
-                            .findAny()
-                            .isPresent();
+                            .anyMatch(handler -> RuleManagerImpl.isRuleTypeAllowed().test(rule, handler));
         }
     }
 }

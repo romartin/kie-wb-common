@@ -98,12 +98,14 @@ public class GraphUtils {
     public static int countEdges(final DefinitionManager definitionManager,
                                  final String edgeId,
                                  final List<? extends Edge> edges) {
-        return null != edges ? (int) edges.stream()
-                .map(edge -> getElementDefinitionId(definitionManager,
-                                                    edge))
+        if (null == edges) {
+            return 0;
+        }
+
+        return (int) edges.stream()
+                .map(edge -> getElementDefinitionId(definitionManager, edge))
                 .filter(edgeId::equals)
-                .count() :
-                0;
+                .count();
     }
 
     /**

@@ -234,18 +234,7 @@ public class DomainLookupFunctions {
     public static boolean isSourceConnectionAllowed(final CanConnect rule,
                                                     final Set<String> labels) {
         return rule.getPermittedConnections().stream()
-                .filter(pc -> labels.contains(pc.getStartRole()))
-                .findAny()
-                .isPresent();
-    }
-
-    private static <T> int countIncomingEdges(final DomainLookupContext context,
-                                              final Node<? extends Definition<T>, ? extends Edge> sourceNode,
-                                              final String edgeId) {
-        final List<? extends Edge> edges = sourceNode.getInEdges();
-        return GraphUtils.countEdges(context.getDefinitionManager(),
-                                     edgeId,
-                                     edges);
+                .anyMatch(pc -> labels.contains(pc.getStartRole()));
     }
 
     private static <T> int countOutgoingEdges(final DomainLookupContext context,

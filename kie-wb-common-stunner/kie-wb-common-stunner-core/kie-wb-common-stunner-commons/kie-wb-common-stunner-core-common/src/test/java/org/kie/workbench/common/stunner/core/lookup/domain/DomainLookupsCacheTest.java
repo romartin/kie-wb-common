@@ -38,8 +38,8 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -78,12 +78,6 @@ public class DomainLookupsCacheTest {
     @Mock
     private Object definitionSet;
 
-    @Mock
-    private Object definition1;
-
-    @Mock
-    private Object definition2;
-
     private DomainLookupsCache tested;
 
     @Before
@@ -114,17 +108,37 @@ public class DomainLookupsCacheTest {
     @Test
     public void testCacheTheConnectionRules() {
         List<CanConnect> rules = tested.getConnectionRules();
-        assertTrue(rules.size() == 1);
+        assertEquals(1, rules.size());
         assertEquals(canConnect1To2, rules.get(0));
     }
 
     @Test
     public void testGetDefinitionsByLabel() {
+        assertEquals(Collections.emptySet(), tested.getDefinitions("SOMETHING_NOT_EXISTING"));
+
         Set<String> defs1 = tested.getDefinitions(ROLE1);
-        assertTrue(defs1.size() == 1);
+        assertEquals(1, defs1.size());
         assertEquals(DEF_ID1, defs1.iterator().next());
         Set<String> defs2 = tested.getDefinitions(ROLE2);
-        assertTrue(defs2.size() == 1);
+        assertEquals(1, defs2.size());
         assertEquals(DEF_ID2, defs2.iterator().next());
+    }
+
+    @Test
+    public void testCleanUp() {
+        DefinitionsCacheRegistry definitionsRegistry = mock(DefinitionsCacheRegistry.class);
+        when(definitionsRegistry.getLabels(eq(DEF_ID1))).thenReturn(Collections.singleton(ROLE1));
+        when(definitionsRegistry.getLabels(eq(DEF_ID2))).thenReturn(Collections.singleton(ROLE2));
+        DomainLookupsCache tested = new DomainLookupsCache(definitionManager,
+                                                           definitionsRegistry,
+                                                           DEF_SET_ID);
+
+        assertEquals(1, tested.getDefinitions(ROLE1).size());
+        assertEquals(1, tested.getDefinitions(ROLE2).size());
+
+        tested.clear();
+        assertEquals(Collections.emptySet(), tested.getDefinitions(ROLE1));
+        assertEquals(Collections.emptySet(), tested.getDefinitions(ROLE2));
+        assertEquals(0, tested.getConnectionRules().size());
     }
 }
