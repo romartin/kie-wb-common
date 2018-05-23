@@ -79,6 +79,9 @@ public class DefaultEditorSessionTest {
     @Mock
     private SessionCommandManager<AbstractCanvasHandler> requestCommandManage;
 
+    @Mock
+    private StunnerPreferencesRegistry preferencesRegistry;
+
     private DefaultEditorSession tested;
 
     @Before
@@ -100,7 +103,7 @@ public class DefaultEditorSessionTest {
                                           canvasCommandManager,
                                           sessionCommandManager,
                                           requestCommandManage,
-                                          mock(StunnerPreferencesRegistry.class)); // TODO
+                                          preferencesRegistry);
     }
 
     @Test
