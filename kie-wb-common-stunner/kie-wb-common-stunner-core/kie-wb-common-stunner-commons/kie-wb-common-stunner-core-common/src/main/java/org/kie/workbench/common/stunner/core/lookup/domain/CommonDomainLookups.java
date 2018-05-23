@@ -103,12 +103,7 @@ public class CommonDomainLookups {
                                                      targetRoles)
                         .execute(context);
 
-        final Set<String> filteredTargetDefinitions =
-                new FilterConnectionTargetDefinitions(edgeId,
-                                                      allowedTargetDefinitions)
-                        .execute(context);
-
-        return filteredTargetDefinitions;
+        return new FilterConnectionTargetDefinitions(edgeId, allowedTargetDefinitions).execute(context);
     }
 
     public Set<String> lookupMorphBaseDefinitions(final Set<String> definitionIds) {

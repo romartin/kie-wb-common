@@ -79,7 +79,6 @@ public class CachedRuleManagerTest {
     private RuleHandlerRegistry ruleHandlerRegistry;
 
     private CachedRuleManager tested;
-    private RuleManagerImpl delegate;
 
     @Before
     public void setup() throws Exception {
@@ -93,7 +92,7 @@ public class CachedRuleManagerTest {
         when(containmentHandler.accepts(any(CanContain.class), any(ContainmentContext.class))).thenReturn(true);
         when(containmentHandler.getRuleType()).thenReturn(CanContain.class);
         when(containmentHandler.getContextType()).thenReturn(ContainmentContext.class);
-        delegate = new RuleManagerImpl(registryFactory);
+        RuleManagerImpl delegate = new RuleManagerImpl(registryFactory);
         when(ruleSet.getName()).thenReturn("testRuleSet");
         when(ruleSet.getRules()).thenReturn(Arrays.asList(containmentRule, connectionRule));
         tested = new CachedRuleManager(delegate);

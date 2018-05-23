@@ -58,7 +58,7 @@ class DomainLookupsCache {
 
     private static Optional<CanConnect> isConnectionRule(final Rule rule) {
         return rule instanceof CanConnect ?
-                Optional.of(((CanConnect) rule)) :
+                Optional.of((CanConnect) rule) :
                 Optional.empty();
     }
 
@@ -104,11 +104,7 @@ class DomainLookupsCache {
 
     private void registerDefinition(final String label,
                                     final String id) {
-        Set<String> ids = definitionsByLabel.get(label);
-        if (null == ids) {
-            ids = new LinkedHashSet<>();
-            definitionsByLabel.put(label, ids);
-        }
+        Set<String> ids = definitionsByLabel.computeIfAbsent(label, k -> new LinkedHashSet<>());
         ids.add(id);
     }
 }

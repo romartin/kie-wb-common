@@ -78,7 +78,6 @@ public class DomainLookupFunctionsTest {
     @Mock
     private RuleManager ruleManager;
 
-    private TestingGraphMockHandler graphTestHandler;
     private TestingGraphInstanceBuilder.TestGraph1 graph1Instance;
 
     @Before
@@ -89,7 +88,7 @@ public class DomainLookupFunctionsTest {
         when(cache.getRuleSet()).thenReturn(RULE_SET);
         when(cache.getConnectionRules()).thenReturn(Collections.singletonList(canConnect1To2));
         when(context.getDefinitionsRegistry()).thenReturn(definitionsCache);
-        graphTestHandler = new TestingGraphMockHandler();
+        TestingGraphMockHandler graphTestHandler = new TestingGraphMockHandler();
         when(context.getDefinitionManager()).thenReturn(graphTestHandler.definitionManager);
         graph1Instance = TestingGraphInstanceBuilder.newGraph1(graphTestHandler);
         Set<String> labels = new HashSet<String>(1) {{
