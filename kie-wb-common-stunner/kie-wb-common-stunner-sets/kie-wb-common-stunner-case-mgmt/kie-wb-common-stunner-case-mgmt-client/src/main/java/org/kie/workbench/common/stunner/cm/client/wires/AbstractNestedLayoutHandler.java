@@ -25,6 +25,7 @@ import com.ait.lienzo.client.core.shape.wires.ILayoutHandler;
 import com.ait.lienzo.client.core.shape.wires.WiresContainer;
 import com.ait.lienzo.client.core.shape.wires.WiresShape;
 import com.ait.lienzo.client.core.types.Point2D;
+import com.ait.lienzo.tools.client.collection.NFastArrayList;
 
 public abstract class AbstractNestedLayoutHandler implements ILayoutHandler {
 
@@ -75,7 +76,9 @@ public abstract class AbstractNestedLayoutHandler implements ILayoutHandler {
 
             while (!q.isEmpty()) {
                 final WiresContainer container = q.remove();
-                for (WiresShape child : container.getChildShapes()) {
+                NFastArrayList<WiresShape> children = container.getChildShapes();
+                for (int i = 0; i < children.size(); i++) {
+                    WiresShape child = children.get(i);
                     q.add(child);
                 }
                 s.add(container);

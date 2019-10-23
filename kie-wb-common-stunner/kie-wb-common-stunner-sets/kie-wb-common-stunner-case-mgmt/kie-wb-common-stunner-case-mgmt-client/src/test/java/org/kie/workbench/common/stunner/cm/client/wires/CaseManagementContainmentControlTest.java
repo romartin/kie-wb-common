@@ -32,7 +32,7 @@ import com.ait.lienzo.client.core.shape.wires.handlers.impl.WiresParentPickerCon
 import com.ait.lienzo.client.core.shape.wires.handlers.impl.WiresShapeLocationControlImpl;
 import com.ait.lienzo.client.core.types.Point2D;
 import com.ait.lienzo.test.LienzoMockitoTestRunner;
-import com.ait.tooling.nativetools.client.collection.NFastArrayList;
+import com.ait.lienzo.tools.client.collection.NFastArrayList;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -19,7 +19,6 @@ package org.kie.workbench.common.stunner.cm.client.wires;
 import java.util.Optional;
 
 import com.ait.lienzo.client.core.Context2D;
-import com.ait.lienzo.client.core.shape.Attributes;
 import com.ait.lienzo.client.core.shape.MultiPath;
 import com.ait.lienzo.client.core.shape.wires.PickerPart;
 import com.ait.lienzo.client.core.shape.wires.WiresLayer;
@@ -27,7 +26,7 @@ import com.ait.lienzo.client.core.shape.wires.WiresShape;
 import com.ait.lienzo.client.core.types.PathPartList;
 import com.ait.lienzo.client.core.util.ScratchPad;
 import com.ait.lienzo.test.LienzoMockitoTestRunner;
-import com.ait.tooling.nativetools.client.collection.NFastArrayList;
+import com.ait.lienzo.tools.client.collection.NFastArrayList;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -94,7 +93,7 @@ public class CaseManagementColorMapBackedPickerTest {
     @Test
     public void checkDropZonesAreAddedForCaseManagementShapesWithDropZone() {
         final MultiPath dropZone = mock(MultiPath.class);
-        when(dropZone.getAttributes()).thenReturn(mock(Attributes.class));
+        // TODO: lienzo-to-native  when(dropZone.getAttributes()).thenReturn(mock(Attributes.class));
         when(dropZone.getPathPartListArray()).thenReturn(new NFastArrayList<>());
         final CaseManagementShapeView shape = mock(CaseManagementShapeView.class);
         when(shape.getDropZone()).thenReturn(Optional.of(dropZone));

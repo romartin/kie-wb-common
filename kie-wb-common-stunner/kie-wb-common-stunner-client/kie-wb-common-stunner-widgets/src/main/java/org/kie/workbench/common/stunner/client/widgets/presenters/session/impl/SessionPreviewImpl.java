@@ -17,6 +17,7 @@
 package org.kie.workbench.common.stunner.client.widgets.presenters.session.impl;
 
 import java.lang.annotation.Annotation;
+import java.util.function.Predicate;
 
 import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Observes;
@@ -25,7 +26,6 @@ import javax.enterprise.inject.Default;
 import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 
-import com.ait.tooling.common.api.java.util.function.Predicate;
 import org.jboss.errai.ioc.client.api.ManagedInstance;
 import org.kie.workbench.common.stunner.client.lienzo.canvas.LienzoCanvasDecoratorFactory;
 import org.kie.workbench.common.stunner.client.lienzo.canvas.LienzoCanvasView;

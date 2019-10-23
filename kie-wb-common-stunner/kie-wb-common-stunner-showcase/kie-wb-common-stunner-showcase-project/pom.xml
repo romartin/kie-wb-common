@@ -816,18 +816,6 @@
       <scope>provided</scope>
     </dependency>
 
-    <dependency>
-      <groupId>com.ahome-it</groupId>
-      <artifactId>ahome-tooling-nativetools</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.ahome-it</groupId>
-      <artifactId>ahome-tooling-common</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
     <!-- Form modeler. -->
     <dependency>
       <groupId>org.kie.workbench.forms</groupId>
@@ -1267,6 +1255,8 @@
           <disableCastChecking>true</disableCastChecking>
           <runTarget>stunner.html</runTarget>
           <hostedWebapp>src/main/webapp</hostedWebapp>
+          <generateJsInteropExports>true</generateJsInteropExports>
+
           <compileSourcesArtifacts>
             <compileSourcesArtifact>org.kie.soup:kie-soup-project-datamodel-api</compileSourcesArtifact>
             <compileSourcesArtifact>org.kie.soup:kie-soup-project-datamodel-commons</compileSourcesArtifact>

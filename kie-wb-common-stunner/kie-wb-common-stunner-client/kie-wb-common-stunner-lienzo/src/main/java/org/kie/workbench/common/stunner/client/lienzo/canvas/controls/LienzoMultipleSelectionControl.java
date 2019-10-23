@@ -35,9 +35,8 @@ import com.ait.lienzo.client.core.shape.wires.WiresConnector;
 import com.ait.lienzo.client.core.shape.wires.WiresManager;
 import com.ait.lienzo.client.core.shape.wires.WiresShape;
 import com.ait.lienzo.client.core.types.Point2D;
-import com.google.gwt.event.dom.client.MouseEvent;
-import com.google.gwt.event.shared.EventHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
+import com.ait.lienzo.tools.client.event.HandlerRegistration;
+import elemental2.dom.MouseEvent;
 import org.kie.soup.commons.util.Lists;
 import org.kie.workbench.common.stunner.client.lienzo.canvas.wires.WiresCanvas;
 import org.kie.workbench.common.stunner.client.lienzo.shape.view.wires.WiresConnectorView;
@@ -251,7 +250,7 @@ public class LienzoMultipleSelectionControl<H extends AbstractCanvasHandler>
         }
 
         @Override
-        public boolean isMultipleSelection(final MouseEvent<? extends EventHandler> event) {
+        public boolean isMultipleSelection(MouseEvent event) {
             return provider.isMultipleSelection(event);
         }
 

@@ -25,8 +25,8 @@ import com.ait.lienzo.client.core.shape.Group;
 import com.ait.lienzo.client.core.shape.IPrimitive;
 import com.ait.lienzo.client.core.types.BoundingBox;
 import com.ait.lienzo.client.core.types.Point2D;
-import com.ait.tooling.nativetools.client.event.HandlerRegistrationManager;
-import com.google.gwt.event.shared.HandlerRegistration;
+import com.ait.lienzo.tools.client.event.HandlerRegistration;
+import com.ait.lienzo.tools.client.event.HandlerRegistrationManager;
 import org.kie.workbench.common.stunner.lienzo.toolbox.GroupItem;
 import org.kie.workbench.common.stunner.lienzo.toolbox.items.AbstractDecoratedItem;
 import org.kie.workbench.common.stunner.lienzo.toolbox.items.AbstractPrimitiveItem;
@@ -242,10 +242,10 @@ public abstract class AbstractGroupItem<T extends AbstractGroupItem>
     private BoundingBox computeAbsoluteBoundingBox(final double pad) {
         final BoundingBox bb = getBoundingBox().get();
         final Point2D computedLocation = asPrimitive().getComputedLocation();
-        return new BoundingBox(computedLocation.getX() - pad,
-                               computedLocation.getY() - pad,
-                               computedLocation.getX() + bb.getWidth() + pad,
-                               computedLocation.getY() + bb.getHeight() + pad);
+        return BoundingBox.fromDoubles(computedLocation.getX() - pad,
+                                       computedLocation.getY() - pad,
+                                       computedLocation.getX() + bb.getWidth() + pad,
+                                       computedLocation.getY() + bb.getHeight() + pad);
     }
 
     protected void updateAddOnsVisibility() {

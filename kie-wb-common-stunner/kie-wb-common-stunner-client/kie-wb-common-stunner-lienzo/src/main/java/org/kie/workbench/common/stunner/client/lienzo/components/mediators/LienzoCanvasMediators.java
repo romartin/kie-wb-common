@@ -34,7 +34,6 @@ import org.kie.workbench.common.stunner.core.client.canvas.controls.keyboard.Key
 import org.kie.workbench.common.stunner.core.client.canvas.controls.keyboard.KeyboardControl;
 import org.kie.workbench.common.stunner.core.client.event.keyboard.KeyboardEvent.Key;
 import org.kie.workbench.common.stunner.core.client.i18n.ClientTranslationService;
-import org.kie.workbench.common.stunner.core.i18n.CoreTranslationMessages;
 
 import static org.kie.workbench.common.stunner.core.client.canvas.controls.keyboard.KeysMatcher.doKeysMatch;
 
@@ -57,10 +56,15 @@ public class LienzoCanvasMediators {
     public LienzoCanvasMediators(final KeyEventHandler keyEventHandler,
                                  final ClientTranslationService translationService,
                                  final LienzoCanvasNotification notification) {
+        // TODO: lienzo-to-native
+        /*this(keyEventHandler,
+             translationService,
+             notification,
+             PanelMediators::build);*/
         this(keyEventHandler,
              translationService,
              notification,
-             PanelMediators::build);
+             p -> null);
     }
 
     LienzoCanvasMediators(final KeyEventHandler keyEventHandler,
@@ -108,20 +112,20 @@ public class LienzoCanvasMediators {
     }
 
     public void setMinScale(final double minScale) {
-        mediators.getZoomMediator().setMinScale(minScale);
+        // TODO: lienzo-to-native  mediators.getZoomMediator().setMinScale(minScale);
     }
 
     public void setMaxScale(final double maxScale) {
-        mediators.getZoomMediator().setMaxScale(maxScale);
-        mediators.getPreviewMediator().setMaxScale(maxScale);
+        // TODO: lienzo-to-native  mediators.getZoomMediator().setMaxScale(maxScale);
+        // TODO: lienzo-to-native  mediators.getPreviewMediator().setMaxScale(maxScale);
     }
 
     public void setZoomFactor(final double factor) {
-        mediators.getZoomMediator().setZoomFactor(factor);
+        // TODO: lienzo-to-native  mediators.getZoomMediator().setZoomFactor(factor);
     }
 
     public void setScaleAboutPoint(final boolean scaleAboutPoint) {
-        mediators.getZoomMediator().setScaleAboutPoint(scaleAboutPoint);
+        // TODO: lienzo-to-native  mediators.getZoomMediator().setScaleAboutPoint(scaleAboutPoint);
     }
 
     public void enable() {
@@ -136,7 +140,7 @@ public class LienzoCanvasMediators {
     @PreDestroy
     public void destroy() {
         if (null != mediators) {
-            mediators.destroy();
+            // TODO: lienzo-to-native  mediators.destroy();
             mediators = null;
         }
     }
@@ -158,17 +162,19 @@ public class LienzoCanvasMediators {
     }
 
     private void enablePreview() {
-        if (null != mediators && mediators.enablePreview()) {
+        // TODO: lienzo-to-native
+        /*if (null != mediators && mediators.enablePreview()) {
             cursor.accept(CURSOR_PREVIEW);
             notification.show(translationService.getNotNullValue(CoreTranslationMessages.MEDIATOR_PREVIEW));
-        }
+        }*/
     }
 
     private void clear() {
-        if (null != mediators) {
+        // TODO: lienzo-to-native
+        /*if (null != mediators) {
             cursor.accept(CURSOR_DEFAULT);
             mediators.disablePreview();
             notification.hide();
-        }
+        }*/
     }
 }

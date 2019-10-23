@@ -195,10 +195,10 @@ public class PrimitiveTextTooltipTest {
     public void testBoundingLocationExecutor() {
         final PrimitiveTextTooltip.BoundingLocationExecutor executor =
                 new PrimitiveTextTooltip.BoundingLocationExecutor();
-        BoundingBox boundingBox = new BoundingBox(0d,
-                                                  0d,
-                                                  100d,
-                                                  200d);
+        BoundingBox boundingBox = BoundingBox.fromDoubles(0d,
+                                                          0d,
+                                                          100d,
+                                                          200d);
         executor.at(Direction.SOUTH)
                 .forBoundingBox(() -> boundingBox)
                 .accept(tooltip);

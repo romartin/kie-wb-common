@@ -31,7 +31,7 @@ import com.ait.lienzo.client.core.shape.wires.event.WiresMoveEvent;
 import com.ait.lienzo.client.core.types.BoundingBox;
 import com.ait.lienzo.client.core.types.Point2D;
 import com.ait.lienzo.shared.core.types.Direction;
-import com.ait.tooling.nativetools.client.event.HandlerRegistrationManager;
+import com.ait.lienzo.tools.client.event.HandlerRegistrationManager;
 import org.kie.workbench.common.stunner.lienzo.toolbox.grid.Point2DGrid;
 import org.kie.workbench.common.stunner.lienzo.toolbox.items.DecoratedItem;
 import org.kie.workbench.common.stunner.lienzo.toolbox.items.DecoratorItem;
@@ -209,7 +209,7 @@ public class WiresShapeToolbox
     }
 
     WiresShapeToolbox reposition() {
-        toolbox.offset(toolboxOffset.offset(gridOffset));
+        toolbox.offset(toolboxOffset.offset(gridOffset.getX(), gridOffset.getY()));
         return this;
     }
 
@@ -227,17 +227,17 @@ public class WiresShapeToolbox
     }
 
     private void onResize(final AbstractWiresResizeEvent event) {
-        shapeOffset((WiresContainer) event.getShape());
+        shapeOffset((WiresContainer) event.getSource());
         resize(event.getWidth(),
                event.getHeight());
     }
 
     private void onMove(final WiresMoveEvent event) {
-        shapeOffset(event.getShape());
+        shapeOffset(event.getSource());
     }
 
     private void onMove(final AbstractWiresDragEvent event) {
-        shapeOffset((WiresContainer) event.getShape());
+        shapeOffset((WiresContainer) event.getSource());
     }
 
     private void shapeOffset(final WiresContainer shape) {

@@ -68,11 +68,11 @@ class GroupImpl extends AbstractGroupItem<GroupImpl> {
     @Override
     public Supplier<BoundingBox> getBoundingBox() {
         return () -> {
-            if (primitive.getChildNodes().size() == 0) {
-                return new BoundingBox(0,
-                                       0,
-                                       1,
-                                       1);
+            if (primitive.getChildNodes().getLength() == 0) {
+                return BoundingBox.fromDoubles(0,
+                                               0,
+                                               1,
+                                               1);
             }
             return GroupImpl.super.getBoundingBox().get();
         };

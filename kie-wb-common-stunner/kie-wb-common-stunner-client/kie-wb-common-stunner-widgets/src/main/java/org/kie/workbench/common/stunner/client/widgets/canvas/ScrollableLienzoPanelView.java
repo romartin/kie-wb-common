@@ -16,15 +16,11 @@
 
 package org.kie.workbench.common.stunner.client.widgets.canvas;
 
-import com.ait.lienzo.client.widget.panel.scrollbars.ScrollablePanel;
+import com.ait.lienzo.client.widget.panel.impl.ScrollablePanel;
 
 public class ScrollableLienzoPanelView
         extends ScrollablePanel
         implements StunnerLienzoBoundsPanelView {
-
-    public ScrollableLienzoPanelView() {
-        super(StunnerBoundsProviderFactory.newProvider());
-    }
 
     public ScrollableLienzoPanelView(final int width,
                                      final int height) {
@@ -33,7 +29,8 @@ public class ScrollableLienzoPanelView
 
     @Override
     public void setPresenter(final StunnerLienzoBoundsPanel presenter) {
-        presenter.register(
+        // TODO: lienzo-to-native
+        /*presenter.register(
                 addKeyDownHandler(event -> presenter.onKeyDown(event.getNativeKeyCode()))
         );
         presenter.register(
@@ -41,6 +38,6 @@ public class ScrollableLienzoPanelView
         );
         presenter.register(
                 addKeyUpHandler(event -> presenter.onKeyUp(event.getNativeKeyCode()))
-        );
+        );*/
     }
 }

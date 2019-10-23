@@ -43,8 +43,8 @@ public class CaseManagementColorMapBackedPicker extends ColorMapBackedPicker {
         final Optional<MultiPath> optMultiPath = prim.getDropZone();
         if (optMultiPath.isPresent()) {
             final MultiPath multiPath = optMultiPath.get();
-            multiPath.getAttributes().setX(prim.getX());
-            multiPath.getAttributes().setY(prim.getY());
+            multiPath.setX(prim.getX());
+            multiPath.setY(prim.getY());
             drawShape(m_colorKeyRotor.next(),
                       multiPath.getStrokeWidth(),
                       multiPath,

@@ -32,7 +32,7 @@ import com.ait.lienzo.client.core.shape.wires.WiresShape;
 import com.ait.lienzo.client.core.types.BoundingBox;
 import com.ait.lienzo.client.core.types.Point2D;
 import com.ait.lienzo.shared.core.types.Direction;
-import com.google.gwt.event.dom.client.MouseEvent;
+import elemental2.dom.MouseEvent;
 import org.kie.workbench.common.stunner.client.lienzo.canvas.wires.WiresCanvas;
 import org.kie.workbench.common.stunner.client.lienzo.canvas.wires.WiresCanvasView;
 import org.kie.workbench.common.stunner.client.lienzo.canvas.wires.WiresLayer;
@@ -180,7 +180,7 @@ public abstract class AbstractActionsToolboxViewTest {
                times(1)).onClick(clickHandlerArgumentCaptor.capture());
         final NodeMouseClickHandler clickHandler = clickHandlerArgumentCaptor.getValue();
         final NodeMouseClickEvent mouseClickEvent = mock(NodeMouseClickEvent.class);
-        when(mouseClickEvent.getMouseEvent()).thenReturn(mock(MouseEvent.class));
+        when(mouseClickEvent.getNativeEvent()).thenReturn(new MouseEvent("mouse"));
         clickHandler.onNodeMouseClick(mouseClickEvent);
         verify(clickEventConsumer,
                times(1)).accept(any(MouseClickEvent.class));

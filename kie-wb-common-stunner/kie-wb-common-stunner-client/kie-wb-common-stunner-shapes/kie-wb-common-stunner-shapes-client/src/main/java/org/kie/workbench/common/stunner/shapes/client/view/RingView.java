@@ -26,7 +26,7 @@ import com.ait.lienzo.client.core.shape.wires.event.WiresResizeStartEvent;
 import com.ait.lienzo.client.core.shape.wires.event.WiresResizeStartHandler;
 import com.ait.lienzo.client.core.shape.wires.event.WiresResizeStepEvent;
 import com.ait.lienzo.client.core.shape.wires.event.WiresResizeStepHandler;
-import org.kie.workbench.common.stunner.core.client.shape.view.event.HandlerRegistrationImpl;
+import com.ait.lienzo.tools.client.event.HandlerRegistrationManager;
 import org.kie.workbench.common.stunner.core.client.shape.view.event.ShapeViewSupportedEvents;
 
 /**
@@ -39,7 +39,7 @@ public class RingView extends AbstractHasRadiusView<RingView> {
     private static final int INNER_RADIUS_FACTOR = 2;
 
     private Ring ring;
-    private final HandlerRegistrationImpl registrations = new HandlerRegistrationImpl();
+    private final HandlerRegistrationManager registrations = new HandlerRegistrationManager();
 
     public RingView(final double radius) {
         super(ShapeViewSupportedEvents.DESKTOP_NO_RESIZE_EVENT_TYPES,

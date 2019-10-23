@@ -57,10 +57,10 @@ public class ItemGridImpl
         this.groupPrimitiveItem =
                 groupPrimitiveItem
                         .setBoundingBox(boundingBoxSupplier);
-        this.boundingBox = new BoundingBox(0,
-                                           0,
-                                           1,
-                                           1);
+        this.boundingBox = BoundingBox.fromDoubles(0,
+                                                   0,
+                                                   1,
+                                                   1);
         this.refreshCallback = () -> {
             if (null != groupPrimitiveItem.asPrimitive().getLayer()) {
                 groupPrimitiveItem.asPrimitive().getLayer().batch();
@@ -191,10 +191,10 @@ public class ItemGridImpl
             }
         }
 
-        boundingBox = new BoundingBox(0,
-                                      0,
-                                      maxw,
-                                      maxh);
+        boundingBox = BoundingBox.fromDoubles(0,
+                                              0,
+                                              maxw,
+                                              maxh);
         // Update decorator.
         if (null != getWrapped().getDecorator()) {
             getWrapped().getDecorator().setBoundingBox(getBoundingBox().get());

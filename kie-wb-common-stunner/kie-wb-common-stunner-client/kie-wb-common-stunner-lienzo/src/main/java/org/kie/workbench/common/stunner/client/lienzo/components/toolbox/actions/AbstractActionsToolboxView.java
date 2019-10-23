@@ -25,6 +25,7 @@ import com.ait.lienzo.client.core.shape.Text;
 import com.ait.lienzo.client.core.shape.wires.WiresShape;
 import org.kie.workbench.common.stunner.client.lienzo.canvas.wires.WiresCanvas;
 import org.kie.workbench.common.stunner.client.lienzo.components.glyph.LienzoGlyphRenderers;
+import org.kie.workbench.common.stunner.client.lienzo.shape.view.ViewEventHandlerManager;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvas;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.ActionsToolbox;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.ActionsToolboxView;
@@ -81,10 +82,8 @@ public abstract class AbstractActionsToolboxView<V extends AbstractActionsToolbo
                         .onMouseExit(event -> onMouseExit())
                         .onClick(event -> clickEventConsumer.accept(new MouseClickEvent(event.getX(),
                                                                                         event.getY(),
-                                                                                        event.getMouseEvent()
-                                                                                                .getClientX(),
-                                                                                        event.getMouseEvent()
-                                                                                                .getClientY())));
+                                                                                        ViewEventHandlerManager.getClientX(event),
+                                                                                        ViewEventHandlerManager.getClientX(event))));
         addButton(button);
         return cast();
     }

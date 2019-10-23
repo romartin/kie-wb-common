@@ -16,7 +16,7 @@
 
 package org.kie.workbench.common.stunner.client.lienzo.components.views;
 
-import com.google.gwt.event.shared.HandlerRegistration;
+import com.ait.lienzo.tools.client.event.HandlerRegistration;
 import org.kie.workbench.common.stunner.client.lienzo.canvas.LienzoPanel;
 import org.uberfire.mvp.Command;
 
@@ -29,8 +29,8 @@ public class LienzoPanelFocusHandler {
                                           final Command onFocus,
                                           final Command onLostFocus) {
         clear();
-        overHandler = panel.getView().addMouseOverHandler(mouseOverEvent -> onFocus.execute());
-        outHandler = panel.getView().addMouseOutHandler(mouseOutEvent -> onLostFocus.execute());
+        // TODO: lienzo-to-native  overHandler = panel.getView().addMouseOverHandler(mouseOverEvent -> onFocus.execute());
+        // TODO: lienzo-to-native  outHandler = panel.getView().addMouseOutHandler(mouseOutEvent -> onLostFocus.execute());
         return this;
     }
 

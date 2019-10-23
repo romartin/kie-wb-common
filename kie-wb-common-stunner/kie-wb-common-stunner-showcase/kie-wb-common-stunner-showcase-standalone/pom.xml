@@ -629,18 +629,6 @@
       <scope>provided</scope>
     </dependency>
 
-    <dependency>
-      <groupId>com.ahome-it</groupId>
-      <artifactId>ahome-tooling-nativetools</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.ahome-it</groupId>
-      <artifactId>ahome-tooling-common</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
     <!-- Form modeler. -->
     <dependency>
       <groupId>org.kie.workbench.forms</groupId>
@@ -933,6 +921,7 @@
           <runTarget>stunner.html</runTarget>
           <hostedWebapp>src/main/webapp</hostedWebapp>
           <gwtSdkFirstInClasspath>false</gwtSdkFirstInClasspath>
+          <generateJsInteropExports>true</generateJsInteropExports>
 
           <compileSourcesArtifacts>
 

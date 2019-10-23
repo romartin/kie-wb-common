@@ -24,7 +24,7 @@ import com.ait.lienzo.client.core.shape.MultiPath;
 import com.ait.lienzo.client.core.shape.wires.ILayoutHandler;
 import com.ait.lienzo.client.core.shape.wires.WiresShape;
 import com.ait.lienzo.shared.core.types.ColorName;
-import com.ait.tooling.nativetools.client.collection.NFastArrayList;
+import com.ait.lienzo.tools.client.collection.NFastArrayList;
 import org.kie.workbench.common.stunner.client.lienzo.shape.impl.ShapeStateDefaultHandler;
 import org.kie.workbench.common.stunner.client.lienzo.shape.view.wires.WiresShapeView;
 import org.kie.workbench.common.stunner.cm.client.canvas.CaseManagementCanvas;
@@ -179,8 +179,10 @@ public class CaseManagementShapeView extends SVGShapeViewImpl implements HasSize
 
         thisGhost.setLayoutHandler(createGhostLayoutHandler());
 
-        for (WiresShape wiresShape : getChildShapes()) {
-            thisGhost.add(((CaseManagementShapeView) wiresShape).getGhost());
+        NFastArrayList<WiresShape> children = getChildShapes();
+        for (int i = 0; i < children.size(); i++) {
+            WiresShape child = children.get(i);
+            thisGhost.add(((CaseManagementShapeView) child).getGhost());
         }
         return thisGhost;
     }

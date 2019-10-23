@@ -192,7 +192,7 @@ public class ToolboxImpl
         // Set the toolbox primitive's location
         // and ensure it's on top of any node or connector present in the layer below.
         asPrimitive()
-                .setLocation(location.offset(this.offset))
+                .setLocation(location.offset(this.offset.getX(), this.offset.getY()))
                 .moveToTop();
         fireRefresh();
     }

@@ -26,12 +26,14 @@ import javax.inject.Inject;
 
 import com.ait.lienzo.client.core.shape.Layer;
 import com.ait.lienzo.client.widget.panel.LienzoBoundsPanel;
+import com.ait.lienzo.client.widget.panel.impl.ScrollablePanel;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.event.dom.client.DomEvent;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
+import elemental2.dom.EventListener;
+import org.jboss.errai.common.client.ui.ElementWrapperWidget;
 import org.kie.workbench.common.stunner.client.lienzo.canvas.LienzoLayer;
 import org.kie.workbench.common.stunner.client.lienzo.canvas.LienzoPanel;
 import org.kie.workbench.common.stunner.core.client.canvas.event.mouse.CanvasMouseDownEvent;
@@ -40,7 +42,6 @@ import org.kie.workbench.common.stunner.core.client.event.keyboard.KeyDownEvent;
 import org.kie.workbench.common.stunner.core.client.event.keyboard.KeyPressEvent;
 import org.kie.workbench.common.stunner.core.client.event.keyboard.KeyUpEvent;
 import org.kie.workbench.common.stunner.core.client.event.keyboard.KeyboardEvent;
-import org.kie.workbench.common.stunner.core.client.shape.view.event.HandlerRegistrationImpl;
 import org.kie.workbench.common.stunner.core.graph.content.Bounds;
 
 @Dependent
@@ -48,12 +49,13 @@ import org.kie.workbench.common.stunner.core.graph.content.Bounds;
 public class StunnerLienzoBoundsPanel
         implements LienzoPanel {
 
-    private final HandlerRegistrationImpl handlerRegistrationManager;
     private final Event<KeyPressEvent> keyPressEvent;
     private final Event<KeyDownEvent> keyDownEvent;
     private final Event<KeyUpEvent> keyUpEvent;
     private final Event<CanvasMouseDownEvent> mouseDownEvent;
     private final Event<CanvasMouseUpEvent> mouseUpEvent;
+    private EventListener mouseDownEventListener;
+    private EventListener mouseUpEventListener;
     private BiFunction<OptionalInt, OptionalInt, LienzoBoundsPanel> panelBuilder;
     private LienzoBoundsPanel view;
 
@@ -63,26 +65,11 @@ public class StunnerLienzoBoundsPanel
                                     final Event<KeyUpEvent> keyUpEvent,
                                     final Event<CanvasMouseDownEvent> mouseDownEvent,
                                     final Event<CanvasMouseUpEvent> mouseUpEvent) {
-        this(keyPressEvent,
-             keyDownEvent,
-             keyUpEvent,
-             mouseDownEvent,
-             mouseUpEvent,
-             new HandlerRegistrationImpl());
-    }
-
-    StunnerLienzoBoundsPanel(final Event<KeyPressEvent> keyPressEvent,
-                             final Event<KeyDownEvent> keyDownEvent,
-                             final Event<KeyUpEvent> keyUpEvent,
-                             final Event<CanvasMouseDownEvent> mouseDownEvent,
-                             final Event<CanvasMouseUpEvent> mouseUpEvent,
-                             final HandlerRegistrationImpl registration) {
         this.keyPressEvent = keyPressEvent;
         this.keyDownEvent = keyDownEvent;
         this.keyUpEvent = keyUpEvent;
         this.mouseDownEvent = mouseDownEvent;
         this.mouseUpEvent = mouseUpEvent;
-        this.handlerRegistrationManager = registration;
     }
 
     public StunnerLienzoBoundsPanel setPanelBuilder(final BiFunction<OptionalInt, OptionalInt, LienzoBoundsPanel> panelBuilder) {
@@ -92,7 +79,7 @@ public class StunnerLienzoBoundsPanel
 
     @Override
     public Widget asWidget() {
-        return view.asWidget();
+        return ElementWrapperWidget.getWidget(view.getElement());
     }
 
     @Override
@@ -133,17 +120,11 @@ public class StunnerLienzoBoundsPanel
         }
     }
 
-    public HandlerRegistration register(final HandlerRegistration handler) {
-        return handlerRegistrationManager.register(handler);
-    }
-
     private void initHandlers() {
-        register(
-                getLienzoPanel().addMouseDownHandler(mouseDownEvent -> onMouseDown())
-        );
-        register(
-                getLienzoPanel().addMouseUpHandler(mouseUpEvent -> onMouseUp())
-        );
+        mouseDownEventListener = e -> onMouseDown();
+        mouseUpEventListener = e -> onMouseUp();
+        getLienzoPanel().getElement().addEventListener("mousedown", mouseDownEventListener);
+        getLienzoPanel().getElement().addEventListener("mouseup", mouseUpEventListener);
     }
 
     private com.ait.lienzo.client.widget.panel.LienzoPanel getLienzoPanel() {
@@ -152,18 +133,18 @@ public class StunnerLienzoBoundsPanel
 
     @Override
     public LienzoPanel focus() {
-        view.setFocus(true);
+        // TODO: lienzo-to-native  view.setFocus(true);
         return this;
     }
 
     @Override
     public int getWidthPx() {
-        return getLienzoPanel().getWidthPx();
+        return getLienzoPanel().getWidePx();
     }
 
     @Override
     public int getHeightPx() {
-        return getLienzoPanel().getHeightPx();
+        return getLienzoPanel().getHighPx();
     }
 
     @Override
@@ -174,8 +155,10 @@ public class StunnerLienzoBoundsPanel
     @Override
     public LienzoPanel setPixelSize(final int wide,
                                     final int high) {
-        getLienzoPanel().setPixelSize(wide,
-                                      high);
+        // TODO: lienzo-to-native : Wrong cast.
+        if (getLienzoPanel() instanceof ScrollablePanel) {
+            ((ScrollablePanel) getLienzoPanel()).setPxSize(wide, high);
+        }
         return this;
     }
 
@@ -185,7 +168,8 @@ public class StunnerLienzoBoundsPanel
     }
 
     public void destroy() {
-        handlerRegistrationManager.destroy();
+        getLienzoPanel().getElement().removeEventListener("mousedown", mouseDownEventListener);
+        getLienzoPanel().getElement().removeEventListener("mouseup", mouseUpEventListener);
         view.destroy();
         panelBuilder = null;
         view = null;

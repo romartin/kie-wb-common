@@ -32,7 +32,7 @@ import com.ait.lienzo.client.core.shape.wires.WiresManager;
 import com.ait.lienzo.client.core.types.BoundingBox;
 import com.ait.lienzo.client.core.types.Point2D;
 import com.ait.lienzo.test.LienzoMockitoTestRunner;
-import com.google.gwt.event.shared.HandlerRegistration;
+import com.ait.lienzo.tools.client.event.HandlerRegistration;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -291,7 +291,7 @@ public class LienzoMultipleSelectionControlTest {
 
         when(delegateShapeProvider.getShape()).thenReturn(mock(com.ait.lienzo.client.core.shape.Shape.class));
         when(selectionManager.getSelectedItems()).thenReturn(selectedItems);
-        when(selectedItems.getBoundingBox()).thenReturn(new BoundingBox(MIN_WIDTH, MIN_HEIGHT, MAX_WIDTH, MAX_HEIGHT));
+        when(selectedItems.getBoundingBox()).thenReturn(BoundingBox.fromDoubles(MIN_WIDTH, MIN_HEIGHT, MAX_WIDTH, MAX_HEIGHT));
         when(shapeLocationsChangedEvent.getCanvasHandler()).thenReturn(canvasHandler);
 
         tested.onShapeLocationsChanged(shapeLocationsChangedEvent);

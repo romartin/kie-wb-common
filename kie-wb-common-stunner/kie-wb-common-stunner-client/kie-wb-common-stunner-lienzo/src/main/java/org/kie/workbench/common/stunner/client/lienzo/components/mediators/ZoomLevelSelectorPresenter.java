@@ -24,12 +24,13 @@ import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
 import com.ait.lienzo.client.core.shape.Layer;
-import com.ait.lienzo.client.widget.panel.scrollbars.ScrollablePanel;
+import com.ait.lienzo.client.widget.panel.impl.ScrollablePanel;
 import com.ait.lienzo.client.widget.panel.util.PanelTransformUtils;
-import com.google.gwt.event.dom.client.MouseOverEvent;
-import com.google.gwt.event.shared.HandlerRegistration;
+import com.ait.lienzo.tools.client.event.HandlerRegistration;
+import com.ait.lienzo.tools.client.event.MouseEventUtil;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.IsWidget;
+import elemental2.dom.EventListener;
 import org.kie.workbench.common.stunner.client.lienzo.canvas.LienzoCanvas;
 import org.kie.workbench.common.stunner.client.lienzo.canvas.LienzoCanvasView;
 import org.kie.workbench.common.stunner.client.lienzo.canvas.LienzoPanel;
@@ -59,9 +60,9 @@ public class ZoomLevelSelectorPresenter {
     private double minScale;
     private double maxScale;
     private double zoomFactor;
-    private HandlerRegistration panelResizeHandlerRegistration;
-    private HandlerRegistration transformChangedHandler;
+    private EventListener panelResizeEventListener;
     private HandlerRegistration selectorOverHandler;
+
     private Timer hideTimer;
 
     @Inject
@@ -113,17 +114,17 @@ public class ZoomLevelSelectorPresenter {
         floatingView.add(selector);
 
         if (panel.getView() instanceof ScrollablePanel) {
-            ScrollablePanel scrollablePanel = (ScrollablePanel) panel.getView();
-            panelResizeHandlerRegistration =
-                    scrollablePanel.addLienzoPanelResizeEventHandler(event -> onPanelResize(event.getWidth(),
-                                                                                            event.getHeight()));
+            final ScrollablePanel scrollablePanel = (ScrollablePanel) panel.getView();
+            panelResizeEventListener =
+                    scrollablePanel.addResizeEventListener(evt -> onPanelResize(scrollablePanel.getWidePx(),
+                                                                                scrollablePanel.getHighPx()));
         }
 
         reposition();
 
-        transformChangedHandler = layer.getViewport().addViewportTransformChangedHandler(event -> onViewportTransformChanged());
+        // TODO: lienzo-to-native  transformChangedHandler = layer.getViewport().addViewportTransformChangedHandler(event -> onViewportTransformChanged());
 
-        selectorOverHandler = selector.asWidget().addDomHandler(mouseOverEvent -> cancelHide(), MouseOverEvent.getType());
+        // TODO: lienzo-to-native  selectorOverHandler = selector.asWidget().addDomHandler(mouseOverEvent -> cancelHide(), MouseOverEvent.getType());
 
         return this;
     }
@@ -172,14 +173,14 @@ public class ZoomLevelSelectorPresenter {
     @PreDestroy
     public void destroy() {
         cancelHide();
-        if (null != panelResizeHandlerRegistration) {
-            panelResizeHandlerRegistration.removeHandler();
-            panelResizeHandlerRegistration = null;
+        if (null != panelResizeEventListener) {
+            ((ScrollablePanel) getPanel().getView()).removeResizeEventListener(panelResizeEventListener);
+            panelResizeEventListener = null;
         }
-        if (null != transformChangedHandler) {
+        /*if (null != transformChangedHandler) {
             transformChangedHandler.removeHandler();
             transformChangedHandler = null;
-        }
+        }*/
         if (null != selectorOverHandler) {
             selectorOverHandler.removeHandler();
             selectorOverHandler = null;
@@ -196,15 +197,15 @@ public class ZoomLevelSelectorPresenter {
 
     private void reposition() {
         final LienzoPanel panel = getPanel();
-        onPanelResize(panel.getView().getWidthPx(),
-                      panel.getView().getHeightPx());
+        onPanelResize(panel.getView().getWidePx(),
+                      panel.getView().getHighPx());
     }
 
     private ZoomLevelSelectorPresenter onPanelResize(final double width,
                                                      final double height) {
         final LienzoPanel panel = getPanel();
-        final int absoluteLeft = panel.getView().getAbsoluteLeft();
-        final int absoluteTop = panel.getView().getAbsoluteTop();
+        final int absoluteLeft = MouseEventUtil.getAbsoluteLeft(panel.getView().getElement());
+        final int absoluteTop = MouseEventUtil.getAbsoluteTop(panel.getView().getElement());
         final double x = absoluteLeft + width - 174;
         final double y = absoluteTop + height - 50;
         return at(x, y);
