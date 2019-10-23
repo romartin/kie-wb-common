@@ -29,7 +29,7 @@ import com.ait.lienzo.client.core.shape.wires.IControlPointsAcceptor;
 import com.ait.lienzo.client.core.shape.wires.WiresManager;
 import com.ait.lienzo.client.core.types.Point2DArray;
 import com.ait.lienzo.test.LienzoMockitoTestRunner;
-import com.google.gwt.event.shared.HandlerRegistration;
+import com.ait.lienzo.tools.client.event.HandlerRegistration;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -260,9 +260,9 @@ public class ControlPointControlImplTest {
     public void testStunnerControlPointsAcceptorMove() {
         ControlPointControl control = mock(ControlPointControl.class);
         ControlPointControlImpl.StunnerControlPointsAcceptor acceptor = createStunnerControlPointsAcceptor(control);
-        Point2DArray locationArray = new Point2DArray(new com.ait.lienzo.client.core.types.Point2D(0, 0),
-                                                      new com.ait.lienzo.client.core.types.Point2D(5, 5),
-                                                      new com.ait.lienzo.client.core.types.Point2D(10, 10));
+        Point2DArray locationArray = Point2DArray.fromArrayOfPoint2D(new com.ait.lienzo.client.core.types.Point2D(0, 0),
+                                                                     new com.ait.lienzo.client.core.types.Point2D(5, 5),
+                                                                     new com.ait.lienzo.client.core.types.Point2D(10, 10));
         final boolean moveResult = acceptor.move(connector, locationArray);
         assertTrue(moveResult);
         ArgumentCaptor<ControlPoint[]> controlPointsExpected = ArgumentCaptor.forClass(ControlPoint[].class);

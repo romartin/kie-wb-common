@@ -20,13 +20,10 @@ import java.util.Collections;
 
 import com.ait.lienzo.client.core.image.ImageProxy;
 import com.ait.lienzo.client.core.image.ImageShapeLoadedHandler;
-import com.ait.lienzo.client.core.shape.Attributes;
 import com.ait.lienzo.client.core.shape.Picture;
 import com.ait.lienzo.client.core.types.BoundingBox;
-import com.ait.lienzo.test.LienzoMockitoTestRunner;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.kie.workbench.common.stunner.bpmn.definition.property.dimensions.Height;
 import org.kie.workbench.common.stunner.bpmn.definition.property.dimensions.RectangleDimensionsSet;
 import org.kie.workbench.common.stunner.bpmn.definition.property.dimensions.Width;
@@ -46,7 +43,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(LienzoMockitoTestRunner.class)
+// TODO: lienzo-to-native @RunWith(LienzoMockitoTestRunner.class)
 public class CustomTaskShapeViewHandlerTest {
 
     private static final String WID_ID = "id1";
@@ -72,8 +69,8 @@ public class CustomTaskShapeViewHandlerTest {
     @Mock
     private ImageProxy imageProxy;
 
-    @Mock
-    private Attributes svgAttr;
+    /*@Mock
+    private Attributes svgAttr;*/
 
     private CustomTaskShapeViewHandler tested;
     private CustomTask task;
@@ -100,9 +97,9 @@ public class CustomTaskShapeViewHandlerTest {
         when(icon.getID()).thenReturn(CustomTaskShapeViewHandler.WID_ICON_ID);
         when(icon.getImageProxy()).thenReturn(imageProxy);
         when(view.getPrimitive()).thenReturn(iconSVGPrimiite);
-        when(icon.getAttributes()).thenReturn(svgAttr);
+        /*when(icon.getAttributes()).thenReturn(svgAttr);
         when(svgAttr.getHeight()).thenReturn(HEIGHT);
-        when(svgAttr.getWidth()).thenReturn(WIDTH);
+        when(svgAttr.getWidth()).thenReturn(WIDTH);*/
 
         this.tested = new CustomTaskShapeViewHandler(() -> registry);
     }
@@ -111,10 +108,10 @@ public class CustomTaskShapeViewHandlerTest {
     @SuppressWarnings("unchecked")
     public void testHandle() {
         when(imageProxy.isLoaded()).thenReturn(true);
-        when(icon.getBoundingBox()).thenReturn(new BoundingBox(0d,
-                                                               0d,
-                                                               CustomTaskShapeViewHandler.WID_ICON_WIDTH * 2,
-                                                               CustomTaskShapeViewHandler.WID_ICON_HEIGHT * 2));
+        when(icon.getBoundingBox()).thenReturn(BoundingBox.fromDoubles(0d,
+                                                                       0d,
+                                                                       CustomTaskShapeViewHandler.WID_ICON_WIDTH * 2,
+                                                                       CustomTaskShapeViewHandler.WID_ICON_HEIGHT * 2));
         tested.handle(task, view);
         ArgumentCaptor<ImageShapeLoadedHandler> loadedHandlerArgumentCaptor =
                 ArgumentCaptor.forClass(ImageShapeLoadedHandler.class);

@@ -16,13 +16,14 @@
 
 package org.kie.workbench.common.stunner.cm.client.wires;
 
+import java.util.function.Supplier;
+
 import com.ait.lienzo.client.core.shape.wires.WiresShape;
 import com.ait.lienzo.client.core.shape.wires.handlers.WiresLayerIndex;
 import com.ait.lienzo.client.core.shape.wires.handlers.WiresParentPickerControl;
 import com.ait.lienzo.client.core.shape.wires.handlers.impl.WiresMagnetsControlImpl;
 import com.ait.lienzo.client.core.shape.wires.handlers.impl.WiresParentPickerControlImpl;
 import com.ait.lienzo.client.core.shape.wires.handlers.impl.WiresShapeControlImpl;
-import com.ait.tooling.common.api.java.util.function.Supplier;
 import org.kie.workbench.common.stunner.client.lienzo.wires.DelegateWiresShapeControl;
 
 public class CaseManagementShapeControl

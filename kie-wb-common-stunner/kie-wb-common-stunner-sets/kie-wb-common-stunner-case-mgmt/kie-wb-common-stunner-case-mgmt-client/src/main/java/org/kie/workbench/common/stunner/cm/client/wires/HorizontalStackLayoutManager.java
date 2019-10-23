@@ -20,7 +20,7 @@ import java.util.List;
 import com.ait.lienzo.client.core.shape.wires.WiresContainer;
 import com.ait.lienzo.client.core.shape.wires.WiresShape;
 import com.ait.lienzo.client.core.types.Point2D;
-import com.ait.tooling.nativetools.client.collection.NFastArrayList;
+import com.ait.lienzo.tools.client.collection.NFastArrayList;
 import org.kie.workbench.common.stunner.cm.client.shape.view.CaseManagementShapeView;
 import org.kie.workbench.common.stunner.svg.client.shape.view.impl.SVGShapeViewImpl;
 
@@ -66,10 +66,12 @@ public class HorizontalStackLayoutManager extends AbstractNestedLayoutHandler {
     @Override
     public void layout(final WiresContainer container) {
         double x = LEFT_MARGIN_PADDING;
-        for (WiresShape ws : container.getChildShapes()) {
-            ws.setLocation(new Point2D(x,
-                                       PADDING_Y));
-            x = x + ws.getPath().getBoundingBox().getWidth() + PADDING_X;
+        NFastArrayList<WiresShape> children = container.getChildShapes();
+        for (int i = 0; i < children.size(); i++) {
+            WiresShape child = children.get(i);
+            child.setLocation(new Point2D(x,
+                                          PADDING_Y));
+            x = x + child.getPath().getBoundingBox().getWidth() + PADDING_X;
         }
     }
 }

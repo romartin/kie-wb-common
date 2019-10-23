@@ -226,7 +226,7 @@ public class LienzoCanvasExportTest {
 
     @Test
     public void testToContext2D() {
-        Transform transform = new Transform().translate(11, 33).scale(0.1, 0.3);
+        Transform transform = new Transform().translate(11, 33).scaleWithXY(0.1, 0.3);
         when(viewport.getTransform()).thenReturn(transform);
         IContext2D iContext2D = tested.toContext2D(canvasHandler, CanvasExportSettings.build());
         assertNotNull(iContext2D);

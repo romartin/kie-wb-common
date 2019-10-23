@@ -27,8 +27,8 @@ import com.ait.lienzo.client.core.event.NodeMouseExitHandler;
 import com.ait.lienzo.client.core.shape.Node;
 import com.ait.lienzo.client.core.shape.Shape;
 import com.ait.lienzo.test.LienzoMockitoTestRunner;
-import com.google.gwt.event.dom.client.MouseEvent;
-import com.google.gwt.event.shared.HandlerRegistration;
+import com.ait.lienzo.tools.client.event.HandlerRegistration;
+import elemental2.dom.MouseEvent;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -121,9 +121,7 @@ public class ViewEventHandlerManagerTest {
         assertFalse(tested.supports(ViewEventType.DRAG));
         assertFalse(tested.supports(ViewEventType.MOUSE_EXIT));
         assertFalse(tested.supports(ViewEventType.MOUSE_MOVE));
-        assertFalse(tested.supports(ViewEventType.GESTURE));
         assertFalse(tested.supports(ViewEventType.RESIZE));
-        assertFalse(tested.supports(ViewEventType.TOUCH));
     }
 
     @Test
@@ -140,9 +138,11 @@ public class ViewEventHandlerManagerTest {
                times(1)).addNodeMouseClickHandler(clickHandlerArgumentCaptor.capture());
         final NodeMouseClickHandler nodeCLickHandler = clickHandlerArgumentCaptor.getValue();
         final NodeMouseClickEvent clickEvent = mock(NodeMouseClickEvent.class);
-        final MouseEvent mouseEvent = mock(MouseEvent.class);
         final int x = 102;
         final int y = 410;
+        final MouseEvent mouseEvent = new MouseEvent("mouse");
+        mouseEvent.clientX = x;
+        mouseEvent.clientY = y;
         when(clickEvent.getX()).thenReturn(x);
         when(clickEvent.getY()).thenReturn(y);
         when(clickEvent.isButtonLeft()).thenReturn(true);
@@ -151,9 +151,7 @@ public class ViewEventHandlerManagerTest {
         when(clickEvent.isShiftKeyDown()).thenReturn(true);
         when(clickEvent.isAltKeyDown()).thenReturn(true);
         when(clickEvent.isMetaKeyDown()).thenReturn(true);
-        when(clickEvent.getMouseEvent()).thenReturn(mouseEvent);
-        when(mouseEvent.getClientX()).thenReturn(x);
-        when(mouseEvent.getClientY()).thenReturn(y);
+        when(clickEvent.getNativeEvent()).thenReturn(mouseEvent);
         nodeCLickHandler.onNodeMouseClick(clickEvent);
         final ArgumentCaptor<ViewEvent> eventArgumentCaptor =
                 ArgumentCaptor.forClass(ViewEvent.class);
@@ -195,9 +193,11 @@ public class ViewEventHandlerManagerTest {
                times(1)).addNodeMouseDoubleClickHandler(clickHandlerArgumentCaptor.capture());
         final NodeMouseDoubleClickHandler nodeCLickHandler = clickHandlerArgumentCaptor.getValue();
         final NodeMouseDoubleClickEvent clickEvent = mock(NodeMouseDoubleClickEvent.class);
-        final MouseEvent mouseEvent = mock(MouseEvent.class);
         final int x = 102;
         final int y = 410;
+        final MouseEvent mouseEvent = new MouseEvent("mouse");
+        mouseEvent.clientX = x;
+        mouseEvent.clientY = y;
         when(clickEvent.getX()).thenReturn(x);
         when(clickEvent.getY()).thenReturn(y);
         when(clickEvent.isButtonLeft()).thenReturn(true);
@@ -206,9 +206,7 @@ public class ViewEventHandlerManagerTest {
         when(clickEvent.isShiftKeyDown()).thenReturn(true);
         when(clickEvent.isAltKeyDown()).thenReturn(true);
         when(clickEvent.isMetaKeyDown()).thenReturn(true);
-        when(clickEvent.getMouseEvent()).thenReturn(mouseEvent);
-        when(mouseEvent.getClientX()).thenReturn(x);
-        when(mouseEvent.getClientY()).thenReturn(y);
+        when(clickEvent.getNativeEvent()).thenReturn(mouseEvent);
         nodeCLickHandler.onNodeMouseDoubleClick(clickEvent);
         final ArgumentCaptor<ViewEvent> eventArgumentCaptor =
                 ArgumentCaptor.forClass(ViewEvent.class);
@@ -250,17 +248,17 @@ public class ViewEventHandlerManagerTest {
                times(1)).addNodeMouseDoubleClickHandler(clickHandlerArgumentCaptor.capture());
         final NodeMouseDoubleClickHandler nodeCLickHandler = clickHandlerArgumentCaptor.getValue();
         final NodeMouseDoubleClickEvent clickEvent = mock(NodeMouseDoubleClickEvent.class);
-        final MouseEvent mouseEvent = mock(MouseEvent.class);
         final int x = 102;
         final int y = 410;
+        final MouseEvent mouseEvent = new MouseEvent("mouse");
+        mouseEvent.clientX = x;
+        mouseEvent.clientY = y;
         when(clickEvent.getX()).thenReturn(x);
         when(clickEvent.getY()).thenReturn(y);
         when(clickEvent.isShiftKeyDown()).thenReturn(true);
         when(clickEvent.isAltKeyDown()).thenReturn(true);
         when(clickEvent.isMetaKeyDown()).thenReturn(true);
-        when(clickEvent.getMouseEvent()).thenReturn(mouseEvent);
-        when(mouseEvent.getClientX()).thenReturn(x);
-        when(mouseEvent.getClientY()).thenReturn(y);
+        when(clickEvent.getNativeEvent()).thenReturn(mouseEvent);
         nodeCLickHandler.onNodeMouseDoubleClick(clickEvent);
         final ArgumentCaptor<ViewEvent> eventArgumentCaptor =
                 ArgumentCaptor.forClass(ViewEvent.class);
@@ -299,17 +297,17 @@ public class ViewEventHandlerManagerTest {
                times(1)).addNodeMouseEnterHandler(clickHandlerArgumentCaptor.capture());
         final NodeMouseEnterHandler nodeCLickHandler = clickHandlerArgumentCaptor.getValue();
         final NodeMouseEnterEvent clickEvent = mock(NodeMouseEnterEvent.class);
-        final MouseEvent mouseEvent = mock(MouseEvent.class);
         final int x = 102;
         final int y = 410;
+        final MouseEvent mouseEvent = new MouseEvent("mouse");
+        mouseEvent.clientX = x;
+        mouseEvent.clientY = y;
         when(clickEvent.getX()).thenReturn(x);
         when(clickEvent.getY()).thenReturn(y);
         when(clickEvent.isShiftKeyDown()).thenReturn(true);
         when(clickEvent.isAltKeyDown()).thenReturn(true);
         when(clickEvent.isMetaKeyDown()).thenReturn(true);
-        when(clickEvent.getMouseEvent()).thenReturn(mouseEvent);
-        when(mouseEvent.getClientX()).thenReturn(x);
-        when(mouseEvent.getClientY()).thenReturn(y);
+        when(clickEvent.getNativeEvent()).thenReturn(mouseEvent);
         nodeCLickHandler.onNodeMouseEnter(clickEvent);
         final ArgumentCaptor<ViewEvent> eventArgumentCaptor =
                 ArgumentCaptor.forClass(ViewEvent.class);
@@ -348,17 +346,17 @@ public class ViewEventHandlerManagerTest {
                times(1)).addNodeMouseExitHandler(clickHandlerArgumentCaptor.capture());
         final NodeMouseExitHandler nodeCLickHandler = clickHandlerArgumentCaptor.getValue();
         final NodeMouseExitEvent clickEvent = mock(NodeMouseExitEvent.class);
-        final MouseEvent mouseEvent = mock(MouseEvent.class);
         final int x = 102;
         final int y = 410;
+        final MouseEvent mouseEvent = new MouseEvent("mouse");
+        mouseEvent.clientX = x;
+        mouseEvent.clientY = y;
         when(clickEvent.getX()).thenReturn(x);
         when(clickEvent.getY()).thenReturn(y);
         when(clickEvent.isShiftKeyDown()).thenReturn(true);
         when(clickEvent.isAltKeyDown()).thenReturn(true);
         when(clickEvent.isMetaKeyDown()).thenReturn(true);
-        when(clickEvent.getMouseEvent()).thenReturn(mouseEvent);
-        when(mouseEvent.getClientX()).thenReturn(x);
-        when(mouseEvent.getClientY()).thenReturn(y);
+        when(clickEvent.getNativeEvent()).thenReturn(mouseEvent);
         nodeCLickHandler.onNodeMouseExit(clickEvent);
         final ArgumentCaptor<ViewEvent> eventArgumentCaptor =
                 ArgumentCaptor.forClass(ViewEvent.class);

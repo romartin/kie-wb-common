@@ -20,7 +20,7 @@ import java.util.List;
 import com.ait.lienzo.client.core.shape.wires.WiresContainer;
 import com.ait.lienzo.client.core.shape.wires.WiresShape;
 import com.ait.lienzo.client.core.types.Point2D;
-import com.ait.tooling.nativetools.client.collection.NFastArrayList;
+import com.ait.lienzo.tools.client.collection.NFastArrayList;
 import org.kie.workbench.common.stunner.cm.client.shape.view.CaseManagementShapeView;
 
 public class VerticalStackLayoutManager extends AbstractNestedLayoutHandler {
@@ -69,18 +69,20 @@ public class VerticalStackLayoutManager extends AbstractNestedLayoutHandler {
         if (container instanceof WiresShape) {
             y = y + ((WiresShape) container).getPath().getBoundingBox().getHeight();
         }
-
-        for (WiresShape ws : container.getChildShapes()) {
-            ws.setLocation(new Point2D(PADDING_X,
-                                       y));
-            y = y + getTotalHeight(ws) + PADDING_Y;
+        NFastArrayList<WiresShape> children = container.getChildShapes();
+        for (int i = 0; i < children.size(); i++) {
+            WiresShape child = children.get(i);
+            child.setLocation(new Point2D(PADDING_X,
+                                          y));
+            y = y + getTotalHeight(child) + PADDING_Y;
         }
     }
 
     private double getTotalHeight(WiresShape ws) {
         double height = ws.getPath().getBoundingBox().getHeight();
-
-        for (WiresShape child : ws.getChildShapes()) {
+        NFastArrayList<WiresShape> children = ws.getChildShapes();
+        for (int i = 0; i < children.size(); i++) {
+            WiresShape child = children.get(i);
             height += (getTotalHeight(child) + PADDING_Y);
         }
 

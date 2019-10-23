@@ -18,7 +18,6 @@ package org.kie.workbench.common.stunner.client.lienzo.canvas.export;
 
 import javax.enterprise.context.ApplicationScoped;
 
-import com.ait.lienzo.client.core.Context2D;
 import com.ait.lienzo.client.core.shape.Viewport;
 import com.ait.lienzo.client.core.types.Transform;
 import com.ait.lienzo.client.widget.panel.Bounds;
@@ -63,8 +62,7 @@ public class LienzoCanvasExport implements CanvasExport<AbstractCanvasHandler> {
         final Transform transform = viewport.getTransform();
         viewport.setTransform(new Transform());
         // Draw into the target context.
-        lienzoLayer.draw(new Context2D(new DelegateNativeContext2D(svgContext2D,
-                                                                   canvasHandler)));
+        // TODO: lienzo-to-native  lienzoLayer.draw(new Context2D(new DelegateNativeContext2D(svgContext2D, canvasHandler)));
         // Set again the previous transform.
         viewport.setTransform(transform);
 

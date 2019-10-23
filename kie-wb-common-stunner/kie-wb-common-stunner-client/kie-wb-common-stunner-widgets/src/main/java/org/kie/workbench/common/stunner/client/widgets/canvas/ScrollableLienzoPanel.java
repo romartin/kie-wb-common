@@ -40,7 +40,8 @@ public class ScrollableLienzoPanel
                 return new ScrollableLienzoPanelView(width.getAsInt(),
                                                      height.getAsInt());
             }
-            return new ScrollableLienzoPanelView();
+            // TODO: lienzo-to-native
+            return new ScrollableLienzoPanelView(300, 300);
         });
     }
 

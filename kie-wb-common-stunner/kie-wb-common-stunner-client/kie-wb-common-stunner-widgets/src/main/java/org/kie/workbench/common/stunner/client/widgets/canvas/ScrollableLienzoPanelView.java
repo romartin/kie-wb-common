@@ -16,7 +16,7 @@
 
 package org.kie.workbench.common.stunner.client.widgets.canvas;
 
-import com.ait.lienzo.client.widget.panel.scrollbars.ScrollablePanel;
+import com.ait.lienzo.client.widget.panel.impl.ScrollablePanel;
 import elemental2.dom.DomGlobal;
 import org.jboss.errai.bus.client.util.BusToolsCli;
 import org.kie.workbench.common.stunner.core.client.canvas.controls.keyboard.KeyEventHandler;
@@ -25,10 +25,6 @@ import org.kie.workbench.common.stunner.core.client.canvas.controls.keyboard.Key
 public class ScrollableLienzoPanelView
         extends ScrollablePanel
         implements StunnerLienzoBoundsPanelView {
-
-    public ScrollableLienzoPanelView() {
-        super(StunnerBoundsProviderFactory.newProvider());
-    }
 
     public ScrollableLienzoPanelView(final int width,
                                      final int height) {
@@ -47,7 +43,8 @@ public class ScrollableLienzoPanelView
             return;
         }
 
-        presenter.register(
+        // TODO: lienzo-to-native
+        /*presenter.register(
                 addKeyDownHandler(event -> presenter.onKeyDown(event.getNativeKeyCode()))
         );
         presenter.register(
@@ -55,7 +52,7 @@ public class ScrollableLienzoPanelView
         );
         presenter.register(
                 addKeyUpHandler(event -> presenter.onKeyUp(event.getNativeKeyCode()))
-        );
+        );*/
     }
 
     boolean isRemoteCommunicationEnabled() {

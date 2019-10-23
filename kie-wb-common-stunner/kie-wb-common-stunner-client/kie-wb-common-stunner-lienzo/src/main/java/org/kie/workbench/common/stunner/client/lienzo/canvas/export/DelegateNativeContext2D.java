@@ -16,30 +16,12 @@
 
 package org.kie.workbench.common.stunner.client.lienzo.canvas.export;
 
-import java.util.HashMap;
-import java.util.Objects;
-import java.util.Optional;
-
-import com.ait.lienzo.client.core.INativeContext2D;
-import com.ait.lienzo.client.core.Path2D;
-import com.ait.lienzo.client.core.types.ImageData;
-import com.ait.lienzo.client.core.types.LinearGradient;
-import com.ait.lienzo.client.core.types.PathPartEntryJSO;
-import com.ait.lienzo.client.core.types.PathPartList;
-import com.ait.lienzo.client.core.types.PatternGradient;
-import com.ait.lienzo.client.core.types.RadialGradient;
-import com.ait.lienzo.client.core.types.Shadow;
-import com.ait.lienzo.client.core.types.TextMetrics;
-import com.ait.lienzo.client.core.types.Transform;
-import com.ait.tooling.nativetools.client.collection.NFastDoubleArrayJSO;
-import com.google.gwt.dom.client.Element;
-import elemental2.dom.HTMLCanvasElement;
 import org.kie.workbench.common.stunner.client.lienzo.util.NativeClassConverter;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
-import org.kie.workbench.common.stunner.core.client.canvas.CanvasHandler;
 import org.uberfire.ext.editor.commons.client.file.exports.svg.IContext2D;
 
-public class DelegateNativeContext2D implements INativeContext2D {
+// TODO
+public class DelegateNativeContext2D /*implements INativeContext2D*/ {
 
     protected static final String DEFAULT_NODE_ID = "id";
 
@@ -61,15 +43,11 @@ public class DelegateNativeContext2D implements INativeContext2D {
         this.context = context;
         this.nativeClassConverter = converter;
         this.canvasHandler = canvasHandler;
-        this.svgNodeId = getSvgNodeId(canvasHandler).orElse(DEFAULT_NODE_ID);
+        // TODO: lienzo-to-native  this.svgNodeId = getSvgNodeId(canvasHandler).orElse(DEFAULT_NODE_ID);
     }
 
-    /**
-     * Get the SVG node id referred to the current diagram definition set. It uses the adapters to get the id.
-     * @param canvasHandler the current {@link CanvasHandler}
-     * @return the optional id if set otherwise empty.
-     */
-    private Optional<String> getSvgNodeId(AbstractCanvasHandler canvasHandler) {
+    // TODO: lienzo-to-native
+    /*private Optional<String> getSvgNodeId(AbstractCanvasHandler canvasHandler) {
         final String diagramDefinitionSetId = canvasHandler.getDiagram().getMetadata().getDefinitionSetId();
         final Object diagramDefinitionSet = canvasHandler.getDefinitionManager().definitionSets().getDefinitionSetById(diagramDefinitionSetId);
         return canvasHandler.getDefinitionManager().adapters().forDefinitionSet().getSvgNodeId(diagramDefinitionSet);
@@ -470,7 +448,7 @@ public class DelegateNativeContext2D implements INativeContext2D {
 
     private Path2D.NativePath2D throwException() {
         throw new UnsupportedOperationException("Not implemented yet.");
-    }
+    }*/
 
     public IContext2D getDelegate() {
         return context;

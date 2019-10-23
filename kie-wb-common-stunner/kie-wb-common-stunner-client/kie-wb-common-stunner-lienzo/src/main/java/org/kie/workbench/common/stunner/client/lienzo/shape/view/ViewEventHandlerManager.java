@@ -19,30 +19,18 @@ package org.kie.workbench.common.stunner.client.lienzo.shape.view;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.ait.lienzo.client.core.event.AbstractNodeGestureEvent;
-import com.ait.lienzo.client.core.event.AbstractNodeTouchEvent;
-import com.ait.lienzo.client.core.event.NodeGestureChangeEvent;
-import com.ait.lienzo.client.core.event.NodeGestureChangeHandler;
-import com.ait.lienzo.client.core.event.NodeGestureEndEvent;
-import com.ait.lienzo.client.core.event.NodeGestureEndHandler;
-import com.ait.lienzo.client.core.event.NodeGestureStartEvent;
-import com.ait.lienzo.client.core.event.NodeGestureStartHandler;
-import com.ait.lienzo.client.core.event.TouchPoint;
+import com.ait.lienzo.client.core.event.AbstractNodeHumanInputEvent;
 import com.ait.lienzo.client.core.shape.Node;
 import com.ait.lienzo.client.core.shape.Shape;
-import com.google.gwt.event.shared.HandlerRegistration;
+import com.ait.lienzo.tools.client.event.HandlerRegistration;
+import com.ait.lienzo.tools.client.event.HandlerRegistrationManager;
 import com.google.gwt.user.client.Timer;
-import org.kie.workbench.common.stunner.core.client.shape.view.event.GestureEvent;
-import org.kie.workbench.common.stunner.core.client.shape.view.event.GestureEventImpl;
-import org.kie.workbench.common.stunner.core.client.shape.view.event.GestureHandler;
-import org.kie.workbench.common.stunner.core.client.shape.view.event.HandlerRegistrationImpl;
+import elemental2.dom.MouseEvent;
 import org.kie.workbench.common.stunner.core.client.shape.view.event.MouseClickEvent;
 import org.kie.workbench.common.stunner.core.client.shape.view.event.MouseDoubleClickEvent;
 import org.kie.workbench.common.stunner.core.client.shape.view.event.MouseEnterEvent;
 import org.kie.workbench.common.stunner.core.client.shape.view.event.MouseExitEvent;
 import org.kie.workbench.common.stunner.core.client.shape.view.event.TextDoubleClickEvent;
-import org.kie.workbench.common.stunner.core.client.shape.view.event.TouchEventImpl;
-import org.kie.workbench.common.stunner.core.client.shape.view.event.TouchHandler;
 import org.kie.workbench.common.stunner.core.client.shape.view.event.ViewEvent;
 import org.kie.workbench.common.stunner.core.client.shape.view.event.ViewEventType;
 import org.kie.workbench.common.stunner.core.client.shape.view.event.ViewHandler;
@@ -52,7 +40,7 @@ public class ViewEventHandlerManager {
 
     private static final int TIMER_DELAY = 50;
 
-    private final HandlerRegistrationImpl registrationManager = new HandlerRegistrationImpl();
+    private final HandlerRegistrationManager registrationManager = new HandlerRegistrationManager();
     private final Map<ViewEventType, HandlerRegistration[]> registrationMap = new HashMap<>();
 
     private final Node<?> node;
@@ -161,12 +149,6 @@ public class ViewEventHandlerManager {
         if (ViewEventType.MOUSE_EXIT.equals(type)) {
             return registerExitHandler((ViewHandler<ViewEvent>) eventHandler);
         }
-        if (ViewEventType.TOUCH.equals(type)) {
-            return registerTouchHandler((TouchHandler) eventHandler);
-        }
-        if (ViewEventType.GESTURE.equals(type)) {
-            return registerGestureHandler((GestureHandler) eventHandler);
-        }
         return null;
     }
 
@@ -192,48 +174,16 @@ public class ViewEventHandlerManager {
         registrationMap.clear();
     }
 
-    protected HandlerRegistration[] registerGestureHandler(final GestureHandler gestureHandler) {
-        HandlerRegistration gestureStartReg = node.addNodeGestureStartHandler(new NodeGestureStartHandler() {
-            @Override
-            public void onNodeGestureStart(final NodeGestureStartEvent event) {
-                if (isEnabled()) {
-                    final GestureEvent event1 = buildGestureEvent(event);
-                    if (null != event1) {
-                        gestureHandler.start(event1);
-                    }
-                }
-            }
-        });
-        HandlerRegistration gestureChangeReg = node.addNodeGestureChangeHandler(new NodeGestureChangeHandler() {
-            @Override
-            public void onNodeGestureChange(final NodeGestureChangeEvent event) {
-                if (isEnabled()) {
-                    final GestureEvent event1 = buildGestureEvent(event);
-                    if (null != event1) {
-                        gestureHandler.change(event1);
-                    }
-                }
-            }
-        });
-        HandlerRegistration gestureEndReg = node.addNodeGestureEndHandler(new NodeGestureEndHandler() {
-            @Override
-            public void onNodeGestureEnd(final NodeGestureEndEvent event) {
-                if (isEnabled()) {
-                    final GestureEvent event1 = buildGestureEvent(event);
-                    if (null != event1) {
-                        gestureHandler.end(event1);
-                    }
-                }
-            }
-        });
-        return new HandlerRegistration[]{
-                gestureStartReg, gestureChangeReg, gestureEndReg
-        };
+    public static MouseEvent getMouseEvent(AbstractNodeHumanInputEvent event) {
+        return (MouseEvent) event.getNativeEvent();
     }
 
-    protected GestureEventImpl buildGestureEvent(final AbstractNodeGestureEvent event) {
-        return new GestureEventImpl(event.getScale(),
-                                    event.getRotation());
+    public static double getClientX(AbstractNodeHumanInputEvent event) {
+        return getMouseEvent(event).clientX;
+    }
+
+    public static double getClientY(AbstractNodeHumanInputEvent event) {
+        return getMouseEvent(event).clientY;
     }
 
     protected HandlerRegistration[] registerEnterHandler(final ViewHandler<ViewEvent> eventHandler) {
@@ -242,8 +192,8 @@ public class ViewEventHandlerManager {
                     if (isEnabled()) {
                         final MouseEnterEvent event = new MouseEnterEvent(e.getX(),
                                                                           e.getY(),
-                                                                          e.getMouseEvent().getClientX(),
-                                                                          e.getMouseEvent().getClientY());
+                                                                          getClientX(e),
+                                                                          getClientY(e));
                         event.setShiftKeyDown(e.isShiftKeyDown());
                         event.setAltKeyDown(e.isAltKeyDown());
                         event.setMetaKeyDown(e.isMetaKeyDown());
@@ -259,8 +209,8 @@ public class ViewEventHandlerManager {
                     if (isEnabled()) {
                         final MouseExitEvent event = new MouseExitEvent(e.getX(),
                                                                         e.getY(),
-                                                                        e.getMouseEvent().getClientX(),
-                                                                        e.getMouseEvent().getClientY());
+                                                                        getClientX(e),
+                                                                        getClientY(e));
                         event.setShiftKeyDown(e.isShiftKeyDown());
                         event.setAltKeyDown(e.isAltKeyDown());
                         event.setMetaKeyDown(e.isMetaKeyDown());
@@ -277,8 +227,8 @@ public class ViewEventHandlerManager {
                         restoreClickHandler();
                         final int x = nodeMouseClickEvent.getX();
                         final int y = nodeMouseClickEvent.getY();
-                        final int clientX = nodeMouseClickEvent.getMouseEvent().getClientX();
-                        final int clientY = nodeMouseClickEvent.getMouseEvent().getClientY();
+                        final double clientX = getClientX(nodeMouseClickEvent);
+                        final double clientY = getClientY(nodeMouseClickEvent);
                         final boolean isShiftKeyDown = nodeMouseClickEvent.isShiftKeyDown();
                         final boolean isAltKeyDown = nodeMouseClickEvent.isAltKeyDown();
                         final boolean isMetaKeyDown = nodeMouseClickEvent.isMetaKeyDown();
@@ -312,8 +262,8 @@ public class ViewEventHandlerManager {
                         skipClickHandler();
                         final MouseDoubleClickEvent event = new MouseDoubleClickEvent(nodeMouseDoubleClickEvent.getX(),
                                                                                       nodeMouseDoubleClickEvent.getY(),
-                                                                                      nodeMouseDoubleClickEvent.getMouseEvent().getClientX(),
-                                                                                      nodeMouseDoubleClickEvent.getMouseEvent().getClientY());
+                                                                                      getClientX(nodeMouseDoubleClickEvent),
+                                                                                      getClientY(nodeMouseDoubleClickEvent));
                         event.setShiftKeyDown(nodeMouseDoubleClickEvent.isShiftKeyDown());
                         event.setAltKeyDown(nodeMouseDoubleClickEvent.isAltKeyDown());
                         event.setMetaKeyDown(nodeMouseDoubleClickEvent.isMetaKeyDown());
@@ -334,8 +284,8 @@ public class ViewEventHandlerManager {
                         skipClickHandler();
                         final TextDoubleClickEvent event = new TextDoubleClickEvent(nodeMouseDoubleClickEvent.getX(),
                                                                                     nodeMouseDoubleClickEvent.getY(),
-                                                                                    nodeMouseDoubleClickEvent.getMouseEvent().getClientX(),
-                                                                                    nodeMouseDoubleClickEvent.getMouseEvent().getClientY());
+                                                                                    getMouseEvent(nodeMouseDoubleClickEvent).clientX,
+                                                                                    getMouseEvent(nodeMouseDoubleClickEvent).clientY);
                         event.setShiftKeyDown(nodeMouseDoubleClickEvent.isShiftKeyDown());
                         event.setAltKeyDown(nodeMouseDoubleClickEvent.isAltKeyDown());
                         event.setMetaKeyDown(nodeMouseDoubleClickEvent.isMetaKeyDown());
@@ -357,8 +307,8 @@ public class ViewEventHandlerManager {
     private void onMouseClick(final ViewHandler<ViewEvent> eventHandler,
                               final int x,
                               final int y,
-                              final int clientX,
-                              final int clientY,
+                              final double clientX,
+                              final double clientY,
                               final boolean isShiftKeyDown,
                               final boolean isAltKeyDown,
                               final boolean isMetaKeyDown,
@@ -378,60 +328,8 @@ public class ViewEventHandlerManager {
         eventHandler.handle(event);
     }
 
-    protected HandlerRegistration[] registerTouchHandler(final TouchHandler touchHandler) {
-        HandlerRegistration touchStartReg = node.addNodeTouchStartHandler(event -> {
-            if (isEnabled()) {
-                final TouchEventImpl event1 = buildTouchEvent(event);
-                if (null != event1) {
-                    touchHandler.start(event1);
-                }
-            }
-        });
-        HandlerRegistration touchMoveReg = node.addNodeTouchMoveHandler(event -> {
-            if (isEnabled()) {
-                final TouchEventImpl event1 = buildTouchEvent(event);
-                if (null != event1) {
-                    touchHandler.move(event1);
-                }
-            }
-        });
-        HandlerRegistration touchEndReg = node.addNodeTouchEndHandler(event -> {
-            if (isEnabled()) {
-                final TouchEventImpl event1 = buildTouchEvent(event);
-                if (null != event1) {
-                    touchHandler.end(event1);
-                }
-            }
-        });
-        HandlerRegistration touchCancelReg = node.addNodeTouchCancelHandler(event -> {
-            if (isEnabled()) {
-                final TouchEventImpl event1 = buildTouchEvent(event);
-                if (null != event1) {
-                    touchHandler.cancel(event1);
-                }
-            }
-        });
-        return new HandlerRegistration[]{
-                touchStartReg, touchMoveReg, touchEndReg, touchCancelReg
-        };
-    }
-
     Map<ViewEventType, HandlerRegistration[]> getRegistrationMap() {
         return registrationMap;
-    }
-
-    private TouchEventImpl buildTouchEvent(final AbstractNodeTouchEvent event) {
-        final TouchPoint touchPoint = null != event.getTouches() && !event.getTouches().isEmpty() ?
-                (TouchPoint) event.getTouches().get(0) : null;
-        if (null != touchPoint) {
-            final int tx = touchPoint.getX();
-            final int ty = touchPoint.getY();
-            return new TouchEventImpl(event.getX(),
-                                      event.getY(),
-                                      tx,
-                                      ty);
-        }
-        return null;
     }
 
     private void listen(final boolean listen) {

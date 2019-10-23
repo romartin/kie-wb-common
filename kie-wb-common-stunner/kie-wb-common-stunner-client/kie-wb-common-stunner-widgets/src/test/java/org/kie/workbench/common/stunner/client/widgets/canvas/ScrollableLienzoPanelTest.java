@@ -56,8 +56,8 @@ public class ScrollableLienzoPanelTest {
         BiFunction<OptionalInt, OptionalInt, LienzoBoundsPanel> builder = builderCaptor.getValue();
         LienzoBoundsPanel result = builder.apply(OptionalInt.of(300), OptionalInt.of(450));
         assertTrue(result instanceof ScrollableLienzoPanelView);
-        assertEquals(300, result.getWidthPx());
-        assertEquals(450, result.getHeightPx());
+        assertEquals(300, result.getWidePx());
+        assertEquals(450, result.getHighPx());
     }
 
     @Test
