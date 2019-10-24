@@ -23,10 +23,10 @@ import com.ait.lienzo.shared.core.types.Direction;
 import org.kie.workbench.common.stunner.client.lienzo.components.glyph.LienzoGlyphRenderers;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.ActionsToolbox;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.CommonActionsToolbox;
-import org.kie.workbench.common.stunner.lienzo.toolbox.ToolboxVisibilityExecutors;
-import org.kie.workbench.common.stunner.lienzo.toolbox.grid.AutoGrid;
-import org.kie.workbench.common.stunner.lienzo.toolbox.items.impl.ToolboxFactory;
-import org.kie.workbench.common.stunner.lienzo.toolbox.items.tooltip.ToolboxTextTooltip;
+import com.ait.lienzo.client.core.shape.toolbox.ToolboxVisibilityExecutors;
+import com.ait.lienzo.client.core.shape.toolbox.grid.AutoGrid;
+import com.ait.lienzo.client.core.shape.toolbox.items.impl.ToolboxFactory;
+import com.ait.lienzo.client.core.shape.toolbox.items.tooltip.ToolboxTextTooltip;
 
 /**
  * It renders the toolbox' actions as first level button items.

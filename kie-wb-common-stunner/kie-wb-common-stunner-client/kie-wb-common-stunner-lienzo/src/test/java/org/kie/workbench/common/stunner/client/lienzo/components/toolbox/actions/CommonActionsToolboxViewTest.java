@@ -24,9 +24,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.workbench.common.stunner.core.client.shape.view.event.MouseClickEvent;
 import org.kie.workbench.common.stunner.core.definition.shape.Glyph;
-import org.kie.workbench.common.stunner.lienzo.toolbox.grid.AutoGrid;
-import org.kie.workbench.common.stunner.lienzo.toolbox.grid.Point2DGrid;
-import org.kie.workbench.common.stunner.lienzo.toolbox.items.ButtonItem;
+import com.ait.lienzo.client.core.shape.toolbox.grid.AutoGrid;
+import com.ait.lienzo.client.core.shape.toolbox.grid.Point2DGrid;
+import com.ait.lienzo.client.core.shape.toolbox.items.ButtonItem;
 import org.mockito.ArgumentCaptor;
 
 import static org.junit.Assert.assertEquals;

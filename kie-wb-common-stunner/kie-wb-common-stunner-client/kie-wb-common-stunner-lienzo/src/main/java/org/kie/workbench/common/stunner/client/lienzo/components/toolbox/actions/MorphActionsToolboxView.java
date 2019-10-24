@@ -26,13 +26,13 @@ import org.kie.workbench.common.stunner.client.lienzo.components.glyph.LienzoGly
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.ActionsToolbox;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.MorphActionsToolbox;
 import org.kie.workbench.common.stunner.core.client.resources.StunnerCommonIconsGlyphFactory;
-import org.kie.workbench.common.stunner.lienzo.toolbox.ToolboxVisibilityExecutors;
-import org.kie.workbench.common.stunner.lienzo.toolbox.grid.FixedLayoutGrid;
-import org.kie.workbench.common.stunner.lienzo.toolbox.grid.Point2DGrid;
-import org.kie.workbench.common.stunner.lienzo.toolbox.items.ButtonGridItem;
-import org.kie.workbench.common.stunner.lienzo.toolbox.items.ButtonItem;
-import org.kie.workbench.common.stunner.lienzo.toolbox.items.impl.ToolboxFactory;
-import org.kie.workbench.common.stunner.lienzo.toolbox.items.tooltip.ToolboxTextTooltip;
+import com.ait.lienzo.client.core.shape.toolbox.ToolboxVisibilityExecutors;
+import com.ait.lienzo.client.core.shape.toolbox.grid.FixedLayoutGrid;
+import com.ait.lienzo.client.core.shape.toolbox.grid.Point2DGrid;
+import com.ait.lienzo.client.core.shape.toolbox.items.ButtonGridItem;
+import com.ait.lienzo.client.core.shape.toolbox.items.ButtonItem;
+import com.ait.lienzo.client.core.shape.toolbox.items.impl.ToolboxFactory;
+import com.ait.lienzo.client.core.shape.toolbox.items.tooltip.ToolboxTextTooltip;
 
 /**
  * It renders the toolbox' morph actions inside a drop-down button.

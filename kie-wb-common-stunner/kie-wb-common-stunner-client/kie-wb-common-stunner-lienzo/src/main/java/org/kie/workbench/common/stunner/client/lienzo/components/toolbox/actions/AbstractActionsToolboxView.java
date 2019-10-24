@@ -31,11 +31,11 @@ import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.A
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.ActionsToolboxView;
 import org.kie.workbench.common.stunner.core.client.shape.view.event.MouseClickEvent;
 import org.kie.workbench.common.stunner.core.definition.shape.Glyph;
-import org.kie.workbench.common.stunner.lienzo.toolbox.items.ButtonItem;
-import org.kie.workbench.common.stunner.lienzo.toolbox.items.DecoratorItem;
-import org.kie.workbench.common.stunner.lienzo.toolbox.items.impl.ToolboxFactory;
-import org.kie.workbench.common.stunner.lienzo.toolbox.items.impl.WiresShapeToolbox;
-import org.kie.workbench.common.stunner.lienzo.toolbox.items.tooltip.ToolboxTextTooltip;
+import com.ait.lienzo.client.core.shape.toolbox.items.ButtonItem;
+import com.ait.lienzo.client.core.shape.toolbox.items.DecoratorItem;
+import com.ait.lienzo.client.core.shape.toolbox.items.impl.ToolboxFactory;
+import com.ait.lienzo.client.core.shape.toolbox.items.impl.WiresShapeToolbox;
+import com.ait.lienzo.client.core.shape.toolbox.items.tooltip.ToolboxTextTooltip;
 
 public abstract class AbstractActionsToolboxView<V extends AbstractActionsToolboxView>
         implements ActionsToolboxView<V> {
