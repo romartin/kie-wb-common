@@ -25,6 +25,9 @@ import com.ait.lienzo.client.core.shape.Shape;
 import com.ait.lienzo.tools.client.event.HandlerRegistration;
 import com.ait.lienzo.tools.client.event.HandlerRegistrationManager;
 import com.google.gwt.user.client.Timer;
+import elemental2.core.JsArray;
+import elemental2.core.JsIteratorIterable;
+import elemental2.core.JsMap;
 import elemental2.dom.MouseEvent;
 import org.kie.workbench.common.stunner.core.client.shape.view.event.MouseClickEvent;
 import org.kie.workbench.common.stunner.core.client.shape.view.event.MouseDoubleClickEvent;
@@ -40,9 +43,7 @@ public class ViewEventHandlerManager {
 
     private static final int TIMER_DELAY = 50;
 
-    private final HandlerRegistrationManager registrationManager = new HandlerRegistrationManager();
-    private final Map<ViewEventType, HandlerRegistration[]> registrationMap = new HashMap<>();
-
+    private final JsMap<ViewEventType, JsArray<HandlerRegistration>> registrationsByType = new JsMap<>();
     private final Node<?> node;
     private final Shape<?> shape;
     private final ViewEventType[] supportedTypes;
@@ -122,11 +123,13 @@ public class ViewEventHandlerManager {
     public void addHandlersRegistration(final ViewEventType type,
                                         final HandlerRegistration... registrations) {
         if (null != registrations && registrations.length > 0) {
-            registrationMap.put(type,
-                                registrations);
-            for (final HandlerRegistration registration : registrations) {
-                registrationManager.register(registration);
+
+            JsArray<HandlerRegistration> regs = registrationsByType.get(type);
+            if (null == regs) {
+                regs = new JsArray<>();
+                registrationsByType.set(type, regs);
             }
+            regs.push(registrations);
         }
     }
 
@@ -155,14 +158,32 @@ public class ViewEventHandlerManager {
     @SuppressWarnings("unchecked")
     public void removeHandler(final ViewHandler<? extends ViewEvent> eventHandler) {
         final ViewEventType type = eventHandler.getType();
-        if (registrationMap.containsKey(type)) {
-            final HandlerRegistration[] registrations = registrationMap.get(type);
-            if (null != registrations && registrations.length > 0) {
-                for (final HandlerRegistration registration : registrations) {
-                    registrationManager.deregister(registration);
-                }
+        if (registrationsByType.has(type)) {
+            removeHandlers(type);
+        }
+    }
+
+    private void removeAllHandlers() {
+        JsIteratorIterable<JsArray<HandlerRegistration>> regs = registrationsByType.values();
+        registrationsByType.forEach(new JsMap.ForEachCallbackFn<ViewEventType, JsArray<HandlerRegistration>>() {
+            @Override
+            public Object onInvoke(JsArray<HandlerRegistration> p0, ViewEventType p1, JsMap<? extends ViewEventType, ? extends JsArray<HandlerRegistration>> p2) {
+                removeHandlers(p0);
+                return null;
             }
-            registrationMap.remove(type);
+        });
+    }
+
+
+    private void removeHandlers(final ViewEventType type) {
+        JsArray<HandlerRegistration> regs = registrationsByType.get(type);
+        removeHandlers(regs);
+    }
+
+    private void removeHandlers(JsArray<HandlerRegistration> regs) {
+        while (regs.length > 0) {
+            HandlerRegistration reg = regs.pop();
+            reg.removeHandler();
         }
     }
 
@@ -170,8 +191,7 @@ public class ViewEventHandlerManager {
     public void destroy() {
         timer.cancel();
         restoreClickHandler();
-        registrationManager.destroy();
-        registrationMap.clear();
+        removeAllHandlers();
     }
 
     public static MouseEvent getMouseEvent(AbstractNodeHumanInputEvent event) {
@@ -328,8 +348,8 @@ public class ViewEventHandlerManager {
         eventHandler.handle(event);
     }
 
-    Map<ViewEventType, HandlerRegistration[]> getRegistrationMap() {
-        return registrationMap;
+    JsMap<ViewEventType, JsArray<HandlerRegistration>> getRegistrationsByType() {
+        return registrationsByType;
     }
 
     private void listen(final boolean listen) {

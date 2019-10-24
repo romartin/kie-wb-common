@@ -176,7 +176,7 @@ public class ViewEventHandlerManagerTest {
         assertTrue(viewEvent.isAltKeyDown());
         assertTrue(viewEvent.isMetaKeyDown());
         assertTrue(viewEvent.isShiftKeyDown());
-        assertNotNull(tested.getRegistrationMap().get(ViewEventType.MOUSE_CLICK));
+        assertTrue(tested.getRegistrationsByType().has(ViewEventType.MOUSE_CLICK));
     }
 
     @Test
@@ -231,7 +231,7 @@ public class ViewEventHandlerManagerTest {
         assertTrue(viewEvent.isAltKeyDown());
         assertTrue(viewEvent.isMetaKeyDown());
         assertTrue(viewEvent.isShiftKeyDown());
-        assertNotNull(tested.getRegistrationMap().get(ViewEventType.MOUSE_DBL_CLICK));
+        assertTrue(tested.getRegistrationsByType().has(ViewEventType.MOUSE_DBL_CLICK));
     }
 
     @Test
@@ -280,7 +280,7 @@ public class ViewEventHandlerManagerTest {
         assertTrue(viewEvent.isAltKeyDown());
         assertTrue(viewEvent.isMetaKeyDown());
         assertTrue(viewEvent.isShiftKeyDown());
-        assertNotNull(tested.getRegistrationMap().get(ViewEventType.TEXT_DBL_CLICK));
+        assertTrue(tested.getRegistrationsByType().has(ViewEventType.TEXT_DBL_CLICK));
     }
 
     @Test
@@ -329,7 +329,7 @@ public class ViewEventHandlerManagerTest {
         assertTrue(viewEvent.isAltKeyDown());
         assertTrue(viewEvent.isMetaKeyDown());
         assertTrue(viewEvent.isShiftKeyDown());
-        assertNotNull(tested.getRegistrationMap().get(ViewEventType.MOUSE_ENTER));
+        assertTrue(tested.getRegistrationsByType().has(ViewEventType.MOUSE_ENTER));
     }
 
     @Test
@@ -378,6 +378,6 @@ public class ViewEventHandlerManagerTest {
         assertTrue(viewEvent.isAltKeyDown());
         assertTrue(viewEvent.isMetaKeyDown());
         assertTrue(viewEvent.isShiftKeyDown());
-        assertNotNull(tested.getRegistrationMap().get(ViewEventType.MOUSE_EXIT));
+        assertTrue(tested.getRegistrationsByType().has(ViewEventType.MOUSE_EXIT));
     }
 }
