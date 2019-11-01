@@ -135,8 +135,6 @@ public class SessionDiagramPreviewScreen extends AbstractSessionScreen {
         final AbstractSession session = getSession();
         preview = sessionPreviews.get();
         preview.open(session,
-                     WIDTH,
-                     HEIGHT,
                      new SessionViewer.SessionViewerCallback<Diagram>() {
                          @Override
                          public void afterCanvasInitialized() {
@@ -146,6 +144,7 @@ public class SessionDiagramPreviewScreen extends AbstractSessionScreen {
                          public void onSuccess() {
                              LOGGER.log(FINE,
                                         "Session's preview completed for [" + session + "]");
+                             preview.scale(WIDTH, HEIGHT);
                              view.showScreenView(preview.getView());
                          }
 

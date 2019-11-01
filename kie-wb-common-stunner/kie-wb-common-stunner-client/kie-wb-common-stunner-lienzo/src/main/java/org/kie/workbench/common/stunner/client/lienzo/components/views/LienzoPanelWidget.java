@@ -19,7 +19,7 @@ package org.kie.workbench.common.stunner.client.lienzo.components.views;
 import com.ait.lienzo.client.core.shape.Layer;
 import com.ait.lienzo.client.core.shape.Viewport;
 import com.ait.lienzo.client.widget.panel.LienzoPanel;
-import com.ait.lienzo.client.widget.panel.impl.LienzoPanelImpl;
+import com.ait.lienzo.client.widget.panel.impl.LienzoFixedPanel;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -28,15 +28,15 @@ import org.jboss.errai.common.client.ui.ElementWrapperWidget;
 
 public class LienzoPanelWidget extends LienzoPanel implements IsWidget {
 
-    private final LienzoPanelImpl panel;
+    private final LienzoFixedPanel panel;
     private final Widget widget;
 
     public static LienzoPanelWidget create(int wide,
                                            int high) {
-        return new LienzoPanelWidget(LienzoPanelImpl.newPanel(wide, high));
+        return new LienzoPanelWidget(LienzoFixedPanel.newPanel(wide, high));
     }
 
-    LienzoPanelWidget(LienzoPanelImpl panel) {
+    LienzoPanelWidget(LienzoFixedPanel panel) {
         this.panel = panel;
         this.widget = ElementWrapperWidget.getWidget(panel.getElement());
     }

@@ -22,6 +22,11 @@ import java.util.function.Consumer;
 import com.ait.lienzo.client.core.shape.Group;
 import com.ait.lienzo.client.core.shape.Layer;
 import com.ait.lienzo.client.core.shape.Text;
+import com.ait.lienzo.client.core.shape.toolbox.items.ButtonItem;
+import com.ait.lienzo.client.core.shape.toolbox.items.DecoratorItem;
+import com.ait.lienzo.client.core.shape.toolbox.items.impl.ToolboxFactory;
+import com.ait.lienzo.client.core.shape.toolbox.items.impl.WiresShapeToolbox;
+import com.ait.lienzo.client.core.shape.toolbox.items.tooltip.ToolboxTextTooltip;
 import com.ait.lienzo.client.core.shape.wires.WiresShape;
 import org.kie.workbench.common.stunner.client.lienzo.canvas.wires.WiresCanvas;
 import org.kie.workbench.common.stunner.client.lienzo.components.glyph.LienzoGlyphRenderers;
@@ -31,11 +36,6 @@ import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.A
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.ActionsToolboxView;
 import org.kie.workbench.common.stunner.core.client.shape.view.event.MouseClickEvent;
 import org.kie.workbench.common.stunner.core.definition.shape.Glyph;
-import com.ait.lienzo.client.core.shape.toolbox.items.ButtonItem;
-import com.ait.lienzo.client.core.shape.toolbox.items.DecoratorItem;
-import com.ait.lienzo.client.core.shape.toolbox.items.impl.ToolboxFactory;
-import com.ait.lienzo.client.core.shape.toolbox.items.impl.WiresShapeToolbox;
-import com.ait.lienzo.client.core.shape.toolbox.items.tooltip.ToolboxTextTooltip;
 
 public abstract class AbstractActionsToolboxView<V extends AbstractActionsToolboxView>
         implements ActionsToolboxView<V> {

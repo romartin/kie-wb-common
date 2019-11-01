@@ -203,8 +203,6 @@ public class ProjectDiagramExplorerScreen {
             }
             previewWidget = sessionPreviews.get();
             previewWidget.open((AbstractSession) session,
-                               PREVIEW_WIDTH,
-                               PREVIEW_HEIGHT,
                                new SessionViewer.SessionViewerCallback<Diagram>() {
                                    @Override
                                    public void afterCanvasInitialized() {
@@ -213,6 +211,7 @@ public class ProjectDiagramExplorerScreen {
 
                                    @Override
                                    public void onSuccess() {
+                                       previewWidget.scale(PREVIEW_WIDTH, PREVIEW_HEIGHT);
                                        view.setPreviewWidget(previewWidget.getView());
                                        updateTitle();
                                    }

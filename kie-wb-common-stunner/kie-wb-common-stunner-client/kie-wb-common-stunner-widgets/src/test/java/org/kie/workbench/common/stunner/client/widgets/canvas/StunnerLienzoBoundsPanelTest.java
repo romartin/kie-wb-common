@@ -89,16 +89,14 @@ public class StunnerLienzoBoundsPanelTest {
                                                    keyUpEvent,
                                                    mouseDownEvent,
                                                    mouseUpEvent)
-                .setPanelBuilder((optionalInt, optionalInt2) -> view);
+                .setPanelBuilder(() -> view);
         when(view.getLienzoPanel()).thenReturn(lienzoPanel);
         when(lienzoLayer.getLienzoLayer()).thenReturn(layer);
     }
 
     @Test
     public void testShow() {
-        tested.show(lienzoLayer,
-                    300,
-                    600);
+        tested.show(lienzoLayer);
         verify(view, times(1)).add(eq(layer));
         verify(view, times(1)).setPresenter(eq(tested));
         // TODO: lienzo-to-native verify(lienzoPanel, times(1)).addMouseDownHandler(any(MouseDownHandler.class));
@@ -120,13 +118,6 @@ public class StunnerLienzoBoundsPanelTest {
         when(lienzoPanel.getHighPx()).thenReturn(450);
         assertEquals(100, tested.getWidthPx());
         assertEquals(450, tested.getHeightPx());
-    }
-
-    @Test
-    public void testSetPixelSize() {
-        tested.setView(view);
-        tested.setPixelSize(100, 300);
-        // TODO: lienzo-to-native  verify(lienzoPanel, times(1)).setPixelSize(eq(100), eq(300));
     }
 
     @Test
