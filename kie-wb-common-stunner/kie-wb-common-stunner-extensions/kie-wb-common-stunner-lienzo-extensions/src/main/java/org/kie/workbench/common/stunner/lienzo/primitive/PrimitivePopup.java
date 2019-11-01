@@ -19,7 +19,7 @@ package org.kie.workbench.common.stunner.lienzo.primitive;
 import com.ait.lienzo.client.core.shape.IPrimitive;
 import com.ait.lienzo.client.core.shape.Layer;
 import com.ait.lienzo.client.widget.panel.LienzoPanel;
-import com.ait.lienzo.client.widget.panel.impl.LienzoPanelImpl;
+import com.ait.lienzo.client.widget.panel.impl.LienzoFixedPanel;
 import com.ait.lienzo.client.widget.panel.impl.LienzoPanelWidgetWrapper;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -72,7 +72,7 @@ public class PrimitivePopup extends FlowPanel {
                           final double x,
                           final double y) {
         reset();
-        LienzoPanelImpl panelView = LienzoPanelImpl.newPanel((int) width, (int) height);
+        LienzoFixedPanel panelView = LienzoFixedPanel.newPanel((int) width, (int) height);
         this.lienzoPanel = new LienzoPanelWidgetWrapper(panelView);
         this.add(this.lienzoPanel);
         this.lienzoPanel.add(canvasLayer);

@@ -16,14 +16,10 @@
 
 package org.kie.workbench.common.stunner.client.lienzo.shape.view;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.ait.lienzo.client.core.event.AbstractNodeHumanInputEvent;
 import com.ait.lienzo.client.core.shape.Node;
 import com.ait.lienzo.client.core.shape.Shape;
 import com.ait.lienzo.tools.client.event.HandlerRegistration;
-import com.ait.lienzo.tools.client.event.HandlerRegistrationManager;
 import com.google.gwt.user.client.Timer;
 import elemental2.core.JsArray;
 import elemental2.core.JsIteratorIterable;
@@ -173,7 +169,6 @@ public class ViewEventHandlerManager {
             }
         });
     }
-
 
     private void removeHandlers(final ViewEventType type) {
         JsArray<HandlerRegistration> regs = registrationsByType.get(type);

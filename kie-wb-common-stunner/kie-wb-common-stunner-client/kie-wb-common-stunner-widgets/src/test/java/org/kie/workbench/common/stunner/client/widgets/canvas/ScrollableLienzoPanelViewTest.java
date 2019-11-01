@@ -34,7 +34,7 @@ public class ScrollableLienzoPanelViewTest {
     @Before
     @SuppressWarnings("unchecked")
     public void init() {
-        tested = spy(new ScrollableLienzoPanelView(300, 150));
+        tested = spy(new ScrollableLienzoPanelView());
     }
 
     // TODO: lienzo-to-native

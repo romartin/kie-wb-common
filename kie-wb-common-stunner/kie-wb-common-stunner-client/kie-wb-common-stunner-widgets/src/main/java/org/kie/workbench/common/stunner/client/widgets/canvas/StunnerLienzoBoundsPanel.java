@@ -16,8 +16,7 @@
 
 package org.kie.workbench.common.stunner.client.widgets.canvas;
 
-import java.util.OptionalInt;
-import java.util.function.BiFunction;
+import java.util.function.Supplier;
 
 import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
@@ -26,7 +25,6 @@ import javax.inject.Inject;
 
 import com.ait.lienzo.client.core.shape.Layer;
 import com.ait.lienzo.client.widget.panel.LienzoBoundsPanel;
-import com.ait.lienzo.client.widget.panel.impl.ScrollablePanel;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.event.dom.client.DomEvent;
@@ -56,7 +54,7 @@ public class StunnerLienzoBoundsPanel
     private final Event<CanvasMouseUpEvent> mouseUpEvent;
     private EventListener mouseDownEventListener;
     private EventListener mouseUpEventListener;
-    private BiFunction<OptionalInt, OptionalInt, LienzoBoundsPanel> panelBuilder;
+    private Supplier<LienzoBoundsPanel> panelBuilder;
     private LienzoBoundsPanel view;
 
     @Inject
@@ -72,7 +70,7 @@ public class StunnerLienzoBoundsPanel
         this.mouseUpEvent = mouseUpEvent;
     }
 
-    public StunnerLienzoBoundsPanel setPanelBuilder(final BiFunction<OptionalInt, OptionalInt, LienzoBoundsPanel> panelBuilder) {
+    public StunnerLienzoBoundsPanel setPanelBuilder(final Supplier<LienzoBoundsPanel> panelBuilder) {
         this.panelBuilder = panelBuilder;
         return this;
     }
@@ -84,25 +82,7 @@ public class StunnerLienzoBoundsPanel
 
     @Override
     public LienzoPanel show(final LienzoLayer layer) {
-        return doShow(layer,
-                      OptionalInt.empty(),
-                      OptionalInt.empty());
-    }
-
-    @Override
-    public LienzoPanel show(final LienzoLayer layer,
-                            final int width,
-                            final int height) {
-        return doShow(layer,
-                      OptionalInt.of(width),
-                      OptionalInt.of(height));
-    }
-
-    private LienzoPanel doShow(final LienzoLayer layer,
-                               final OptionalInt width,
-                               final OptionalInt height) {
-        setView(panelBuilder.apply(width,
-                                   height));
+        setView(panelBuilder.get());
         view.add(layer.getLienzoLayer());
         initHandlers();
         if (view instanceof StunnerLienzoBoundsPanelView) {
@@ -150,16 +130,6 @@ public class StunnerLienzoBoundsPanel
     @Override
     public Bounds getLocationConstraints() {
         return Bounds.createMinBounds(0d, 0d);
-    }
-
-    @Override
-    public LienzoPanel setPixelSize(final int wide,
-                                    final int high) {
-        // TODO: lienzo-to-native : Wrong cast.
-        if (getLienzoPanel() instanceof ScrollablePanel) {
-            ((ScrollablePanel) getLienzoPanel()).setPxSize(wide, high);
-        }
-        return this;
     }
 
     @Override

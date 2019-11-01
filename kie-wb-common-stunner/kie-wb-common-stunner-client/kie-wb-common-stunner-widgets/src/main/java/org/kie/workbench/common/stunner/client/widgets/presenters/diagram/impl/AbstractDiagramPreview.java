@@ -19,6 +19,7 @@ package org.kie.workbench.common.stunner.client.widgets.presenters.diagram.impl;
 import org.kie.workbench.common.stunner.client.widgets.presenters.diagram.DiagramViewer;
 import org.kie.workbench.common.stunner.client.widgets.views.WidgetWrapperView;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
+import org.kie.workbench.common.stunner.core.client.service.ClientRuntimeError;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
 import org.uberfire.mvp.Command;
 
@@ -35,20 +36,29 @@ public abstract class AbstractDiagramPreview<D extends Diagram, H extends Abstra
     public void open(final D item,
                      final DiagramViewerCallback<D> callback) {
         getViewerOrNothing(() -> getViewer().open(item,
-                                                  getWidth(),
-                                                  getHeight(),
-                                                  callback));
-    }
+                                                  new DiagramViewerCallback<D>() {
 
-    @Override
-    public void open(final D item,
-                     final int width,
-                     final int height,
-                     final DiagramViewerCallback<D> callback) {
-        getViewerOrNothing(() -> getViewer().open(item,
-                                                  width,
-                                                  height,
-                                                  callback));
+                                                      @Override
+                                                      public void onSuccess() {
+                                                          scale(getWidth(), getHeight());
+                                                          callback.onSuccess();
+                                                      }
+
+                                                      @Override
+                                                      public void onError(ClientRuntimeError error) {
+                                                          callback.onError(error);
+                                                      }
+
+                                                      @Override
+                                                      public void onOpen(D diagram) {
+                                                          callback.onOpen(diagram);
+                                                      }
+
+                                                      @Override
+                                                      public void afterCanvasInitialized() {
+                                                          callback.afterCanvasInitialized();
+                                                      }
+                                                  }));
     }
 
     @Override

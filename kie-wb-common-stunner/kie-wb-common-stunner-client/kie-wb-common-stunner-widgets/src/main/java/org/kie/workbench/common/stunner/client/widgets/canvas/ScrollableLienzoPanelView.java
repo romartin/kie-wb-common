@@ -26,9 +26,8 @@ public class ScrollableLienzoPanelView
         extends ScrollablePanel
         implements StunnerLienzoBoundsPanelView {
 
-    public ScrollableLienzoPanelView(final int width,
-                                     final int height) {
-        super(StunnerBoundsProviderFactory.newProvider(), width, height);
+    public ScrollableLienzoPanelView() {
+        super(StunnerBoundsProviderFactory.newProvider());
     }
 
     /**

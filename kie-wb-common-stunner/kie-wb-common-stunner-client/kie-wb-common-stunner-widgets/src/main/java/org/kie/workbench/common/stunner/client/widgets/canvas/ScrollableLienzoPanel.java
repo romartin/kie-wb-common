@@ -21,6 +21,8 @@ import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 
+import com.ait.lienzo.client.widget.panel.impl.ScrollablePanel;
+
 @Dependent
 @Typed(ScrollableLienzoPanel.class)
 public class ScrollableLienzoPanel
@@ -35,19 +37,16 @@ public class ScrollableLienzoPanel
 
     @PostConstruct
     public void init() {
-        panel.setPanelBuilder((width, height) -> {
-            if (width.isPresent() && height.isPresent()) {
-                return new ScrollableLienzoPanelView(width.getAsInt(),
-                                                     height.getAsInt());
-            }
-            // TODO: lienzo-to-native
-            return new ScrollableLienzoPanelView(300, 300);
-        });
+        panel.setPanelBuilder(ScrollableLienzoPanelView::new);
     }
 
     public ScrollableLienzoPanel refresh() {
-        getDelegate().getView().refresh();
+        getView().refresh();
         return this;
+    }
+
+    public ScrollablePanel getView() {
+        return (ScrollablePanel) getDelegate().getView();
     }
 
     @Override
