@@ -174,7 +174,7 @@ public class ZoomLevelSelectorPresenter {
     public void destroy() {
         cancelHide();
         if (null != panelResizeEventListener) {
-            ((ScrollablePanel) getPanel().getView()).removeResizeEventListener(panelResizeEventListener);
+            // TODO: lienzo-to-native  ((ScrollablePanel) getPanel().getView()).removeResizeEventListener(panelResizeEventListener);
             panelResizeEventListener = null;
         }
         /*if (null != transformChangedHandler) {
