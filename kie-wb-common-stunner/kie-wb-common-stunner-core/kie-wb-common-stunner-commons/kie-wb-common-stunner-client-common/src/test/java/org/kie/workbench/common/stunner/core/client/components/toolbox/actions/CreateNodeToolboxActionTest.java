@@ -177,7 +177,10 @@ public class CreateNodeToolboxActionTest {
 
         this.tested = new CreateNodeToolboxAction(definitionUtils,
                                                   translationService,
-                                                  actions)
+                                                  actions,
+                                                  // TODO
+                                                  null,
+                                                  null)
                 .setEdgeId(EDGE_ID)
                 .setNodeId(TARGET_NODE_ID);
     }

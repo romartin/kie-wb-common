@@ -27,7 +27,6 @@ import org.kie.workbench.common.stunner.core.client.canvas.util.CanvasLayoutUtil
 import org.kie.workbench.common.stunner.core.client.command.CanvasCommand;
 import org.kie.workbench.common.stunner.core.client.command.CanvasCommandFactory;
 import org.kie.workbench.common.stunner.core.client.command.SessionCommandManager;
-import org.kie.workbench.common.stunner.core.client.session.Session;
 import org.kie.workbench.common.stunner.core.command.CommandResult;
 import org.kie.workbench.common.stunner.core.command.impl.DeferredCompositeCommand;
 import org.kie.workbench.common.stunner.core.command.util.CommandUtils;
@@ -52,7 +51,7 @@ public abstract class GeneralCreateNodeAction implements CreateNodeAction<Abstra
     public GeneralCreateNodeAction(final ClientFactoryManager clientFactoryManager,
                                    final CanvasLayoutUtils canvasLayoutUtils,
                                    final Event<CanvasSelectionEvent> selectionEvent,
-                                   final @Session SessionCommandManager<AbstractCanvasHandler> sessionCommandManager,
+                                   final SessionCommandManager<AbstractCanvasHandler> sessionCommandManager,
                                    final CanvasCommandFactory<AbstractCanvasHandler> canvasCommandFactory) {
         this.clientFactoryManager = clientFactoryManager;
         this.canvasLayoutUtils = canvasLayoutUtils;

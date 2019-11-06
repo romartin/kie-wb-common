@@ -26,14 +26,13 @@ import org.kie.workbench.common.stunner.core.client.command.CanvasCommandFactory
 import org.kie.workbench.common.stunner.core.client.command.SessionCommandManager;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.DeleteNodeToolboxAction;
 import org.kie.workbench.common.stunner.core.client.i18n.ClientTranslationService;
-import org.kie.workbench.common.stunner.core.client.session.Session;
 
 @DMNEditor
 public class DMNDeleteNodeToolboxAction extends DeleteNodeToolboxAction {
 
     @Inject
     public DMNDeleteNodeToolboxAction(final ClientTranslationService translationService,
-                                      final @Session SessionCommandManager<AbstractCanvasHandler> sessionCommandManager,
+                                      final SessionCommandManager<AbstractCanvasHandler> sessionCommandManager,
                                       final @DMNEditor CanvasCommandFactory<AbstractCanvasHandler> commandFactory,
                                       final Event<CanvasClearSelectionEvent> clearSelectionEvent) {
         super(translationService, sessionCommandManager, commandFactory, clearSelectionEvent);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2019 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,17 @@
 
 package org.kie.workbench.common.stunner.core.client.components.toolbox.actions;
 
-public interface ActionsToolboxView<V extends ActionsToolboxView> {
+import org.kie.workbench.common.stunner.core.client.canvas.CanvasHandler;
+import org.kie.workbench.common.stunner.core.client.shape.view.event.MouseMoveEvent;
 
-    V init(ActionsToolbox toolbox);
+public interface IsToolboxActionDraggable<H extends CanvasHandler> {
 
-    V show();
-
-    V hide();
-
-    void destroy();
-
-    void hideAndDestroy();
+    /**
+     * The operation to perform once start "moving" the toolbox' button.
+     * @param canvasHandler The toolbox' canvas handler instance.
+     * @param uuid The toolbox' element identifier.
+     */
+    ToolboxAction<H> onMoveStart(H canvasHandler,
+                                 String uuid,
+                                 MouseMoveEvent event);
 }

@@ -27,7 +27,6 @@ import org.kie.workbench.common.stunner.core.client.canvas.event.selection.Canva
 import org.kie.workbench.common.stunner.core.client.canvas.util.CanvasLayoutUtils;
 import org.kie.workbench.common.stunner.core.client.command.CanvasCommandFactory;
 import org.kie.workbench.common.stunner.core.client.command.SessionCommandManager;
-import org.kie.workbench.common.stunner.core.client.session.Session;
 
 @Dependent
 @Default
@@ -37,7 +36,7 @@ public class DefaultCreateNodeAction extends GeneralCreateNodeAction {
     public DefaultCreateNodeAction(final ClientFactoryManager clientFactoryManager,
                                    final CanvasLayoutUtils canvasLayoutUtils,
                                    final Event<CanvasSelectionEvent> selectionEvent,
-                                   final @Session SessionCommandManager<AbstractCanvasHandler> sessionCommandManager,
+                                   final SessionCommandManager<AbstractCanvasHandler> sessionCommandManager,
                                    final CanvasCommandFactory<AbstractCanvasHandler> canvasCommandFactory) {
         super(clientFactoryManager,
               canvasLayoutUtils,

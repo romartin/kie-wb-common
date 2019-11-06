@@ -28,7 +28,6 @@ import org.kie.workbench.common.stunner.core.client.canvas.event.selection.Canva
 import org.kie.workbench.common.stunner.core.client.canvas.util.CanvasLayoutUtils;
 import org.kie.workbench.common.stunner.core.client.command.SessionCommandManager;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.GeneralCreateNodeAction;
-import org.kie.workbench.common.stunner.core.client.session.Session;
 
 @DMNEditor
 @Dependent
@@ -38,7 +37,7 @@ public class DMNCreateNodeAction extends GeneralCreateNodeAction {
     public DMNCreateNodeAction(final ClientFactoryManager clientFactoryManager,
                                final CanvasLayoutUtils canvasLayoutUtils,
                                final Event<CanvasSelectionEvent> selectionEvent,
-                               final @Session SessionCommandManager<AbstractCanvasHandler> sessionCommandManager,
+                               final SessionCommandManager<AbstractCanvasHandler> sessionCommandManager,
                                final @DMNEditor DefaultCanvasCommandFactory canvasCommandFactory) {
         super(clientFactoryManager,
               canvasLayoutUtils,

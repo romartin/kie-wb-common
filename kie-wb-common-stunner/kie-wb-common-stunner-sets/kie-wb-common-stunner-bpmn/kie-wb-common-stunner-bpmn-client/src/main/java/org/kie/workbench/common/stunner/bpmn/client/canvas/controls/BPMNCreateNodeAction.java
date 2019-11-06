@@ -29,7 +29,6 @@ import org.kie.workbench.common.stunner.core.client.canvas.util.CanvasLayoutUtil
 import org.kie.workbench.common.stunner.core.client.command.CanvasCommandFactory;
 import org.kie.workbench.common.stunner.core.client.command.SessionCommandManager;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.GeneralCreateNodeAction;
-import org.kie.workbench.common.stunner.core.client.session.Session;
 import org.kie.workbench.common.stunner.core.graph.Edge;
 import org.kie.workbench.common.stunner.core.graph.Node;
 import org.kie.workbench.common.stunner.core.graph.content.view.MagnetConnection;
@@ -43,7 +42,7 @@ public class BPMNCreateNodeAction extends GeneralCreateNodeAction {
     public BPMNCreateNodeAction(final ClientFactoryManager clientFactoryManager,
                                 final CanvasLayoutUtils canvasLayoutUtils,
                                 final Event<CanvasSelectionEvent> selectionEvent,
-                                final @Session SessionCommandManager<AbstractCanvasHandler> sessionCommandManager,
+                                final SessionCommandManager<AbstractCanvasHandler> sessionCommandManager,
                                 final CanvasCommandFactory<AbstractCanvasHandler> canvasCommandFactory) {
         super(clientFactoryManager,
               canvasLayoutUtils,

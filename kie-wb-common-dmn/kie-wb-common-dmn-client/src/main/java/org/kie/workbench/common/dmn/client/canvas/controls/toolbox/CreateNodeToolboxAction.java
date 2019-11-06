@@ -22,6 +22,8 @@ import javax.inject.Inject;
 
 import org.jboss.errai.ioc.client.api.ManagedInstance;
 import org.kie.workbench.common.dmn.api.qualifiers.DMNEditor;
+import org.kie.workbench.common.stunner.core.client.api.ClientFactoryManager;
+import org.kie.workbench.common.stunner.core.client.components.proxy.NodeProxy;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.GeneralCreateNodeAction;
 import org.kie.workbench.common.stunner.core.client.i18n.ClientTranslationService;
 import org.kie.workbench.common.stunner.core.util.DefinitionUtils;
@@ -33,9 +35,13 @@ public class CreateNodeToolboxAction extends org.kie.workbench.common.stunner.co
     @Inject
     public CreateNodeToolboxAction(final DefinitionUtils definitionUtils,
                                    final ClientTranslationService translationService,
-                                   final @Any @DMNEditor ManagedInstance<GeneralCreateNodeAction> actions) {
+                                   final @Any @DMNEditor ManagedInstance<GeneralCreateNodeAction> actions,
+                                   final NodeProxy nodeProxy,
+                                   final ClientFactoryManager clientFactoryManager) {
         super(definitionUtils,
               translationService,
-              actions);
+              actions,
+              nodeProxy,
+              clientFactoryManager);
     }
 }

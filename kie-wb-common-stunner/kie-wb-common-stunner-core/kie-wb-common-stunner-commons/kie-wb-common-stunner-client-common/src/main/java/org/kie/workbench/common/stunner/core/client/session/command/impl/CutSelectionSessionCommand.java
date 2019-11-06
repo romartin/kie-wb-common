@@ -32,7 +32,6 @@ import org.kie.workbench.common.stunner.core.client.command.CanvasViolation;
 import org.kie.workbench.common.stunner.core.client.command.SessionCommandManager;
 import org.kie.workbench.common.stunner.core.client.event.keyboard.KeyboardEvent.Key;
 import org.kie.workbench.common.stunner.core.client.session.ClientSession;
-import org.kie.workbench.common.stunner.core.client.session.Session;
 import org.kie.workbench.common.stunner.core.client.session.impl.EditorSession;
 import org.kie.workbench.common.stunner.core.command.Command;
 
@@ -62,7 +61,7 @@ public class CutSelectionSessionCommand extends AbstractSelectionAwareSessionCom
     @Inject
     public CutSelectionSessionCommand(final CopySelectionSessionCommand copySelectionSessionCommand,
                                       final DeleteSelectionSessionCommand deleteSelectionSessionCommand,
-                                      final @Session SessionCommandManager<AbstractCanvasHandler> sessionCommandManager,
+                                      final SessionCommandManager<AbstractCanvasHandler> sessionCommandManager,
                                       final Event<CutSelectionSessionCommandExecutedEvent> commandExecutedEvent) {
         super(true);
         this.copySelectionSessionCommand = copySelectionSessionCommand;

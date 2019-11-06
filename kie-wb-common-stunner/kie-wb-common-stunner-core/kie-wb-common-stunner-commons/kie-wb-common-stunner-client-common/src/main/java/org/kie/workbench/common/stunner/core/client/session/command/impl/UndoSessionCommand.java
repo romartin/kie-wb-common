@@ -27,7 +27,6 @@ import org.kie.workbench.common.stunner.core.client.command.CanvasViolation;
 import org.kie.workbench.common.stunner.core.client.command.SessionCommandManager;
 import org.kie.workbench.common.stunner.core.client.event.keyboard.KeyboardEvent;
 import org.kie.workbench.common.stunner.core.client.session.ClientSession;
-import org.kie.workbench.common.stunner.core.client.session.Session;
 import org.kie.workbench.common.stunner.core.client.session.command.AbstractClientSessionCommand;
 import org.kie.workbench.common.stunner.core.client.session.impl.EditorSession;
 import org.kie.workbench.common.stunner.core.command.CommandResult;
@@ -43,7 +42,7 @@ public class UndoSessionCommand extends AbstractClientSessionCommand<EditorSessi
     private final SessionCommandManager<AbstractCanvasHandler> sessionCommandManager;
 
     @Inject
-    public UndoSessionCommand(final @Session SessionCommandManager<AbstractCanvasHandler> sessionCommandManager) {
+    public UndoSessionCommand(final SessionCommandManager<AbstractCanvasHandler> sessionCommandManager) {
         super(false);
         this.sessionCommandManager = sessionCommandManager;
     }

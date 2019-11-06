@@ -30,7 +30,6 @@ import org.kie.workbench.common.stunner.core.client.command.CanvasCommandFactory
 import org.kie.workbench.common.stunner.core.client.command.SessionCommandManager;
 import org.kie.workbench.common.stunner.core.client.i18n.ClientTranslationService;
 import org.kie.workbench.common.stunner.core.client.resources.StunnerCommonIconsGlyphFactory;
-import org.kie.workbench.common.stunner.core.client.session.Session;
 import org.kie.workbench.common.stunner.core.client.shape.view.event.MouseClickEvent;
 import org.kie.workbench.common.stunner.core.definition.shape.Glyph;
 import org.kie.workbench.common.stunner.core.graph.Edge;
@@ -52,7 +51,7 @@ public class DeleteNodeToolboxAction implements ToolboxAction<AbstractCanvasHand
 
     @Inject
     public DeleteNodeToolboxAction(final ClientTranslationService translationService,
-                                   final @Session SessionCommandManager<AbstractCanvasHandler> sessionCommandManager,
+                                   final SessionCommandManager<AbstractCanvasHandler> sessionCommandManager,
                                    final CanvasCommandFactory<AbstractCanvasHandler> commandFactory,
                                    final Event<CanvasClearSelectionEvent> clearSelectionEvent) {
         this(translationService,

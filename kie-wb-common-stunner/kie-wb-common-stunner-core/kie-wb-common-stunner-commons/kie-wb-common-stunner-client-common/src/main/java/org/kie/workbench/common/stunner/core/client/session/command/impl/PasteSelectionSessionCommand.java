@@ -48,7 +48,6 @@ import org.kie.workbench.common.stunner.core.client.command.CanvasViolation;
 import org.kie.workbench.common.stunner.core.client.command.SessionCommandManager;
 import org.kie.workbench.common.stunner.core.client.event.keyboard.KeyboardEvent.Key;
 import org.kie.workbench.common.stunner.core.client.session.ClientSession;
-import org.kie.workbench.common.stunner.core.client.session.Session;
 import org.kie.workbench.common.stunner.core.client.session.command.AbstractClientSessionCommand;
 import org.kie.workbench.common.stunner.core.client.session.impl.EditorSession;
 import org.kie.workbench.common.stunner.core.command.Command;
@@ -96,7 +95,7 @@ public class PasteSelectionSessionCommand extends AbstractClientSessionCommand<E
     }
 
     @Inject
-    public PasteSelectionSessionCommand(final @Session SessionCommandManager<AbstractCanvasHandler> sessionCommandManager,
+    public PasteSelectionSessionCommand(final SessionCommandManager<AbstractCanvasHandler> sessionCommandManager,
                                         @Any ManagedInstance<CanvasCommandFactory<AbstractCanvasHandler>> canvasCommandFactoryInstance,
                                         final Event<CanvasSelectionEvent> selectionEvent,
                                         final CopySelectionSessionCommand copySelectionSessionCommand,
