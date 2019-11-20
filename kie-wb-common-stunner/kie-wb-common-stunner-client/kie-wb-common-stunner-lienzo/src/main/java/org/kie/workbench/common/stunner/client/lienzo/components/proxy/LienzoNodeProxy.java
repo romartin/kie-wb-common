@@ -43,7 +43,6 @@ import org.kie.workbench.common.stunner.core.graph.Node;
 import org.kie.workbench.common.stunner.core.graph.content.view.MagnetConnection;
 import org.kie.workbench.common.stunner.core.graph.content.view.View;
 import org.kie.workbench.common.stunner.core.graph.content.view.ViewConnector;
-import org.kie.workbench.common.stunner.core.graph.util.GraphUtils;
 
 import static org.kie.workbench.common.stunner.core.command.util.CommandUtils.isError;
 
@@ -106,9 +105,9 @@ public class LienzoNodeProxy implements NodeProxy {
                                             MagnetConnection.Builder.atCenter(getSourceNode()),
                                             getShapeSetId());
 
-        final Node parent = (Node) GraphUtils.getParent(getSourceNode());
-        final CanvasCommand<AbstractCanvasHandler> addNode = null != parent ?
-                commandFactory.addChildNode(parent,
+        final String rootUUID = getCanvasHandler().getDiagram().getMetadata().getCanvasRootUUID();
+        final CanvasCommand<AbstractCanvasHandler> addNode = null != rootUUID ?
+                commandFactory.addChildNode(getCanvasHandler().getGraphIndex().getNode(rootUUID),
                                             getTargetNode(),
                                             getShapeSetId()) :
                 commandFactory.addNode(getTargetNode(),
