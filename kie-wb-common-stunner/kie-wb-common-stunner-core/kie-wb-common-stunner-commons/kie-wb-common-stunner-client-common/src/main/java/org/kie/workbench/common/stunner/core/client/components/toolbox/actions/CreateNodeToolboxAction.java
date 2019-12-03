@@ -148,7 +148,7 @@ public class CreateNodeToolboxAction
                                                    connector,
                                                    sourceNode));
 
-        nodeProxy.start(event);
+        nodeProxy.enable(event);
 
         return this;
     }

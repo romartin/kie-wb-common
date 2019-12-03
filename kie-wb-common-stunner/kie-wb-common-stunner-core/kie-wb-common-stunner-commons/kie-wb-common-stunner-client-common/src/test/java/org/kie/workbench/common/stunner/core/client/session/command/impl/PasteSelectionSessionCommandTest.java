@@ -199,7 +199,7 @@ public class PasteSelectionSessionCommandTest extends BaseSessionCommandKeyboard
         when(clone.getUUID()).thenReturn(CLONE_UUID);
         when(clone2.getUUID()).thenReturn(CLONE2_UUID);
         when(session.getClipboardControl()).thenReturn(clipboardControl);
-        when(sessionCommandManager.getRegistry()).thenReturn(commandRegistry);
+        when(session.getCommandRegistry()).thenReturn(commandRegistry);
 
         cloneMap = new HashMap() {{
             put(node, clone);

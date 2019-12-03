@@ -72,9 +72,9 @@ public class CutSelectionSessionCommandTest extends BaseSessionCommandKeyboardSe
     @SuppressWarnings("unchecked")
     public void setUp() throws Exception {
         clipboardControl = spy(new LocalClipboardControl());
-        when(sessionCommandManager.getRegistry()).thenReturn(commandRegistry);
         when(commandRegistry.peek()).thenReturn(deleteNodeCommand);
         when(session.getClipboardControl()).thenReturn(clipboardControl);
+        when(session.getCommandRegistry()).thenReturn(commandRegistry);
         commandExecutedEventCaptor = ArgumentCaptor.forClass(CutSelectionSessionCommandExecutedEvent.class);
         super.setup();
         this.cutSelectionSessionCommand = getCommand();
@@ -91,7 +91,7 @@ public class CutSelectionSessionCommandTest extends BaseSessionCommandKeyboardSe
         //success
         callbackArgumentCaptor.getValue().onSuccess();
         verify(deleteSelectionSessionCommand, times(1)).execute(mainCallback);
-        verify(sessionCommandManager.getRegistry(), atLeastOnce()).peek();
+        verify(commandRegistry, atLeastOnce()).peek();
         verify(clipboardControl, atLeastOnce()).setRollbackCommand(deleteNodeCommand);
         verify(commandExecutedEvent, times(1)).fire(commandExecutedEventCaptor.capture());
         assertEquals(session, commandExecutedEventCaptor.getValue().getClientSession());
@@ -105,7 +105,7 @@ public class CutSelectionSessionCommandTest extends BaseSessionCommandKeyboardSe
 
     @Override
     protected CutSelectionSessionCommand getCommand() {
-        return new CutSelectionSessionCommand(copySelectionSessionCommand, deleteSelectionSessionCommand, sessionCommandManager, commandExecutedEvent);
+        return new CutSelectionSessionCommand(copySelectionSessionCommand, deleteSelectionSessionCommand, commandExecutedEvent);
     }
 
     @Override

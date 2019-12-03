@@ -26,9 +26,23 @@ public interface ShapeProxy<H extends CanvasHandler, T extends ShapeProxy.ShapeP
         public abstract H getCanvasHandler();
     }
 
+    /**
+     * Prepares the proxy for being started.
+     * @param argument The proxy's argument instance.
+     */
     void setup(T argument);
 
-    void start(AbstractMouseEvent event);
+    /**
+     * Starts the proxy.
+     * @param event The proxy can be started by using different mouse event types (eg: click, drag, mouse over).
+     * So the interface just requires an instance for the common abstract type.
+     */
+    void enable(AbstractMouseEvent event);
 
+    /**
+     * Destroys the proxy and its state.
+     * No expected to be longer used.
+     * From this point, it should ready for further GC.
+     */
     void destroy();
 }

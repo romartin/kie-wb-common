@@ -115,7 +115,7 @@ public class CommonActionsToolboxFactoryTest {
 
     @Test
     public void testBuildToolboxNotAllowed() {
-        when(commandManager.allow(eq(canvasHandler), eq(deleteNodeCommand))).thenReturn(CanvasCommandResultBuilder.FAILED);
+        when(commandManager.allow(eq(canvasHandler), eq(deleteNodeCommand))).thenReturn(CanvasCommandResultBuilder.failed());
         final Optional<Toolbox<?>> toolbox =
                 tested.build(canvasHandler,
                              element);

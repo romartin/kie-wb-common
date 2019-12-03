@@ -16,16 +16,12 @@
 
 package org.kie.workbench.common.stunner.core.client.components.toolbox.actions;
 
-import java.util.logging.Logger;
-
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.Dependent;
-import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
 import org.kie.workbench.common.stunner.core.client.api.ClientFactoryManager;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
-import org.kie.workbench.common.stunner.core.client.canvas.event.CancelCanvasAction;
 import org.kie.workbench.common.stunner.core.client.canvas.util.CanvasLayoutUtils;
 import org.kie.workbench.common.stunner.core.client.components.proxy.ConnectorProxy;
 import org.kie.workbench.common.stunner.core.client.components.proxy.ConnectorProxy.Arguments;
@@ -50,7 +46,6 @@ public class CreateConnectorToolboxAction
         extends AbstractToolboxAction
         implements IsToolboxActionDraggable<AbstractCanvasHandler> {
 
-    private static Logger LOGGER = Logger.getLogger(CreateConnectorToolboxAction.class.getName());
     static final String KEY_TITLE = "org.kie.workbench.common.stunner.core.client.toolbox.createNewConnector";
 
     private final ClientFactoryManager clientFactoryManager;
@@ -109,11 +104,8 @@ public class CreateConnectorToolboxAction
         connectorProxy.setup(Arguments.create(canvasHandler,
                                               connector,
                                               sourceNode));
-        connectorProxy.start(event);
-    }
 
-    // TODO
-    protected void cancelConnector(@Observes CancelCanvasAction cancelCanvasAction) {
+        connectorProxy.enable(event);
     }
 
     @Override

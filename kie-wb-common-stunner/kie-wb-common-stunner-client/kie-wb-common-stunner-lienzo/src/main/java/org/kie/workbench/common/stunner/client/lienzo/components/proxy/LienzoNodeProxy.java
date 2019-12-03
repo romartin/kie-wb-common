@@ -18,6 +18,7 @@ package org.kie.workbench.common.stunner.client.lienzo.components.proxy;
 
 import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
+import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
 import com.ait.lienzo.client.core.shape.wires.WiresShape;
@@ -26,25 +27,24 @@ import com.ait.lienzo.client.core.shape.wires.proxy.WiresShapeProxy;
 import org.kie.workbench.common.stunner.client.lienzo.canvas.wires.WiresCanvas;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
 import org.kie.workbench.common.stunner.core.client.canvas.event.selection.CanvasSelectionEvent;
-import org.kie.workbench.common.stunner.core.client.command.CanvasCommand;
 import org.kie.workbench.common.stunner.core.client.command.CanvasCommandFactory;
 import org.kie.workbench.common.stunner.core.client.command.CanvasViolation;
 import org.kie.workbench.common.stunner.core.client.command.SessionCommandManager;
 import org.kie.workbench.common.stunner.core.client.components.proxy.NodeProxy;
+import org.kie.workbench.common.stunner.core.client.event.keyboard.KeyDownEvent;
+import org.kie.workbench.common.stunner.core.client.event.keyboard.KeyboardEvent;
 import org.kie.workbench.common.stunner.core.client.shape.Shape;
 import org.kie.workbench.common.stunner.core.client.shape.ShapeState;
 import org.kie.workbench.common.stunner.core.client.shape.view.event.AbstractMouseEvent;
 import org.kie.workbench.common.stunner.core.command.Command;
 import org.kie.workbench.common.stunner.core.command.CommandResult;
-import org.kie.workbench.common.stunner.core.command.impl.CompositeCommand;
+import org.kie.workbench.common.stunner.core.command.impl.DeferredCompositeCommand;
 import org.kie.workbench.common.stunner.core.diagram.Metadata;
 import org.kie.workbench.common.stunner.core.graph.Edge;
 import org.kie.workbench.common.stunner.core.graph.Node;
-import org.kie.workbench.common.stunner.core.graph.content.view.MagnetConnection;
+import org.kie.workbench.common.stunner.core.graph.content.view.MagnetConnection.Builder;
 import org.kie.workbench.common.stunner.core.graph.content.view.View;
 import org.kie.workbench.common.stunner.core.graph.content.view.ViewConnector;
-
-import static org.kie.workbench.common.stunner.core.command.util.CommandUtils.isError;
 
 @Dependent
 public class LienzoNodeProxy implements NodeProxy {
@@ -75,69 +75,62 @@ public class LienzoNodeProxy implements NodeProxy {
     }
 
     @Override
-    public void start(final AbstractMouseEvent event) {
+    public void enable(final AbstractMouseEvent event) {
         dragProxy.enable(event.getX(), event.getY());
     }
 
     @Override
     public void destroy() {
         if (null != dragProxy) {
+            commandManager.rollback();
             dragProxy.destroy();
             dragProxy = null;
         }
         arguments = null;
     }
 
+    void onKeyDownEvent(final @Observes KeyDownEvent event) {
+        if (KeyboardEvent.Key.ESC == event.getKey()) {
+            destroy();
+        }
+    }
+
     private void acceptProxy(final WiresShape shape) {
-        getTargetShape().applyState(ShapeState.NONE);
-        getEdgeShape().applyState(ShapeState.NONE);
+        commandManager.complete();
         selectionEvent.fire(new CanvasSelectionEvent(getCanvasHandler(), getTargetNode().getUUID()));
     }
 
     private void destroyProxy(final WiresShape shape) {
-        // TODO
+        commandManager.rollback();
+        commandManager.complete();
     }
 
     private WiresShape createProxy() {
-        final CanvasCommand<AbstractCanvasHandler> addConnector =
-                commandFactory.addConnector(getSourceNode(),
-                                            getEdge(),
-                                            MagnetConnection.Builder.atCenter(getSourceNode()),
-                                            getShapeSetId());
-
         final String rootUUID = getCanvasHandler().getDiagram().getMetadata().getCanvasRootUUID();
-        final CanvasCommand<AbstractCanvasHandler> addNode = null != rootUUID ?
-                commandFactory.addChildNode(getCanvasHandler().getGraphIndex().getNode(rootUUID),
-                                            getTargetNode(),
-                                            getShapeSetId()) :
-                commandFactory.addNode(getTargetNode(),
-                                       getShapeSetId());
+        commandManager.start();
+        execute(new DeferredCompositeCommand.Builder<AbstractCanvasHandler, CanvasViolation>()
+                        .deferCommand(() -> null != rootUUID ?
+                                commandFactory.addChildNode(getCanvasHandler().getGraphIndex().getNode(rootUUID),
+                                                            getTargetNode(),
+                                                            getShapeSetId()) :
+                                commandFactory.addNode(getTargetNode(),
+                                                       getShapeSetId()))
+                        .deferCommand(() -> commandFactory.addConnector(getSourceNode(),
+                                                                        getEdge(),
+                                                                        Builder.atCenter(getSourceNode()),
+                                                                        getShapeSetId()))
+                        // TODO: BPMN should provide an specific different magnet approach...
+                        .deferCommand(() -> commandFactory.setTargetNode(getTargetNode(),
+                                                                         getEdge(),
+                                                                         Builder.forTarget(getSourceNode(),
+                                                                                           getTargetNode())))
+                        .build());
 
-        // TODO: BPMN should provide an specific different magnet approach...
-        final CanvasCommand<AbstractCanvasHandler> setTargetNode =
-                commandFactory.setTargetNode(getTargetNode(),
-                                             getEdge(),
-                                             MagnetConnection.Builder.forTarget(getSourceNode(), getTargetNode()));
-
-        final CompositeCommand<AbstractCanvasHandler, CanvasViolation> command =
-                new CompositeCommand.Builder<AbstractCanvasHandler, CanvasViolation>()
-                        .addCommand(addConnector)
-                        .addCommand(addNode)
-                        .addCommand(setTargetNode)
-                        .build();
-
-        final CommandResult<CanvasViolation> result = execute(command);
-
-        if (!isError(result)) {
-            final Shape<?> targetShape = getTargetShape();
-            final Shape<?> edgeShape = getEdgeShape();
-            edgeShape.applyState(ShapeState.SELECTED);
-            targetShape.applyState(ShapeState.SELECTED);
-            return getTargetShapeView(targetShape);
-        }
-
-        // TODO
-        return null;
+        final Shape<?> targetShape = getTargetShape();
+        final Shape<?> edgeShape = getEdgeShape();
+        edgeShape.applyState(ShapeState.SELECTED);
+        targetShape.applyState(ShapeState.SELECTED);
+        return getTargetShapeView(targetShape);
     }
 
     private Shape<?> getEdgeShape() {

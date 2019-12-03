@@ -40,10 +40,11 @@ import org.kie.workbench.common.stunner.core.util.DefinitionUtils;
 
 import static org.kie.soup.commons.validation.PortablePreconditions.checkNotNull;
 
-// TODO: Improve casts to AbstractSession...
-
+/**
+ * Manages a single session by Window
+ */
 @ApplicationScoped
-public class SessionManagerImpl implements SessionManager {
+public class GlobalSessionManager implements SessionManager {
 
     private final Function<Metadata, Annotation> qualifierProvider;
     private final ManagedInstance<ClientSession> sessionInstances;
@@ -53,7 +54,7 @@ public class SessionManagerImpl implements SessionManager {
 
     private AbstractSession current;
 
-    protected SessionManagerImpl() {
+    protected GlobalSessionManager() {
         this(null,
              null,
              null,
@@ -62,11 +63,11 @@ public class SessionManagerImpl implements SessionManager {
     }
 
     @Inject
-    public SessionManagerImpl(final DefinitionUtils definitionUtils,
-                              final @Any ManagedInstance<ClientSession> sessionInstances,
-                              final Event<SessionOpenedEvent> sessionOpenedEvent,
-                              final Event<SessionDestroyedEvent> sessionDestroyedEvent,
-                              final Event<OnSessionErrorEvent> sessionErrorEvent) {
+    public GlobalSessionManager(final DefinitionUtils definitionUtils,
+                                final @Any ManagedInstance<ClientSession> sessionInstances,
+                                final Event<SessionOpenedEvent> sessionOpenedEvent,
+                                final Event<SessionDestroyedEvent> sessionDestroyedEvent,
+                                final Event<OnSessionErrorEvent> sessionErrorEvent) {
         this.qualifierProvider = metadata -> definitionUtils.getQualifier(metadata.getDefinitionSetId());
         this.sessionInstances = sessionInstances;
         this.sessionOpenedEvent = sessionOpenedEvent;

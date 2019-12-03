@@ -108,6 +108,6 @@ public class ClearSessionCommand extends AbstractClientSessionCommand<EditorSess
     private void cleanSessionRegistry() {
         LOGGER.log(FINE,
                    "Clear Session Command executed - Cleaning the session's command registry...");
-        sessionCommandManager.getRegistry().clear();
+        getSession().getCommandRegistry().clear();
     }
 }

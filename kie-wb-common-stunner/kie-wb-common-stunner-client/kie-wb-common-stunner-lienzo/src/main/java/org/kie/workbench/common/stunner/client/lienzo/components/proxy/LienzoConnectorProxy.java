@@ -18,6 +18,7 @@ package org.kie.workbench.common.stunner.client.lienzo.components.proxy;
 
 import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
+import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
 import com.ait.lienzo.client.core.shape.wires.WiresConnector;
@@ -31,6 +32,8 @@ import org.kie.workbench.common.stunner.core.client.command.CanvasCommandFactory
 import org.kie.workbench.common.stunner.core.client.command.CanvasViolation;
 import org.kie.workbench.common.stunner.core.client.command.SessionCommandManager;
 import org.kie.workbench.common.stunner.core.client.components.proxy.ConnectorProxy;
+import org.kie.workbench.common.stunner.core.client.event.keyboard.KeyDownEvent;
+import org.kie.workbench.common.stunner.core.client.event.keyboard.KeyboardEvent;
 import org.kie.workbench.common.stunner.core.client.shape.Shape;
 import org.kie.workbench.common.stunner.core.client.shape.ShapeState;
 import org.kie.workbench.common.stunner.core.client.shape.view.event.AbstractMouseEvent;
@@ -41,8 +44,6 @@ import org.kie.workbench.common.stunner.core.graph.Node;
 import org.kie.workbench.common.stunner.core.graph.content.view.MagnetConnection;
 import org.kie.workbench.common.stunner.core.graph.content.view.View;
 import org.kie.workbench.common.stunner.core.graph.content.view.ViewConnector;
-
-import static org.kie.workbench.common.stunner.core.command.util.CommandUtils.isError;
 
 @Dependent
 public class LienzoConnectorProxy implements ConnectorProxy {
@@ -74,51 +75,47 @@ public class LienzoConnectorProxy implements ConnectorProxy {
     }
 
     @Override
-    public void start(final AbstractMouseEvent event) {
+    public void enable(final AbstractMouseEvent event) {
         this.dragProxy.enable(event.getX(), event.getY());
     }
 
     @Override
     public void destroy() {
         if (null != dragProxy) {
+            commandManager.rollback();
             dragProxy.destroy();
             dragProxy = null;
         }
         arguments = null;
     }
 
-    private WiresConnector createProxy() {
-        final CanvasCommand<AbstractCanvasHandler> addConnector =
-                commandFactory.addConnector(getSourceNode(),
-                                            getEdge(),
-                                            new MagnetConnection.Builder()
-                                                    .atX(0)
-                                                    .atY(0)
-                                                    .magnet(0)
-                                                    .build(),
-                                            getMetadata().getShapeSetId());
-
-        final CommandResult<CanvasViolation> addConnectorResult = execute(addConnector);
-
-        if (!isError(addConnectorResult)) {
-            final Shape<?> connector = getConnector();
-            connector.applyState(ShapeState.SELECTED);
-            return getConnectorView(connector);
+    void onKeyDownEvent(final @Observes KeyDownEvent event) {
+        if (KeyboardEvent.Key.ESC == event.getKey()) {
+            destroy();
         }
+    }
 
-        // TODO
-        return null;
+    private WiresConnector createProxy() {
+        commandManager.start();
+        final Node<? extends View<?>, Edge> sourceNode = getSourceNode();
+        execute(commandFactory.addConnector(sourceNode,
+                                            getEdge(),
+                                            MagnetConnection.Builder.atCenter(sourceNode),
+                                            getMetadata().getShapeSetId()));
+
+        final Shape<?> connector = getConnector();
+        connector.applyState(ShapeState.SELECTED);
+        return getConnectorView(connector);
     }
 
     private void acceptProxy(WiresConnector connector) {
-        if (null != dragProxy) {
-            getConnector().applyState(ShapeState.NONE);
-            selectionEvent.fire(new CanvasSelectionEvent(getCanvasHandler(), getEdge().getUUID()));
-        }
+        commandManager.complete();
+        selectionEvent.fire(new CanvasSelectionEvent(getCanvasHandler(), getEdge().getUUID()));
     }
 
     private void destroyProxy(WiresConnector connector) {
-        // TODO
+        commandManager.rollback();
+        commandManager.complete();
     }
 
     private Shape<?> getConnector() {

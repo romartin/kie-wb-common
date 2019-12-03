@@ -29,7 +29,6 @@ import org.kie.workbench.common.stunner.core.client.canvas.event.registration.Ca
 import org.kie.workbench.common.stunner.core.client.canvas.event.selection.CanvasClearSelectionEvent;
 import org.kie.workbench.common.stunner.core.client.canvas.event.selection.CanvasSelectionEvent;
 import org.kie.workbench.common.stunner.core.client.command.CanvasViolation;
-import org.kie.workbench.common.stunner.core.client.command.SessionCommandManager;
 import org.kie.workbench.common.stunner.core.client.event.keyboard.KeyboardEvent.Key;
 import org.kie.workbench.common.stunner.core.client.session.ClientSession;
 import org.kie.workbench.common.stunner.core.client.session.impl.EditorSession;
@@ -48,12 +47,10 @@ public class CutSelectionSessionCommand extends AbstractSelectionAwareSessionCom
     private final DeleteSelectionSessionCommand deleteSelectionSessionCommand;
     private final Event<CutSelectionSessionCommandExecutedEvent> commandExecutedEvent;
     private static Logger LOGGER = Logger.getLogger(CopySelectionSessionCommand.class.getName());
-    private final SessionCommandManager<AbstractCanvasHandler> sessionCommandManager;
     private ClipboardControl clipboardControl;
 
     protected CutSelectionSessionCommand() {
         this(null,
-             null,
              null,
              null);
     }
@@ -61,12 +58,10 @@ public class CutSelectionSessionCommand extends AbstractSelectionAwareSessionCom
     @Inject
     public CutSelectionSessionCommand(final CopySelectionSessionCommand copySelectionSessionCommand,
                                       final DeleteSelectionSessionCommand deleteSelectionSessionCommand,
-                                      final SessionCommandManager<AbstractCanvasHandler> sessionCommandManager,
                                       final Event<CutSelectionSessionCommandExecutedEvent> commandExecutedEvent) {
         super(true);
         this.copySelectionSessionCommand = copySelectionSessionCommand;
         this.deleteSelectionSessionCommand = deleteSelectionSessionCommand;
-        this.sessionCommandManager = sessionCommandManager;
         this.commandExecutedEvent = commandExecutedEvent;
     }
 
@@ -105,7 +100,7 @@ public class CutSelectionSessionCommand extends AbstractSelectionAwareSessionCom
             public void onSuccess() {
                 deleteSelectionSessionCommand.execute(callback);
                 //get the executed command by deleteSelectionSessionCommand
-                Command<AbstractCanvasHandler, CanvasViolation> command = sessionCommandManager.getRegistry().peek();
+                Command<AbstractCanvasHandler, CanvasViolation> command = getSession().getCommandRegistry().peek();
                 clipboardControl.setRollbackCommand(command);
                 commandExecutedEvent.fire(new CutSelectionSessionCommandExecutedEvent(CutSelectionSessionCommand.this,
                                                                                       CutSelectionSessionCommand.this.getSession()));
