@@ -22,9 +22,6 @@ import org.junit.Test;
 import org.kie.workbench.common.stunner.core.client.api.ClientFactoryManager;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvas;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
-import org.kie.workbench.common.stunner.core.client.components.drag.ConnectorDragProxy;
-import org.kie.workbench.common.stunner.core.client.components.drag.DragProxy;
-import org.kie.workbench.common.stunner.core.client.components.drag.DragProxyCallback;
 import org.kie.workbench.common.stunner.core.client.i18n.ClientTranslationService;
 import org.kie.workbench.common.stunner.core.client.shape.factory.ShapeFactory;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
@@ -92,9 +89,6 @@ public class CreateConnectorToolboxActionTest {
 
     @Mock
     private Node<View<?>, Edge> targetNode;
-
-    @Mock
-    private DragProxy<AbstractCanvasHandler, ConnectorDragProxy.Item, DragProxyCallback> dragProxy;
 
     private CreateConnectorToolboxAction tested;
 

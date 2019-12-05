@@ -84,8 +84,8 @@ public class ConnectorProxyTest {
     private EdgeShape connector;
 
     private ConnectorProxy tested;
-    private ElementShapeProxy proxy;
-    private ElementShapeProxyTest.ElementShapeProxyViewMock<EdgeShape> view;
+    private ElementProxy proxy;
+    private ElementProxyTest.ElementProxyViewMock<EdgeShape> view;
     private Edge<ViewConnector<?>, Node> edge;
     private Node<View<?>, Edge> sourceNode;
 
@@ -95,8 +95,8 @@ public class ConnectorProxyTest {
         sourceNode.setContent(new ViewImpl<>(mock(Object.class),
                                              Bounds.create()));
         edge = new EdgeImpl<>(EDGE_ID);
-        proxy = spy(new ElementShapeProxy(commandManager, selectionEvent));
-        view = spy(new ElementShapeProxyTest.ElementShapeProxyViewMock<>());
+        proxy = spy(new ElementProxy(commandManager, selectionEvent));
+        view = spy(new ElementProxyTest.ElementProxyViewMock<>());
         when(canvasHandler.getCanvas()).thenReturn(canvas);
         when(canvasHandler.getDiagram()).thenReturn(diagram);
         when(diagram.getMetadata()).thenReturn(metadata);

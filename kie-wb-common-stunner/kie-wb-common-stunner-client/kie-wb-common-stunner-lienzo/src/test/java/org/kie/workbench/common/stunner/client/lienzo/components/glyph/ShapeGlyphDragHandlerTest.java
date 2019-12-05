@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2019 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,9 +35,8 @@ import com.google.gwt.user.client.ui.AbsolutePanel;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.kie.workbench.common.stunner.client.lienzo.components.glyph.ShapeGlyphDragHandler.Callback;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvas;
-import org.kie.workbench.common.stunner.core.client.components.drag.DragProxyCallback;
-import org.kie.workbench.common.stunner.core.client.components.glyph.ShapeGlyphDragHandler;
 import org.kie.workbench.common.stunner.core.definition.shape.Glyph;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -55,7 +54,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(LienzoMockitoTestRunner.class)
-public class ShapeGlyphDragHandlerImplTest {
+public class ShapeGlyphDragHandlerTest {
 
     private static final int DRAG_PROXY_WIDTH = 150;
     private static final int DRAG_PROXY_HEIGHT = 300;
@@ -90,7 +89,7 @@ public class ShapeGlyphDragHandlerImplTest {
     @Mock
     private HandlerRegistration keyHandlerReg;
 
-    private ShapeGlyphDragHandlerImpl tested;
+    private ShapeGlyphDragHandler tested;
     private List<HandlerRegistration> handlerRegistrations;
     private LienzoPanelImpl proxyPanel;
     private Group glyphGroup;
@@ -112,16 +111,16 @@ public class ShapeGlyphDragHandlerImplTest {
                 .thenReturn(upHandlerReg);
         when(rootPanel.addDomHandler(any(KeyDownHandler.class), eq(KeyDownEvent.getType())))
                 .thenReturn(keyHandlerReg);
-        tested = new ShapeGlyphDragHandlerImpl(glyphLienzoGlyphRenderer,
-                                               handlerRegistrations,
-                                               () -> rootPanel,
-                                               item -> proxyPanel,
-                                               (task, timeout) -> task.execute());
+        tested = new ShapeGlyphDragHandler(glyphLienzoGlyphRenderer,
+                                           handlerRegistrations,
+                                           () -> rootPanel,
+                                           item -> proxyPanel,
+                                           (task, timeout) -> task.execute());
     }
 
     @Test
     public void testShowProxy() throws Exception {
-        tested.show(glyphDragItem, 11, 33, mock(DragProxyCallback.class));
+        tested.show(glyphDragItem, 11, 33, mock(Callback.class));
         ArgumentCaptor<Layer> layerArgumentCaptor = ArgumentCaptor.forClass(Layer.class);
         verify(proxyPanel, times(1)).add(layerArgumentCaptor.capture());
         Layer layer = layerArgumentCaptor.getValue();
@@ -135,7 +134,7 @@ public class ShapeGlyphDragHandlerImplTest {
 
     @Test
     public void testProxyhHandlers() throws Exception {
-        DragProxyCallback callback = mock(DragProxyCallback.class);
+        Callback callback = mock(Callback.class);
         tested.show(glyphDragItem, 11, 33, callback);
 
         // Check keyboard event handling.
@@ -172,7 +171,7 @@ public class ShapeGlyphDragHandlerImplTest {
 
     @Test
     public void testKeyboardHandling() throws Exception {
-        DragProxyCallback callback = mock(DragProxyCallback.class);
+        Callback callback = mock(Callback.class);
         tested.show(glyphDragItem, 11, 33, callback);
         assertEquals(keyHandlerReg, handlerRegistrations.get(2));
         KeyDownEvent event = mock(KeyDownEvent.class);
@@ -185,7 +184,7 @@ public class ShapeGlyphDragHandlerImplTest {
 
     @Test
     public void testClear() throws Exception {
-        DragProxyCallback callback = mock(DragProxyCallback.class);
+        Callback callback = mock(Callback.class);
         tested.show(glyphDragItem, 11, 33, callback);
         tested.clear();
         verify(proxyPanel, times(1)).clear();
@@ -198,7 +197,7 @@ public class ShapeGlyphDragHandlerImplTest {
 
     @Test
     public void testDestroy() throws Exception {
-        DragProxyCallback callback = mock(DragProxyCallback.class);
+        Callback callback = mock(Callback.class);
         tested.show(glyphDragItem, 11, 33, callback);
         tested.destroy();
         verify(proxyPanel, times(1)).destroy();

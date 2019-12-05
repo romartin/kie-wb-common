@@ -41,7 +41,7 @@ import org.kie.workbench.common.stunner.core.graph.content.view.ViewConnector;
 @Dependent
 public class NodeProxy implements ShapeProxy {
 
-    private final ElementShapeProxy proxy;
+    private final ElementProxy proxy;
     private final ShapeProxyView<NodeShape> view;
     private final CanvasCommandFactory<AbstractCanvasHandler> commandFactory;
 
@@ -50,7 +50,7 @@ public class NodeProxy implements ShapeProxy {
     private Node<View<?>, Edge> sourceNode;
 
     @Inject
-    public NodeProxy(final ElementShapeProxy proxy,
+    public NodeProxy(final ElementProxy proxy,
                      final ShapeProxyView<NodeShape> view,
                      final CanvasCommandFactory<AbstractCanvasHandler> commandFactory) {
         this.proxy = proxy;

@@ -44,7 +44,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ElementShapeProxyTest {
+public class ElementProxyTest {
 
     private static final String SHAPE_UUID = "proxyShape1";
 
@@ -63,15 +63,15 @@ public class ElementShapeProxyTest {
     @Mock
     private ElementShape proxyShape;
 
-    private ElementShapeProxy tested;
-    private ElementShapeProxyViewMock<ElementShape> view;
+    private ElementProxy tested;
+    private ElementProxyViewMock<ElementShape> view;
 
     @Before
     public void setUp() {
         when(proxyShape.getUUID()).thenReturn(SHAPE_UUID);
         when(canvasHandler.getCanvas()).thenReturn(canvas);
-        view = spy(new ElementShapeProxyViewMock<>());
-        tested = new ElementShapeProxy(commandManager, selectionEvent)
+        view = spy(new ElementProxyViewMock<>());
+        tested = new ElementProxy(commandManager, selectionEvent)
                 .setCanvasHandler(canvasHandler)
                 .setView(view)
                 .setProxyBuilder(() -> proxyShape);
@@ -134,7 +134,7 @@ public class ElementShapeProxyTest {
         verify(commandManager, never()).allow(any(), any());
     }
 
-    static class ElementShapeProxyViewMock<S extends ElementShape>
+    static class ElementProxyViewMock<S extends ElementShape>
             extends AbstractShapeProxyView<S> {
 
         @Override

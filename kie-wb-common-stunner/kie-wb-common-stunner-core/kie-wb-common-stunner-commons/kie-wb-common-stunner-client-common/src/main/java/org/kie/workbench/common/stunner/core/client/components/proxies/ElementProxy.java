@@ -34,7 +34,7 @@ import org.kie.workbench.common.stunner.core.command.Command;
 import org.kie.workbench.common.stunner.core.command.CommandResult;
 
 @Dependent
-public class ElementShapeProxy implements ShapeProxy {
+public class ElementProxy implements ShapeProxy {
 
     private final SessionCommandManager<AbstractCanvasHandler> commandManager;
     private final Event<CanvasSelectionEvent> selectionEvent;
@@ -44,24 +44,24 @@ public class ElementShapeProxy implements ShapeProxy {
     private Supplier<ElementShape> proxyBuilder;
 
     @Inject
-    public ElementShapeProxy(final SessionCommandManager<AbstractCanvasHandler> commandManager,
-                             final Event<CanvasSelectionEvent> selectionEvent) {
+    public ElementProxy(final SessionCommandManager<AbstractCanvasHandler> commandManager,
+                        final Event<CanvasSelectionEvent> selectionEvent) {
         this.commandManager = commandManager;
         this.selectionEvent = selectionEvent;
     }
 
     @SuppressWarnings("unchecked")
-    public ElementShapeProxy setView(final ShapeProxyView<? extends ElementShape> view) {
+    public ElementProxy setView(final ShapeProxyView<? extends ElementShape> view) {
         this.view = (ShapeProxyView<ElementShape>) view;
         return this;
     }
 
-    public ElementShapeProxy setProxyBuilder(final Supplier<ElementShape> proxyBuilder) {
+    public ElementProxy setProxyBuilder(final Supplier<ElementShape> proxyBuilder) {
         this.proxyBuilder = proxyBuilder;
         return this;
     }
 
-    public ElementShapeProxy setCanvasHandler(final AbstractCanvasHandler canvasHandler) {
+    public ElementProxy setCanvasHandler(final AbstractCanvasHandler canvasHandler) {
         this.canvasHandler = canvasHandler;
         return this;
     }

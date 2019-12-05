@@ -36,7 +36,7 @@ import org.kie.workbench.common.stunner.core.graph.content.view.ViewConnector;
 @Dependent
 public class ConnectorProxy implements ShapeProxy {
 
-    private final ElementShapeProxy proxy;
+    private final ElementProxy proxy;
     private final ShapeProxyView<EdgeShape> view;
     private final CanvasCommandFactory<AbstractCanvasHandler> commandFactory;
 
@@ -44,7 +44,7 @@ public class ConnectorProxy implements ShapeProxy {
     private Node<? extends View<?>, Edge> sourceNode;
 
     @Inject
-    public ConnectorProxy(final ElementShapeProxy proxy,
+    public ConnectorProxy(final ElementProxy proxy,
                           final ShapeProxyView<EdgeShape> view,
                           final CanvasCommandFactory<AbstractCanvasHandler> commandFactory) {
         this.proxy = proxy;
@@ -98,8 +98,7 @@ public class ConnectorProxy implements ShapeProxy {
                                                   MagnetConnection.Builder.atCenter(sourceNode),
                                                   getMetadata().getShapeSetId()));
 
-        final EdgeShape connector = getConnector();
-        return connector;
+        return getConnector();
     }
 
     void onKeyDownEvent(final @Observes KeyDownEvent event) {
