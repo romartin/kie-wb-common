@@ -34,16 +34,26 @@ import org.kie.workbench.common.stunner.core.registry.command.CommandRegistry;
 
 import static org.kie.workbench.common.stunner.core.command.util.CommandUtils.isError;
 
+/**
+ * - Binds to a single ClientSession.
+ * - Delegates command operations to the session's CanvasCommandManager instance.
+ * - Listens for request lifecycle, if any
+ * - Updates the session's registry as:
+ * - If commands have been successfully executed - Add a CompositeCommand by using all commands executed during the current request
+ * - If some command execution fails
+ * - It rolls-back all successfully executed commands during the current request to retun back to initial state.
+ * - No registry updates are being done
+ */
 @Dependent
-@Typed(CanvasSessionCommandManager.class)
-public class CanvasSessionCommandManager
+@Typed(RegistryAwareCommandManager.class)
+public class RegistryAwareCommandManager
         implements SessionCommandManager<AbstractCanvasHandler> {
 
     private final RequestCommands commands;
     private ClientSession<AbstractCanvas, AbstractCanvasHandler> session;
     private CanvasCommandManager<AbstractCanvasHandler> commandManager;
 
-    public CanvasSessionCommandManager() {
+    public RegistryAwareCommandManager() {
         this.commands =
                 new RequestCommands.Builder()
                         .onComplete(command -> getRegistry().ifPresent(r -> r.register(command)))
@@ -52,7 +62,7 @@ public class CanvasSessionCommandManager
     }
 
     @SuppressWarnings("unchecked")
-    public CanvasSessionCommandManager init(final ClientSession session) {
+    public RegistryAwareCommandManager init(final ClientSession session) {
         this.session = session;
         return this;
     }
@@ -65,15 +75,20 @@ public class CanvasSessionCommandManager
         return execute(getCanvasHandler(), command);
     }
 
-    public CommandResult<CanvasViolation> undo() {
+    @Override
+    public CommandResult<CanvasViolation> undo(final AbstractCanvasHandler context) {
         final Command<AbstractCanvasHandler, CanvasViolation> lastEntry =
                 getRegistry()
-                        .map(CommandRegistry::peek)
+                        .map(CommandRegistry::pop)
                         .orElse(null);
         if (null != lastEntry) {
-            return undo(getCanvasHandler(), lastEntry);
+            return undo(context, lastEntry);
         }
         return CanvasCommandResultBuilder.failed();
+    }
+
+    public CommandResult<CanvasViolation> undo() {
+        return undo(getCanvasHandler());
     }
 
     @Override
@@ -99,11 +114,7 @@ public class CanvasSessionCommandManager
     @Override
     public CommandResult<CanvasViolation> undo(final AbstractCanvasHandler context,
                                                final Command<AbstractCanvasHandler, CanvasViolation> command) {
-        final CommandResult<CanvasViolation> result = getCommandManager().undo(context, command);
-        if (!isError(result)) {
-            getRegistry().ifPresent(CommandRegistry::pop);
-        }
-        return result;
+        return getCommandManager().undo(context, command);
     }
 
     @Override

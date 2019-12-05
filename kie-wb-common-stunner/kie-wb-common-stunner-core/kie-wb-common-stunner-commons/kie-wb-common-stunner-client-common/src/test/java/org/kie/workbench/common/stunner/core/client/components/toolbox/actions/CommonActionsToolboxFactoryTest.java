@@ -106,11 +106,6 @@ public class CommonActionsToolboxFactoryTest {
                      actionsToolbox.iterator().next());
         verify(view,
                times(1)).init(eq(actionsToolbox));
-        // TODO: fix properly.
-        /*verify(view,
-               times(1)).addButton(any(Glyph.class),
-                                   anyString(),
-                                   any(Consumer.class));*/
     }
 
     @Test

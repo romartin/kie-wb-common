@@ -23,8 +23,7 @@ import javax.inject.Inject;
 import org.kie.workbench.common.stunner.core.client.api.ClientFactoryManager;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
 import org.kie.workbench.common.stunner.core.client.canvas.util.CanvasLayoutUtils;
-import org.kie.workbench.common.stunner.core.client.components.proxy.ConnectorProxy;
-import org.kie.workbench.common.stunner.core.client.components.proxy.ConnectorProxy.Arguments;
+import org.kie.workbench.common.stunner.core.client.components.proxies.ConnectorProxy;
 import org.kie.workbench.common.stunner.core.client.i18n.ClientTranslationService;
 import org.kie.workbench.common.stunner.core.client.shape.view.event.AbstractMouseEvent;
 import org.kie.workbench.common.stunner.core.client.shape.view.event.MouseClickEvent;
@@ -101,11 +100,11 @@ public class CreateConnectorToolboxAction
                                     edgeId)
                         .asEdge();
 
-        connectorProxy.setup(Arguments.create(canvasHandler,
-                                              connector,
-                                              sourceNode));
-
-        connectorProxy.enable(event);
+        connectorProxy
+                .setEdge(connector)
+                .setSourceNode(sourceNode)
+                .setCanvasHandler(canvasHandler)
+                .start(event);
     }
 
     @Override

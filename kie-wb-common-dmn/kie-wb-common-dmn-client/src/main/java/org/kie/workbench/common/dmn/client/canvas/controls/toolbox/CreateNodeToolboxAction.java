@@ -23,7 +23,7 @@ import javax.inject.Inject;
 import org.jboss.errai.ioc.client.api.ManagedInstance;
 import org.kie.workbench.common.dmn.api.qualifiers.DMNEditor;
 import org.kie.workbench.common.stunner.core.client.api.ClientFactoryManager;
-import org.kie.workbench.common.stunner.core.client.components.proxy.NodeProxy;
+import org.kie.workbench.common.stunner.core.client.components.proxies.NodeProxy;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.GeneralCreateNodeAction;
 import org.kie.workbench.common.stunner.core.client.i18n.ClientTranslationService;
 import org.kie.workbench.common.stunner.core.util.DefinitionUtils;

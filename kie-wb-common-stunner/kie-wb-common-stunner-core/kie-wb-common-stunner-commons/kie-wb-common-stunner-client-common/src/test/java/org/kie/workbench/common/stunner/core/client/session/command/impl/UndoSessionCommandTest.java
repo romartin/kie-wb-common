@@ -100,15 +100,14 @@ public class UndoSessionCommandTest extends BaseSessionCommandKeyboardTest {
     @Test
     @SuppressWarnings("unchecked")
     public void testExecuteSuccess() {
-        Command<AbstractCanvasHandler, CanvasViolation> lastEntry = mock(Command.class);
-        when(commandRegistry.peek()).thenReturn(lastEntry);
+        when(commandRegistry.isEmpty()).thenReturn(false);
         command.bind(session);
-        when(sessionCommandManager.undo(eq(canvasHandler), eq(lastEntry))).thenReturn(CanvasCommandResultBuilder.SUCCESS);
+        when(sessionCommandManager.undo(eq(canvasHandler))).thenReturn(CanvasCommandResultBuilder.SUCCESS);
 
         command.execute(callback);
 
         verify(sessionCommandManager,
-               times(1)).undo(eq(canvasHandler), eq(lastEntry));
+               times(1)).undo(eq(canvasHandler));
         verify(selectionControl,
                times(1)).clearSelection();
         verify(callback,
@@ -120,16 +119,15 @@ public class UndoSessionCommandTest extends BaseSessionCommandKeyboardTest {
     @Test
     @SuppressWarnings("unchecked")
     public void testExecuteWithErrors() {
-        Command<AbstractCanvasHandler, CanvasViolation> lastEntry = mock(Command.class);
-        when(commandRegistry.peek()).thenReturn(lastEntry);
+        when(commandRegistry.isEmpty()).thenReturn(false);
         command.bind(session);
-        when(sessionCommandManager.undo(eq(canvasHandler), eq(lastEntry))).thenReturn(commandResult);
+        when(sessionCommandManager.undo(eq(canvasHandler))).thenReturn(commandResult);
         when(commandResult.getType()).thenReturn(CommandResult.Type.ERROR);
 
         command.execute(callback);
 
         verify(sessionCommandManager,
-               times(1)).undo(eq(canvasHandler), eq(lastEntry));
+               times(1)).undo(eq(canvasHandler));
         verify(selectionControl,
                times(1)).clearSelection();
         verify(callback,

@@ -27,7 +27,7 @@ import org.jboss.errai.ioc.client.api.ManagedInstance;
 import org.kie.workbench.common.stunner.core.client.api.ClientFactoryManager;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
 import org.kie.workbench.common.stunner.core.client.canvas.util.CanvasLayoutUtils;
-import org.kie.workbench.common.stunner.core.client.components.proxy.NodeProxy;
+import org.kie.workbench.common.stunner.core.client.components.proxies.NodeProxy;
 import org.kie.workbench.common.stunner.core.client.i18n.ClientTranslationService;
 import org.kie.workbench.common.stunner.core.client.shape.view.event.MouseClickEvent;
 import org.kie.workbench.common.stunner.core.client.shape.view.event.MouseMoveEvent;
@@ -143,12 +143,12 @@ public class CreateNodeToolboxAction
                                     nodeId)
                         .asNode();
 
-        nodeProxy.setup(NodeProxy.Arguments.create(canvasHandler,
-                                                   targetNode,
-                                                   connector,
-                                                   sourceNode));
-
-        nodeProxy.enable(event);
+        nodeProxy
+                .setTargetNode(targetNode)
+                .setEdge(connector)
+                .setSourceNode(sourceNode)
+                .setCanvasHandler(canvasHandler)
+                .start(event);
 
         return this;
     }

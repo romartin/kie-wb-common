@@ -36,17 +36,17 @@ public class MouseRequestLifecycle implements CommandRequestLifecycle {
 
     @Override
     public void start() {
-        target.get().start();
+        getTarget().start();
     }
 
     @Override
     public void rollback() {
-        target.get().rollback();
+        getTarget().rollback();
     }
 
     @Override
     public void complete() {
-        target.get().complete();
+        getTarget().complete();
     }
 
     @PreDestroy
@@ -60,5 +60,9 @@ public class MouseRequestLifecycle implements CommandRequestLifecycle {
 
     void onMouseUp(final @Observes CanvasMouseUpEvent event) {
         complete();
+    }
+
+    CommandRequestLifecycle getTarget() {
+        return target.get();
     }
 }

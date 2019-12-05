@@ -80,9 +80,8 @@ public class UndoSessionCommand extends AbstractClientSessionCommand<EditorSessi
         checkNotNull("callback",
                      callback);
         final CommandRegistry<Command<AbstractCanvasHandler, CanvasViolation>> registry = getSession().getCommandRegistry();
-        final Command<AbstractCanvasHandler, CanvasViolation> lastEntry = registry.peek();
-        if (null != lastEntry) {
-            final CommandResult<CanvasViolation> result = sessionCommandManager.undo(getSession().getCanvasHandler(), lastEntry);
+        if (!registry.isEmpty()) {
+            final CommandResult<CanvasViolation> result = sessionCommandManager.undo(getSession().getCanvasHandler());
             checkState();
             if (CommandUtils.isError(result)) {
                 callback.onError((V) result);

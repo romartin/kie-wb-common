@@ -42,18 +42,18 @@ import org.kie.workbench.common.stunner.core.command.util.CommandUtils;
 
 @ApplicationScoped
 @Typed(SessionCommandManager.class)
-public class GlobalSessionCommandManager
+public class ApplicationCommandManager
         implements SessionCommandManager<AbstractCanvasHandler> {
 
     private final SessionManager sessionManager;
     private final MouseRequestLifecycle lifecycle;
-    private final ManagedInstance<CanvasSessionCommandManager> commandManagerInstances;
-    private final Map<String, CanvasSessionCommandManager> commandManagers;
+    private final ManagedInstance<RegistryAwareCommandManager> commandManagerInstances;
+    private final Map<String, RegistryAwareCommandManager> commandManagers;
 
     @Inject
-    public GlobalSessionCommandManager(final SessionManager sessionManager,
-                                       final MouseRequestLifecycle lifecycle,
-                                       final @Any ManagedInstance<CanvasSessionCommandManager> commandManagerInstances) {
+    public ApplicationCommandManager(final SessionManager sessionManager,
+                                     final MouseRequestLifecycle lifecycle,
+                                     final @Any ManagedInstance<RegistryAwareCommandManager> commandManagerInstances) {
         this.sessionManager = sessionManager;
         this.lifecycle = lifecycle;
         this.commandManagerInstances = commandManagerInstances;
@@ -110,17 +110,26 @@ public class GlobalSessionCommandManager
         return runSafeOperation(() -> getDelegate().undo(context, command));
     }
 
+    @Override
+    public CommandResult<CanvasViolation> undo(final AbstractCanvasHandler context) {
+        return runSafeOperation(() -> getDelegate().undo(context));
+    }
+
     @PreDestroy
     public void destroy() {
-        commandManagers.clear();
+        getCommandManagers().clear();
         commandManagerInstances.destroyAll();
     }
 
-    void onSessionDestroyedEvent(@Observes SessionDestroyedEvent event) {
+    void onSessionDestroyed(@Observes SessionDestroyedEvent event) {
         final String sessionUUID = event.getSessionUUID();
-        final CanvasSessionCommandManager commandManager = commandManagers.get(sessionUUID);
+        final RegistryAwareCommandManager commandManager = getCommandManagers().get(sessionUUID);
         commandManagerInstances.destroy(commandManager);
-        commandManagers.remove(sessionUUID);
+        getCommandManagers().remove(sessionUUID);
+    }
+
+    Map<String, RegistryAwareCommandManager> getCommandManagers() {
+        return commandManagers;
     }
 
     private CommandResult<CanvasViolation> runSafeOperation(final Supplier<CommandResult<CanvasViolation>> operation) {
@@ -154,13 +163,13 @@ public class GlobalSessionCommandManager
         return result;
     }
 
-    private CanvasSessionCommandManager getDelegate() {
+    private RegistryAwareCommandManager getDelegate() {
         final ClientSession session = getCurrentSession();
         final String sessionUUID = session.getSessionUUID();
-        CanvasSessionCommandManager commandManager = commandManagers.get(sessionUUID);
+        RegistryAwareCommandManager commandManager = getCommandManagers().get(sessionUUID);
         if (null == commandManager) {
             commandManager = commandManagerInstances.get().init(session);
-            commandManagers.put(sessionUUID, commandManager);
+            getCommandManagers().put(sessionUUID, commandManager);
         }
         return commandManager;
     }

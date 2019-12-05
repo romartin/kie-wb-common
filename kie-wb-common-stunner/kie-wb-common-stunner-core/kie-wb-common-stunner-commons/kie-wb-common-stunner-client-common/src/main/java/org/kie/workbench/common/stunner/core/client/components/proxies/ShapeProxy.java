@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2019 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.stunner.core.client.shape;
+package org.kie.workbench.common.stunner.core.client.components.proxies;
 
-public interface HasShapeState {
+public interface ShapeProxy {
 
-    /**
-     * Applies some pre-defined visual appearance, which is given by the <code>shapeState</code>.
-     */
-    void applyState(ShapeState shapeState);
+    void start(double x,
+               double y);
+
+    void destroy();
 }
