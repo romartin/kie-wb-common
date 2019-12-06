@@ -19,13 +19,16 @@ package org.kie.workbench.common.stunner.core.client.components.proxies;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.kie.workbench.common.stunner.core.client.ManagedInstanceStub;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
 import org.kie.workbench.common.stunner.core.client.canvas.Canvas;
+import org.kie.workbench.common.stunner.core.client.canvas.command.DefaultCanvasCommandFactory;
 import org.kie.workbench.common.stunner.core.client.canvas.event.selection.CanvasSelectionEvent;
 import org.kie.workbench.common.stunner.core.client.command.SessionCommandManager;
 import org.kie.workbench.common.stunner.core.client.shape.ElementShape;
 import org.kie.workbench.common.stunner.core.client.shape.ShapeState;
 import org.kie.workbench.common.stunner.core.command.Command;
+import org.kie.workbench.common.stunner.core.util.DefinitionUtils;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
@@ -49,6 +52,13 @@ public class ElementProxyTest {
     private static final String SHAPE_UUID = "proxyShape1";
 
     @Mock
+    private DefinitionUtils definitionUtils;
+
+    @Mock
+    private DefaultCanvasCommandFactory commandFactory;
+    private ManagedInstanceStub<DefaultCanvasCommandFactory> commandFactories;
+
+    @Mock
     private SessionCommandManager<AbstractCanvasHandler> commandManager;
 
     @Mock
@@ -68,10 +78,11 @@ public class ElementProxyTest {
 
     @Before
     public void setUp() {
+        commandFactories = new ManagedInstanceStub<>(commandFactory);
         when(proxyShape.getUUID()).thenReturn(SHAPE_UUID);
         when(canvasHandler.getCanvas()).thenReturn(canvas);
         view = spy(new ElementProxyViewMock<>());
-        tested = new ElementProxy(commandManager, selectionEvent)
+        tested = new ElementProxy(commandManager, selectionEvent, commandFactories, definitionUtils)
                 .setCanvasHandler(canvasHandler)
                 .setView(view)
                 .setProxyBuilder(() -> proxyShape);

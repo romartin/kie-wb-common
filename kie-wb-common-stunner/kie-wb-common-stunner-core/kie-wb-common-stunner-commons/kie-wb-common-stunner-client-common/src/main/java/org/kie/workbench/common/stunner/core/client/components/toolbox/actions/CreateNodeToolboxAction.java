@@ -21,6 +21,7 @@ import java.lang.annotation.Annotation;
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Any;
+import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 
 import org.jboss.errai.ioc.client.api.ManagedInstance;
@@ -49,30 +50,31 @@ import static org.kie.workbench.common.stunner.core.client.session.impl.Instance
  */
 @Dependent
 @FlowActionsToolbox
+@Default
 public class CreateNodeToolboxAction
         extends AbstractToolboxAction
         implements IsToolboxActionDraggable<AbstractCanvasHandler> {
 
     static final String KEY_TITLE = "org.kie.workbench.common.stunner.core.client.toolbox.createNewNode";
 
-    private final ManagedInstance<GeneralCreateNodeAction> actions;
-    private final NodeProxy nodeProxy;
+    private final ManagedInstance<GeneralCreateNodeAction> createNodeActions;
     private final ClientFactoryManager clientFactoryManager;
+    private final NodeProxy nodeProxy;
 
     private String nodeId;
     private String edgeId;
 
     @Inject
-    public CreateNodeToolboxAction(final DefinitionUtils definitionUtils,
+    public CreateNodeToolboxAction(final @Any ManagedInstance<GeneralCreateNodeAction> createNodeActions,
+                                   final DefinitionUtils definitionUtils,
                                    final ClientTranslationService translationService,
-                                   final @Any ManagedInstance<GeneralCreateNodeAction> actions,
-                                   final NodeProxy nodeProxy,
-                                   final ClientFactoryManager clientFactoryManager) {
+                                   final ClientFactoryManager clientFactoryManager,
+                                   final NodeProxy nodeProxy) {
         super(definitionUtils,
               translationService);
-        this.actions = actions;
-        this.nodeProxy = nodeProxy;
+        this.createNodeActions = createNodeActions;
         this.clientFactoryManager = clientFactoryManager;
+        this.nodeProxy = nodeProxy;
     }
 
     public String getNodeId() {
@@ -112,15 +114,19 @@ public class CreateNodeToolboxAction
     public ToolboxAction<AbstractCanvasHandler> onMouseClick(final AbstractCanvasHandler canvasHandler,
                                                              final String uuid,
                                                              final MouseClickEvent event) {
-        final Metadata metadata = canvasHandler.getDiagram().getMetadata();
-        final Annotation qualifier = getDefinitionUtils().getQualifier(metadata.getDefinitionSetId());
-        final GeneralCreateNodeAction action = lookup(actions, qualifier);
+        final GeneralCreateNodeAction action = lookupAction(canvasHandler, uuid);
         action.executeAction(canvasHandler,
                              uuid,
                              nodeId,
                              edgeId);
-
         return this;
+    }
+
+    private GeneralCreateNodeAction lookupAction(final AbstractCanvasHandler canvasHandler,
+                                                 final String uuid) {
+        final Metadata metadata = canvasHandler.getDiagram().getMetadata();
+        final Annotation qualifier = getDefinitionUtils().getQualifier(metadata.getDefinitionSetId());
+        return lookup(createNodeActions, qualifier);
     }
 
     @Override
@@ -128,26 +134,16 @@ public class CreateNodeToolboxAction
     public ToolboxAction<AbstractCanvasHandler> onMoveStart(final AbstractCanvasHandler canvasHandler,
                                                             final String uuid,
                                                             final MouseMoveEvent event) {
-        final Element<View<?>> sourceElement = (Element<View<?>>) CanvasLayoutUtils.getElement(canvasHandler,
-                                                                                               uuid);
-        final Node<View<?>, Edge> sourceNode = sourceElement.asNode();
-
-        final Edge<ViewConnector<?>, Node> connector =
-                (Edge<ViewConnector<?>, Node>) clientFactoryManager
-                        .newElement(UUID.uuid(),
-                                    edgeId)
-                        .asEdge();
-        final Node<View<?>, Edge> targetNode =
-                (Node<View<?>, Edge>) clientFactoryManager
-                        .newElement(UUID.uuid(),
-                                    nodeId)
-                        .asNode();
-
+        final GeneralCreateNodeAction action = lookupAction(canvasHandler, uuid);
+        final Node<View<?>, Edge> sourceNode = getSourceNode(canvasHandler, uuid);
+        final Edge<ViewConnector<?>, Node> connector = getEdge();
+        final Node<View<?>, Edge> targetNode = getTargetNode();
         nodeProxy
                 .setTargetNode(targetNode)
                 .setEdge(connector)
                 .setSourceNode(sourceNode)
                 .setCanvasHandler(canvasHandler)
+                .setMagnetConnectionBuilder(action::buildConnectionBetween)
                 .start(event);
 
         return this;
@@ -155,9 +151,34 @@ public class CreateNodeToolboxAction
 
     @PreDestroy
     public void destroy() {
+        createNodeActions.destroyAll();
         nodeProxy.destroy();
         nodeId = null;
         edgeId = null;
+    }
+
+    @SuppressWarnings("unchecked")
+    private Node<View<?>, Edge> getSourceNode(final AbstractCanvasHandler canvasHandler,
+                                              final String uuid) {
+        final Element<View<?>> sourceElement = (Element<View<?>>) CanvasLayoutUtils.getElement(canvasHandler,
+                                                                                               uuid);
+        return sourceElement.asNode();
+    }
+
+    @SuppressWarnings("unchecked")
+    private Edge<ViewConnector<?>, Node> getEdge() {
+        return (Edge<ViewConnector<?>, Node>) clientFactoryManager
+                .newElement(UUID.uuid(),
+                            edgeId)
+                .asEdge();
+    }
+
+    @SuppressWarnings("unchecked")
+    private Node<View<?>, Edge> getTargetNode() {
+        return (Node<View<?>, Edge>) clientFactoryManager
+                .newElement(UUID.uuid(),
+                            nodeId)
+                .asNode();
     }
 
     @Override

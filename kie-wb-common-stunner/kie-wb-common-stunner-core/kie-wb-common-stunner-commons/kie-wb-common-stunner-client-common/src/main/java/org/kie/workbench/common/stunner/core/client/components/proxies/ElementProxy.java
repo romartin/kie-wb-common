@@ -16,28 +16,38 @@
 
 package org.kie.workbench.common.stunner.core.client.components.proxies;
 
+import java.lang.annotation.Annotation;
 import java.util.function.Supplier;
 
 import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
+import javax.enterprise.inject.Any;
 import javax.inject.Inject;
 
+import org.jboss.errai.ioc.client.api.ManagedInstance;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
 import org.kie.workbench.common.stunner.core.client.canvas.Canvas;
+import org.kie.workbench.common.stunner.core.client.canvas.command.DefaultCanvasCommandFactory;
 import org.kie.workbench.common.stunner.core.client.canvas.event.selection.CanvasSelectionEvent;
+import org.kie.workbench.common.stunner.core.client.command.CanvasCommandFactory;
 import org.kie.workbench.common.stunner.core.client.command.CanvasViolation;
 import org.kie.workbench.common.stunner.core.client.command.SessionCommandManager;
 import org.kie.workbench.common.stunner.core.client.event.keyboard.KeyboardEvent;
+import org.kie.workbench.common.stunner.core.client.session.impl.InstanceUtils;
 import org.kie.workbench.common.stunner.core.client.shape.ElementShape;
 import org.kie.workbench.common.stunner.core.client.shape.ShapeState;
 import org.kie.workbench.common.stunner.core.command.Command;
 import org.kie.workbench.common.stunner.core.command.CommandResult;
+import org.kie.workbench.common.stunner.core.diagram.Diagram;
+import org.kie.workbench.common.stunner.core.util.DefinitionUtils;
 
 @Dependent
 public class ElementProxy implements ShapeProxy {
 
     private final SessionCommandManager<AbstractCanvasHandler> commandManager;
     private final Event<CanvasSelectionEvent> selectionEvent;
+    private final ManagedInstance<DefaultCanvasCommandFactory> commandFactories;
+    private final DefinitionUtils definitionUtils;
 
     private AbstractCanvasHandler canvasHandler;
     private ShapeProxyView<ElementShape> view;
@@ -45,9 +55,13 @@ public class ElementProxy implements ShapeProxy {
 
     @Inject
     public ElementProxy(final SessionCommandManager<AbstractCanvasHandler> commandManager,
-                        final Event<CanvasSelectionEvent> selectionEvent) {
+                        final Event<CanvasSelectionEvent> selectionEvent,
+                        final @Any ManagedInstance<DefaultCanvasCommandFactory> commandFactories,
+                        final DefinitionUtils definitionUtils) {
         this.commandManager = commandManager;
         this.selectionEvent = selectionEvent;
+        this.commandFactories = commandFactories;
+        this.definitionUtils = definitionUtils;
     }
 
     @SuppressWarnings("unchecked")
@@ -82,6 +96,7 @@ public class ElementProxy implements ShapeProxy {
         if (null != view) {
             view.destroy();
         }
+        commandFactories.destroyAll();
         canvasHandler = null;
         view = null;
         proxyBuilder = null;
@@ -120,5 +135,12 @@ public class ElementProxy implements ShapeProxy {
     private void destroyProxy(final ElementShape shape) {
         commandManager.rollback();
         commandManager.complete();
+    }
+
+    CanvasCommandFactory<AbstractCanvasHandler> lookupCanvasFactory() {
+        final Diagram diagram = getCanvasHandler().getDiagram();
+        final String id = diagram.getMetadata().getDefinitionSetId();
+        final Annotation qualifier = definitionUtils.getQualifier(id);
+        return InstanceUtils.lookup(commandFactories, qualifier);
     }
 }

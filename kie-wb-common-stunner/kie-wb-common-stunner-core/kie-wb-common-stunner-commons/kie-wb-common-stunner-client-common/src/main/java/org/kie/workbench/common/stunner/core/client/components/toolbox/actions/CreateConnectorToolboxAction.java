@@ -18,6 +18,7 @@ package org.kie.workbench.common.stunner.core.client.components.toolbox.actions;
 
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.Dependent;
+import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 
 import org.kie.workbench.common.stunner.core.client.api.ClientFactoryManager;
@@ -41,6 +42,7 @@ import org.kie.workbench.common.stunner.core.util.UUID;
  * toolbox's related node, to any other candidate canvas' node.
  */
 @Dependent
+@Default
 public class CreateConnectorToolboxAction
         extends AbstractToolboxAction
         implements IsToolboxActionDraggable<AbstractCanvasHandler> {

@@ -21,11 +21,12 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.kie.workbench.common.stunner.core.client.ManagedInstanceStub;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
 import org.kie.workbench.common.stunner.core.client.canvas.Canvas;
+import org.kie.workbench.common.stunner.core.client.canvas.command.DefaultCanvasCommandFactory;
 import org.kie.workbench.common.stunner.core.client.canvas.event.selection.CanvasSelectionEvent;
 import org.kie.workbench.common.stunner.core.client.command.CanvasCommand;
-import org.kie.workbench.common.stunner.core.client.command.CanvasCommandFactory;
 import org.kie.workbench.common.stunner.core.client.command.SessionCommandManager;
 import org.kie.workbench.common.stunner.core.client.event.keyboard.KeyDownEvent;
 import org.kie.workbench.common.stunner.core.client.event.keyboard.KeyboardEvent;
@@ -45,6 +46,7 @@ import org.kie.workbench.common.stunner.core.graph.content.view.ViewConnector;
 import org.kie.workbench.common.stunner.core.graph.content.view.ViewImpl;
 import org.kie.workbench.common.stunner.core.graph.impl.EdgeImpl;
 import org.kie.workbench.common.stunner.core.graph.impl.NodeImpl;
+import org.kie.workbench.common.stunner.core.util.DefinitionUtils;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -68,13 +70,17 @@ public class NodeProxyTest {
     private static final String EDGE_ID = "edge1";
 
     @Mock
+    private DefinitionUtils definitionUtils;
+
+    @Mock
     private SessionCommandManager<AbstractCanvasHandler> commandManager;
 
     @Mock
     private EventSourceMock<CanvasSelectionEvent> selectionEvent;
 
     @Mock
-    private CanvasCommandFactory<AbstractCanvasHandler> commandFactory;
+    private DefaultCanvasCommandFactory commandFactory;
+    private ManagedInstanceStub<DefaultCanvasCommandFactory> commandFactories;
 
     @Mock
     private AbstractCanvasHandler canvasHandler;
@@ -103,6 +109,7 @@ public class NodeProxyTest {
 
     @Before
     public void setUp() {
+        commandFactories = new ManagedInstanceStub<>(commandFactory);
         sourceNode = new NodeImpl<>("sourceNode");
         sourceNode.setContent(new ViewImpl<>(mock(Object.class),
                                              Bounds.create()));
@@ -110,7 +117,7 @@ public class NodeProxyTest {
         targetNode.setContent(new ViewImpl<>(mock(Object.class),
                                              Bounds.create()));
         edge = new EdgeImpl<>(EDGE_ID);
-        proxy = spy(new ElementProxy(commandManager, selectionEvent));
+        proxy = spy(new ElementProxy(commandManager, selectionEvent, commandFactories, definitionUtils));
         view = spy(new ElementProxyTest.ElementProxyViewMock<>());
         when(canvasHandler.getCanvas()).thenReturn(canvas);
         when(canvasHandler.getDiagram()).thenReturn(diagram);
@@ -118,7 +125,7 @@ public class NodeProxyTest {
         when(metadata.getShapeSetId()).thenReturn(SHAPE_SET_ID);
         when(canvas.getShape(eq(EDGE_ID))).thenReturn(connector);
         when(canvas.getShape(eq(TARGET_NODE_ID))).thenReturn(targetShape);
-        tested = new NodeProxy(proxy, view, commandFactory)
+        tested = new NodeProxy(proxy, view)
                 .setCanvasHandler(canvasHandler)
                 .setSourceNode(sourceNode)
                 .setEdge(edge)

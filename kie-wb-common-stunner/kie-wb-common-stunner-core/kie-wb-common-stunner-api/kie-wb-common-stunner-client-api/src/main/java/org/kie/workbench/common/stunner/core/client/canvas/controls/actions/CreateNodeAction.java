@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2019 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,18 @@
 package org.kie.workbench.common.stunner.core.client.canvas.controls.actions;
 
 import org.kie.workbench.common.stunner.core.client.canvas.CanvasHandler;
+import org.kie.workbench.common.stunner.core.graph.Edge;
+import org.kie.workbench.common.stunner.core.graph.Node;
+import org.kie.workbench.common.stunner.core.graph.content.view.Connection;
+import org.kie.workbench.common.stunner.core.graph.content.view.View;
 
 public interface CreateNodeAction<H extends CanvasHandler> {
 
-    void executeAction(final H canvasHandler,
-                       final String sourceNodeId,
-                       final String targetNodeId,
-                       final String connectorId);
+    void executeAction(H canvasHandler,
+                       String sourceNodeId,
+                       String targetNodeId,
+                       String connectorId);
+
+    Connection buildConnectionBetween(Node<View<?>, Edge> sourceNode,
+                                      Node<View<?>, Edge> targetNode);
 }

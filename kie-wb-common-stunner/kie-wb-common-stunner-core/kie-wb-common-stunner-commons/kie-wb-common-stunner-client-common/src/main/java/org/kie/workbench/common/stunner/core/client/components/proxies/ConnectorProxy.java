@@ -38,18 +38,15 @@ public class ConnectorProxy implements ShapeProxy {
 
     private final ElementProxy proxy;
     private final ShapeProxyView<EdgeShape> view;
-    private final CanvasCommandFactory<AbstractCanvasHandler> commandFactory;
 
     private Edge<? extends ViewConnector<?>, Node> edge;
     private Node<? extends View<?>, Edge> sourceNode;
 
     @Inject
     public ConnectorProxy(final ElementProxy proxy,
-                          final ShapeProxyView<EdgeShape> view,
-                          final CanvasCommandFactory<AbstractCanvasHandler> commandFactory) {
+                          final ShapeProxyView<EdgeShape> view) {
         this.proxy = proxy;
         this.view = view;
-        this.commandFactory = commandFactory;
     }
 
     @PostConstruct
@@ -93,6 +90,7 @@ public class ConnectorProxy implements ShapeProxy {
     }
 
     private EdgeShape onCreateProxy() {
+        final CanvasCommandFactory<AbstractCanvasHandler> commandFactory = proxy.lookupCanvasFactory();
         proxy.execute(commandFactory.addConnector(sourceNode,
                                                   edge,
                                                   MagnetConnection.Builder.atCenter(sourceNode),
