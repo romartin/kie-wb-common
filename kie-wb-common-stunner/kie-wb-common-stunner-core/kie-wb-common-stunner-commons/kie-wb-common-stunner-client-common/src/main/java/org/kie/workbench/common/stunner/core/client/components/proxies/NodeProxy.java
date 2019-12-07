@@ -131,7 +131,6 @@ public class NodeProxy implements ShapeProxy {
                                                                               edge,
                                                                               magnetConnectionBuilder.apply(sourceNode, targetNode),
                                                                               getShapeSetId()))
-                              // TODO: BPMN should provide an specific different magnet approach...
                               .deferCommand(() -> commandFactory.setTargetNode(targetNode,
                                                                                edge,
                                                                                magnetConnectionBuilder.apply(targetNode, sourceNode)))

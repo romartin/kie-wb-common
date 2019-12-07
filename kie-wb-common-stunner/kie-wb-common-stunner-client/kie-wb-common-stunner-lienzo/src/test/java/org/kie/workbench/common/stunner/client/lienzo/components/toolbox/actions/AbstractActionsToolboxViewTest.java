@@ -16,7 +16,7 @@
 
 package org.kie.workbench.common.stunner.client.lienzo.components.toolbox.actions;
 
-import java.util.function.Consumer;
+import java.util.Collections;
 
 import com.ait.lienzo.client.core.event.NodeMouseEnterEvent;
 import com.ait.lienzo.client.core.event.NodeMouseEnterHandler;
@@ -36,6 +36,7 @@ import com.ait.lienzo.client.core.shape.toolbox.items.impl.ToolboxFactory;
 import com.ait.lienzo.client.core.shape.toolbox.items.impl.WiresShapeToolbox;
 import com.ait.lienzo.client.core.shape.toolbox.items.tooltip.ToolboxTextTooltip;
 import com.ait.lienzo.client.core.shape.toolbox.items.tooltip.TooltipFactory;
+import com.ait.lienzo.client.core.shape.toolbox.items.util.ItemsToolboxHighlight;
 import com.ait.lienzo.client.core.shape.wires.WiresShape;
 import com.ait.lienzo.client.core.types.BoundingBox;
 import com.ait.lienzo.client.core.types.Point2D;
@@ -46,13 +47,11 @@ import org.kie.workbench.common.stunner.client.lienzo.canvas.wires.WiresLayer;
 import org.kie.workbench.common.stunner.client.lienzo.components.glyph.LienzoGlyphRenderers;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvas;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.ActionsToolbox;
-import org.kie.workbench.common.stunner.core.client.shape.view.event.MouseClickEvent;
 import org.kie.workbench.common.stunner.core.definition.shape.Glyph;
 import org.mockito.ArgumentCaptor;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyDouble;
-import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
@@ -79,6 +78,7 @@ public abstract class AbstractActionsToolboxViewTest {
     protected ButtonItemImpl buttonItem;
     protected BoxDecorator boxDecorator;
     protected ToolboxTextTooltip toolboxTooltip;
+    protected ItemsToolboxHighlight toolboxHighlight;
     protected Group glyphView;
 
     @SuppressWarnings("unchecked")
@@ -100,6 +100,7 @@ public abstract class AbstractActionsToolboxViewTest {
         buttonItem = mock(ButtonItemImpl.class);
         boxDecorator = mock(BoxDecorator.class);
         toolboxTooltip = mock(ToolboxTextTooltip.class);
+        toolboxHighlight = mock(ItemsToolboxHighlight.class);
         glyphView = mock(Group.class);
         when(canvas.getView()).thenReturn(canvasView);
         when(canvasView.getLayer()).thenReturn(wiresLayer);
@@ -135,7 +136,8 @@ public abstract class AbstractActionsToolboxViewTest {
         when(toolboxTooltip.setText(anyString())).thenReturn(toolboxTooltip);
         when(toolboxTooltip.forComputedBoundingBox(any(com.ait.tooling.common.api.java.util.function.Supplier.class))).thenReturn(toolboxTooltip);
         when(toolboxTooltip.withText(any(com.ait.tooling.common.api.java.util.function.Consumer.class))).thenReturn(toolboxTooltip);
-        when(toolbox.size()).thenReturn(2);
+        when(toolbox.size()).thenReturn(0);
+        when(toolbox.iterator()).thenReturn(Collections.emptyIterator());
         when(glyphRenderers.render(any(Glyph.class),
                                    anyDouble(),
                                    anyDouble()))
@@ -143,10 +145,10 @@ public abstract class AbstractActionsToolboxViewTest {
     }
 
     @SuppressWarnings("unchecked")
-    protected void testAddButton(final Consumer<MouseClickEvent> clickEventConsumer) {
+    protected void testAddButton(final String title) {
         // Verify tootlip.
         verify(toolboxTooltip,
-               times(1)).createItem(eq("title1"));
+               times(1)).createItem(eq(title));
         verify(buttonItem,
                times(1)).tooltip(any(TooltipItem.class));
         // Verify mouse enter.
@@ -169,14 +171,5 @@ public abstract class AbstractActionsToolboxViewTest {
         exitHandler.onNodeMouseExit(mouseExitEvent);
         verify(canvasView,
                times(1)).setCursor(eq(AbstractCanvas.Cursors.DEFAULT));
-        // Verify mouse click.
-        final ArgumentCaptor<com.ait.tooling.common.api.java.util.function.Consumer> clickHandlerArgumentCaptor =
-                ArgumentCaptor.forClass(com.ait.tooling.common.api.java.util.function.Consumer.class);
-        verify(buttonItem,
-               times(1)).onClick(clickHandlerArgumentCaptor.capture());
-        final com.ait.tooling.common.api.java.util.function.Consumer clickHandler = clickHandlerArgumentCaptor.getValue();
-        clickHandler.accept(anyObject());
-        verify(clickEventConsumer,
-               times(1)).accept(any(MouseClickEvent.class));
     }
 }

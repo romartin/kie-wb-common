@@ -29,10 +29,12 @@ import com.ait.lienzo.client.core.shape.toolbox.items.DecoratorItem;
 import com.ait.lienzo.client.core.shape.toolbox.items.TooltipItem;
 import com.ait.lienzo.client.core.shape.toolbox.items.decorator.BoxDecorator;
 import com.ait.lienzo.client.core.types.BoundingBox;
+import com.ait.lienzo.test.LienzoMockitoTestRunner;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.kie.workbench.common.stunner.core.client.shape.view.event.MouseClickEvent;
+import org.kie.workbench.common.stunner.core.definition.shape.Glyph;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 
@@ -45,8 +47,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-// TODO: @RunWith(LienzoMockitoTestRunner.class)
-@Ignore
+@RunWith(LienzoMockitoTestRunner.class)
 public class MorphActionsToolboxViewTest
         extends AbstractActionsToolboxViewTest {
 
@@ -62,6 +63,7 @@ public class MorphActionsToolboxViewTest
     @SuppressWarnings("unchecked")
     public void setup() throws Exception {
         super.init();
+        when(toolbox.size()).thenReturn(2);
         when(buttonsFactory.dropRight(any(Group.class))).thenReturn(buttonGridItem);
         when(decoratorsFactory.button()).thenReturn(buttonDecorator);
         when(buttonDecorator.configure(any(com.ait.tooling.common.api.java.util.function.Consumer.class))).thenReturn(buttonDecorator);
@@ -99,11 +101,9 @@ public class MorphActionsToolboxViewTest
     public void testAddButton() {
         doInit();
         final Consumer<MouseClickEvent> eventConsumer = mock(Consumer.class);
-        // TODO: fix properly.
-        /*tested.addButton(mock(Glyph.class),
-                         "title1",
-                         eventConsumer);*/
-        super.testAddButton(eventConsumer);
+        tested.addButton(mock(Glyph.class),
+                         "title1");
+        super.testAddButton("title1");
     }
 
     @Test

@@ -18,6 +18,7 @@ package org.kie.workbench.common.stunner.client.lienzo.components.toolbox.action
 
 import java.util.Optional;
 
+import com.ait.lienzo.client.core.event.AbstractNodeMouseEvent;
 import com.ait.lienzo.client.core.shape.Group;
 import com.ait.lienzo.client.core.shape.Layer;
 import com.ait.lienzo.client.core.shape.Text;
@@ -119,38 +120,45 @@ public abstract class AbstractActionsToolboxView<V extends AbstractActionsToolbo
         for (ToolboxAction toolboxAction : toolbox) {
             final ButtonItem button = addButton(toolbox.getGlyph(toolboxAction),
                                                 toolbox.getTitle(toolboxAction));
-            // TODO final ItemsToolboxHighlight highlight = new ItemsToolboxHighlight(toolboxView);
             button.onClick(event -> {
-                // Highlight the toolbox button once cliking on it. No need to call restore after this,
-                // because Stunner actually destroys and recreates the toolbox after click
-                // (so after some command has been executed).
-                // TODO highlight.highlight(button);
-                toolboxAction.onMouseClick(toolbox.getCanvasHandler(),
-                                           toolbox.getElementUUID(),
-                                           new MouseClickEvent(event.getX(),
-                                                               event.getY(),
-                                                               event.getMouseEvent().getClientX(),
-                                                               event.getMouseEvent().getClientY()));
+                onButtonClick(toolbox, toolboxAction, button, event);
             });
             if (toolboxAction instanceof IsToolboxActionDraggable) {
-                final IsToolboxActionDraggable draggableAction = (IsToolboxActionDraggable) toolboxAction;
-
-                button
-                        .onMoveStart(event -> {
-                            // TODO highlight.highlight(button);
-                            draggableAction.onMoveStart(toolbox.getCanvasHandler(),
-                                                        toolbox.getElementUUID(),
-                                                        new MouseMoveEvent(event.getX(),
-                                                                           event.getY(),
-                                                                           event.getMouseEvent().getClientX(),
-                                                                           event.getMouseEvent().getClientY()));
-                        });
+                button.onMoveStart(event -> {
+                    onButtonMoveStart(toolbox, (IsToolboxActionDraggable) toolboxAction, button, event);
+                });
             }
         }
     }
 
-    private ButtonItem addButton(Glyph glyph,
-                                 String title) {
+    @SuppressWarnings("unchecked")
+    protected void onButtonClick(final ActionsToolbox<ActionsToolboxView<?>> toolbox,
+                                 final ToolboxAction toolboxAction,
+                                 final ButtonItem button,
+                                 final AbstractNodeMouseEvent event) {
+        toolboxAction.onMouseClick(toolbox.getCanvasHandler(),
+                                   toolbox.getElementUUID(),
+                                   new MouseClickEvent(event.getX(),
+                                                       event.getY(),
+                                                       event.getMouseEvent().getClientX(),
+                                                       event.getMouseEvent().getClientY()));
+    }
+
+    @SuppressWarnings("unchecked")
+    protected void onButtonMoveStart(final ActionsToolbox<ActionsToolboxView<?>> toolbox,
+                                     final IsToolboxActionDraggable toolboxAction,
+                                     final ButtonItem button,
+                                     final AbstractNodeMouseEvent event) {
+        toolboxAction.onMoveStart(toolbox.getCanvasHandler(),
+                                  toolbox.getElementUUID(),
+                                  new MouseMoveEvent(event.getX(),
+                                                     event.getY(),
+                                                     event.getMouseEvent().getClientX(),
+                                                     event.getMouseEvent().getClientY()));
+    }
+
+    ButtonItem addButton(final Glyph glyph,
+                         final String title) {
         final ButtonItem button =
                 toolboxFactory.buttons()
                         .button(renderGlyph(glyph,
