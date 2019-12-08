@@ -29,6 +29,7 @@ import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler
 import org.kie.workbench.common.stunner.core.client.canvas.Canvas;
 import org.kie.workbench.common.stunner.core.client.canvas.command.DefaultCanvasCommandFactory;
 import org.kie.workbench.common.stunner.core.client.canvas.event.selection.CanvasSelectionEvent;
+import org.kie.workbench.common.stunner.core.client.canvas.util.CanvasLayoutUtils;
 import org.kie.workbench.common.stunner.core.client.command.CanvasCommandFactory;
 import org.kie.workbench.common.stunner.core.client.command.CanvasViolation;
 import org.kie.workbench.common.stunner.core.client.command.SessionCommandManager;
@@ -129,7 +130,9 @@ public class ElementProxy implements ShapeProxy {
 
     private void acceptProxy(final ElementShape shape) {
         commandManager.complete();
-        selectionEvent.fire(new CanvasSelectionEvent(canvasHandler, shape.getUUID()));
+        CanvasLayoutUtils.fireElementSelectedEvent(selectionEvent,
+                                                   canvasHandler,
+                                                   shape.getUUID());
     }
 
     private void destroyProxy(final ElementShape shape) {

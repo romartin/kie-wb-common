@@ -16,12 +16,13 @@
 
 package org.kie.workbench.common.stunner.core.client.components.proxies;
 
+import com.google.gwtmockito.GwtMockitoTestRunner;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.workbench.common.stunner.core.client.ManagedInstanceStub;
+import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvas;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
-import org.kie.workbench.common.stunner.core.client.canvas.Canvas;
 import org.kie.workbench.common.stunner.core.client.canvas.command.DefaultCanvasCommandFactory;
 import org.kie.workbench.common.stunner.core.client.canvas.event.selection.CanvasSelectionEvent;
 import org.kie.workbench.common.stunner.core.client.command.SessionCommandManager;
@@ -32,7 +33,6 @@ import org.kie.workbench.common.stunner.core.util.DefinitionUtils;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.uberfire.mocks.EventSourceMock;
 
 import static org.junit.Assert.assertEquals;
@@ -46,7 +46,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(GwtMockitoTestRunner.class)
 public class ElementProxyTest {
 
     private static final String SHAPE_UUID = "proxyShape1";
@@ -68,7 +68,7 @@ public class ElementProxyTest {
     private AbstractCanvasHandler canvasHandler;
 
     @Mock
-    private Canvas canvas;
+    private AbstractCanvas canvas;
 
     @Mock
     private ElementShape proxyShape;
@@ -81,6 +81,7 @@ public class ElementProxyTest {
         commandFactories = new ManagedInstanceStub<>(commandFactory);
         when(proxyShape.getUUID()).thenReturn(SHAPE_UUID);
         when(canvasHandler.getCanvas()).thenReturn(canvas);
+        when(canvasHandler.getAbstractCanvas()).thenReturn(canvas);
         view = spy(new ElementProxyViewMock<>());
         tested = new ElementProxy(commandManager, selectionEvent, commandFactories, definitionUtils)
                 .setCanvasHandler(canvasHandler)

@@ -134,7 +134,6 @@ public class CreateNodeToolboxAction
     public ToolboxAction<AbstractCanvasHandler> onMoveStart(final AbstractCanvasHandler canvasHandler,
                                                             final String uuid,
                                                             final MouseMoveEvent event) {
-        final GeneralCreateNodeAction action = lookupAction(canvasHandler, uuid);
         final Node<View<?>, Edge> sourceNode = getSourceNode(canvasHandler, uuid);
         final Edge<ViewConnector<?>, Node> connector = getEdge();
         final Node<View<?>, Edge> targetNode = getTargetNode();
@@ -143,7 +142,6 @@ public class CreateNodeToolboxAction
                 .setEdge(connector)
                 .setSourceNode(sourceNode)
                 .setCanvasHandler(canvasHandler)
-                .setMagnetConnectionBuilder(action::buildConnectionBetween)
                 .start(event);
 
         return this;

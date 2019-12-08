@@ -16,8 +16,6 @@
 
 package org.kie.workbench.common.stunner.core.client.components.proxies;
 
-import java.util.function.BiFunction;
-
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Observes;
@@ -46,7 +44,6 @@ public class NodeProxy implements ShapeProxy {
     private final ElementProxy proxy;
     private final ShapeProxyView<NodeShape> view;
 
-    private BiFunction<Node, Node, MagnetConnection> magnetConnectionBuilder;
     private Node<View<?>, Edge> targetNode;
     private Edge<ViewConnector<?>, Node> edge;
     private Node<View<?>, Edge> sourceNode;
@@ -56,7 +53,6 @@ public class NodeProxy implements ShapeProxy {
                      final ShapeProxyView<NodeShape> view) {
         this.proxy = proxy;
         this.view = view;
-        this.magnetConnectionBuilder = MagnetConnection.Builder::forTarget;
     }
 
     @PostConstruct
@@ -64,11 +60,6 @@ public class NodeProxy implements ShapeProxy {
         proxy
                 .setView(view)
                 .setProxyBuilder(this::onCreateProxy);
-    }
-
-    public NodeProxy setMagnetConnectionBuilder(final BiFunction<Node, Node, MagnetConnection> magnetConnectionBuilder) {
-        this.magnetConnectionBuilder = magnetConnectionBuilder;
-        return this;
     }
 
     public NodeProxy setCanvasHandler(final AbstractCanvasHandler canvasHandler) {
@@ -108,7 +99,6 @@ public class NodeProxy implements ShapeProxy {
         targetNode = null;
         edge = null;
         sourceNode = null;
-        magnetConnectionBuilder = null;
     }
 
     void onKeyDownEvent(final @Observes KeyDownEvent event) {
@@ -129,11 +119,11 @@ public class NodeProxy implements ShapeProxy {
                                                              getShapeSetId()))
                               .deferCommand(() -> commandFactory.addConnector(sourceNode,
                                                                               edge,
-                                                                              magnetConnectionBuilder.apply(sourceNode, targetNode),
+                                                                              MagnetConnection.Builder.atCenter(sourceNode),
                                                                               getShapeSetId()))
                               .deferCommand(() -> commandFactory.setTargetNode(targetNode,
                                                                                edge,
-                                                                               magnetConnectionBuilder.apply(targetNode, sourceNode)))
+                                                                               MagnetConnection.Builder.forTarget(sourceNode, targetNode)))
                               .build());
 
         final Canvas canvas = proxy.getCanvas();

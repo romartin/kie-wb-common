@@ -57,8 +57,8 @@ public class BPMNCreateNodeAction extends GeneralCreateNodeAction {
     }
 
     @Override
-    public MagnetConnection buildConnectionBetween(final Node<View<?>, Edge> sourceNode,
-                                                   final Node<View<?>, Edge> targetNode) {
+    protected MagnetConnection buildConnectionBetween(final Node<View<?>, Edge> sourceNode,
+                                                      final Node<View<?>, Edge> targetNode) {
         final MagnetConnection connection = super.buildConnectionBetween(sourceNode, targetNode);
         connection.setAuto(isAutoMagnetConnection(sourceNode, targetNode));
         return connection;
@@ -74,6 +74,6 @@ public class BPMNCreateNodeAction extends GeneralCreateNodeAction {
     }
 
     private static boolean isGateway(final Object bean) {
-        return null != bean && bean instanceof BaseGateway;
+        return bean instanceof BaseGateway;
     }
 }

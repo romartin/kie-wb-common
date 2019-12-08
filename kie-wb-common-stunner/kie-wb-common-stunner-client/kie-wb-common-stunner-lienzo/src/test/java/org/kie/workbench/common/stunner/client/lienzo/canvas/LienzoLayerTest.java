@@ -44,7 +44,7 @@ import static org.mockito.Mockito.when;
 public class LienzoLayerTest {
 
     @Mock
-    private Layer layer;
+    private LienzoLayer.LienzoCustomLayer layer;
     @Mock
     private Scene scene;
     @Mock

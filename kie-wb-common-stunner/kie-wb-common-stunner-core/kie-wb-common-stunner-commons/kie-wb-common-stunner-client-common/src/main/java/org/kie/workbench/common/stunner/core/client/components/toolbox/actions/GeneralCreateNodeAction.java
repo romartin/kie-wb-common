@@ -164,9 +164,8 @@ public class GeneralCreateNodeAction implements CreateNodeAction<AbstractCanvasH
                                            canvasHandler.getDiagram().getMetadata().getShapeSetId());
     }
 
-    @Override
-    public MagnetConnection buildConnectionBetween(final Node<View<?>, Edge> sourceNode,
-                                                   final Node<View<?>, Edge> targetNode) {
+    protected MagnetConnection buildConnectionBetween(final Node<View<?>, Edge> sourceNode,
+                                                      final Node<View<?>, Edge> targetNode) {
         return MagnetConnection.Builder.forTarget(sourceNode, targetNode);
     }
 

@@ -17,10 +17,6 @@
 package org.kie.workbench.common.stunner.core.client.canvas.controls.actions;
 
 import org.kie.workbench.common.stunner.core.client.canvas.CanvasHandler;
-import org.kie.workbench.common.stunner.core.graph.Edge;
-import org.kie.workbench.common.stunner.core.graph.Node;
-import org.kie.workbench.common.stunner.core.graph.content.view.Connection;
-import org.kie.workbench.common.stunner.core.graph.content.view.View;
 
 public interface CreateNodeAction<H extends CanvasHandler> {
 
@@ -28,7 +24,4 @@ public interface CreateNodeAction<H extends CanvasHandler> {
                        String sourceNodeId,
                        String targetNodeId,
                        String connectorId);
-
-    Connection buildConnectionBetween(Node<View<?>, Edge> sourceNode,
-                                      Node<View<?>, Edge> targetNode);
 }
