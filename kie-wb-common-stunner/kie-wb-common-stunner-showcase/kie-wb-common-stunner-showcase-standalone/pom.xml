@@ -923,34 +923,6 @@
 
   <profiles>
 
-    <!-- Full profile builds all GWT permutations -->
-    <profile>
-      <id>fullProfile</id>
-      <activation>
-        <property>
-          <name>full</name>
-        </property>
-      </activation>
-      <properties>
-        <gwt.memory.settings>-Xmx3g -Xms1g -Xss1M</gwt.memory.settings>
-        <gwt.compiler.localWorkers>4</gwt.compiler.localWorkers>
-      </properties>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.codehaus.mojo</groupId>
-              <artifactId>gwt-maven-plugin</artifactId>
-              <configuration>
-                <module>org.kie.workbench.common.stunner.standalone.StunnerStandaloneShowcase</module>
-                <draftCompile>false</draftCompile>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
-
     <!-- Fast compiled build including Source maps for easier debugging. -->
     <profile>
       <id>sources</id>
