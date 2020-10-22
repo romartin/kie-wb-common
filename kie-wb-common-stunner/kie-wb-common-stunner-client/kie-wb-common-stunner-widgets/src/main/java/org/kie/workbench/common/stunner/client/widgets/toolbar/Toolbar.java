@@ -18,6 +18,8 @@ package org.kie.workbench.common.stunner.client.widgets.toolbar;
 
 import org.kie.workbench.common.stunner.core.client.session.ClientSession;
 
+// TODO: Drop all toolbar stuff.
+
 public interface Toolbar<S extends ClientSession> {
 
     void load(S session);

@@ -16,51 +16,36 @@
 
 package org.kie.workbench.common.stunner.kogito.client.editor;
 
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwtmockito.GwtMockitoTestRunner;
-import org.jboss.errai.ioc.client.api.ManagedInstance;
+import elemental2.promise.Promise;
+import org.appformer.client.context.EditorContextProvider;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.kie.workbench.common.kogito.client.editor.MultiPageEditorContainerView;
-import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionPresenter;
-import org.kie.workbench.common.stunner.client.widgets.presenters.session.impl.SessionEditorPresenter;
-import org.kie.workbench.common.stunner.client.widgets.presenters.session.impl.SessionViewerPresenter;
+import org.kie.workbench.common.stunner.client.widgets.editor.StunnerEditor;
+import org.kie.workbench.common.stunner.core.client.canvas.CanvasHandler;
 import org.kie.workbench.common.stunner.core.client.canvas.util.CanvasFileExport;
-import org.kie.workbench.common.stunner.core.client.components.layout.LayoutHelper;
-import org.kie.workbench.common.stunner.core.client.components.layout.OpenDiagramLayoutExecutor;
-import org.kie.workbench.common.stunner.core.client.error.DiagramClientErrorHandler;
-import org.kie.workbench.common.stunner.core.client.i18n.ClientTranslationService;
 import org.kie.workbench.common.stunner.core.client.session.ClientSession;
-import org.kie.workbench.common.stunner.core.client.session.impl.EditorSession;
-import org.kie.workbench.common.stunner.core.client.session.impl.ViewerSession;
-import org.kie.workbench.common.stunner.core.diagram.Diagram;
-import org.kie.workbench.common.stunner.core.diagram.Metadata;
-import org.kie.workbench.common.stunner.core.documentation.DocumentationView;
-import org.kie.workbench.common.stunner.forms.client.event.FormPropertiesOpened;
+import org.kie.workbench.common.stunner.core.diagram.DiagramImpl;
+import org.kie.workbench.common.stunner.core.diagram.MetadataImpl;
+import org.kie.workbench.common.stunner.core.graph.Graph;
 import org.kie.workbench.common.stunner.forms.client.widgets.FormsFlushManager;
-import org.kie.workbench.common.stunner.kogito.api.editor.impl.KogitoDiagramResourceImpl;
 import org.kie.workbench.common.stunner.kogito.client.docks.DiagramEditorPreviewAndExplorerDock;
 import org.kie.workbench.common.stunner.kogito.client.docks.DiagramEditorPropertiesDock;
-import org.kie.workbench.common.stunner.kogito.client.editor.event.OnDiagramFocusEvent;
-import org.kie.workbench.common.stunner.kogito.client.menus.BPMNStandaloneEditorMenuSessionItems;
 import org.kie.workbench.common.stunner.kogito.client.perspectives.AuthoringPerspective;
 import org.kie.workbench.common.stunner.kogito.client.service.AbstractKogitoClientDiagramService;
-import org.kie.workbench.common.widgets.client.menu.FileMenuBuilder;
-import org.mockito.InOrder;
 import org.mockito.Mock;
-import org.uberfire.client.mvp.PlaceManager;
 import org.uberfire.client.promise.Promises;
-import org.uberfire.client.workbench.events.ChangeTitleWidgetEvent;
-import org.uberfire.client.workbench.widgets.common.ErrorPopupPresenter;
 import org.uberfire.ext.widgets.core.client.editors.texteditor.TextEditorView;
-import org.uberfire.mocks.EventSourceMock;
+import org.uberfire.mvp.impl.DefaultPlaceRequest;
 import org.uberfire.promise.SyncPromises;
-import org.uberfire.workbench.events.NotificationEvent;
 
-import static org.jgroups.util.Util.assertEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -68,125 +53,144 @@ import static org.mockito.Mockito.when;
 @RunWith(GwtMockitoTestRunner.class)
 public class BPMNDiagramEditorTest {
 
-    private static final String ELEMENTUUID = "ElementUUID";
-
-    private BPMNDiagramEditor editor;
-
+    private Promises promises;
     @Mock
-    private DiagramEditorCore.View view;
-
+    private EditorContextProvider editorContextProvider;
     @Mock
-    private FileMenuBuilder fileMenuBuilder;
-
-    @Mock
-    private PlaceManager placeManager;
-
-    @Mock
-    private MultiPageEditorContainerView multiPageEditorContainerView;
-
-    @Mock
-    private EventSourceMock<ChangeTitleWidgetEvent> changeTitleNotificationEvent;
-
-    @Mock
-    private EventSourceMock<NotificationEvent> notificationEvent;
-
-    @Mock
-    private EventSourceMock<OnDiagramFocusEvent> onDiagramFocusEvent;
-
-    @Mock
-    private TextEditorView xmlEditorView;
-
-    @Mock
-    private ManagedInstance<SessionEditorPresenter<EditorSession>> editorSessionPresenterInstances;
-
-    @Mock
-    private ManagedInstance<SessionViewerPresenter<ViewerSession>> viewerSessionPresenterInstances;
-
-    @Mock
-    private BPMNStandaloneEditorMenuSessionItems menuSessionItems;
-
-    @Mock
-    private ErrorPopupPresenter errorPopupPresenter;
-
-    @Mock
-    private DiagramClientErrorHandler diagramClientErrorHandler;
-
-    @Mock
-    private ClientTranslationService translationService;
-
-    @Mock
-    private DocumentationView documentationView;
-
-    @Mock
-    private DiagramEditorPreviewAndExplorerDock diagramPreviewAndExplorerDock;
-
-    @Mock
-    private DiagramEditorPropertiesDock diagramPropertiesDock;
-
-    @Mock
-    private LayoutHelper layoutHelper;
-
-    @Mock
-    private OpenDiagramLayoutExecutor openDiagramLayoutExecutor;
-
+    private StunnerEditor stunnerEditor;
     @Mock
     private AbstractKogitoClientDiagramService diagramServices;
-
     @Mock
     private CanvasFileExport canvasFileExport;
-
+    @Mock
+    private DiagramEditorPreviewAndExplorerDock diagramPreviewAndExplorerDock;
+    @Mock
+    private DiagramEditorPropertiesDock diagramPropertiesDock;
     @Mock
     private FormsFlushManager formsFlushManager;
-
     @Mock
-    private SessionPresenter sessionPresenter;
-
+    private ClientSession session;
     @Mock
-    private ClientSession clientSession;
+    private CanvasHandler canvasHandler;
+    private DiagramImpl diagram;
 
-    private Promises promises = new SyncPromises();
+    private BPMNDiagramEditor tested;
 
-    @SuppressWarnings("unchecked")
     @Before
-    public void setUp() {
-        editor = spy(new BPMNDiagramEditor(view,
-                                           fileMenuBuilder,
-                                           placeManager,
-                                           multiPageEditorContainerView,
-                                           changeTitleNotificationEvent,
-                                           notificationEvent,
-                                           onDiagramFocusEvent,
-                                           xmlEditorView,
-                                           editorSessionPresenterInstances,
-                                           viewerSessionPresenterInstances,
-                                           menuSessionItems,
-                                           errorPopupPresenter,
-                                           diagramClientErrorHandler,
-                                           translationService,
-                                           documentationView,
-                                           diagramPreviewAndExplorerDock,
-                                           diagramPropertiesDock,
-                                           layoutHelper,
-                                           openDiagramLayoutExecutor,
-                                           diagramServices,
-                                           formsFlushManager,
-                                           canvasFileExport,
-                                           promises));
-
-        when(editor.getSessionPresenter()).thenReturn(sessionPresenter);
-        when(sessionPresenter.getInstance()).thenReturn(clientSession);
+    @SuppressWarnings("unchecked")
+    public void setup() {
+        promises = new SyncPromises();
+        diagram = new DiagramImpl("testDiagram",
+                                  mock(Graph.class),
+                                  new MetadataImpl.MetadataImplBuilder("testSet").build());
+        when(session.getCanvasHandler()).thenReturn(canvasHandler);
+        when(canvasHandler.getDiagram()).thenReturn(diagram);
+        when(stunnerEditor.getSession()).thenReturn(session);
+        when(stunnerEditor.getCanvasHandler()).thenReturn(canvasHandler);
+        when(stunnerEditor.getDiagram()).thenReturn(diagram);
+        tested = new BPMNDiagramEditor(promises,
+                                       editorContextProvider,
+                                       stunnerEditor,
+                                       diagramServices,
+                                       canvasFileExport,
+                                       diagramPreviewAndExplorerDock,
+                                       diagramPropertiesDock,
+                                       formsFlushManager);
     }
 
     @Test
-    public void testMenuInitialized() {
-        editor.menuBarInitialized = false;
-        editor.makeMenuBar();
-        assertEquals(editor.menuBarInitialized, true);
-
-        editor.menuBarInitialized = true;
-        editor.makeMenuBar();
-        assertEquals(editor.menuBarInitialized, true);
+    public void testStartup() {
+        when(editorContextProvider.isReadOnly()).thenReturn(false);
+        tested.onStartup(new DefaultPlaceRequest());
+        verify(stunnerEditor, times(1)).setReadOnly(eq(false));
+        verifyDocksAreInit();
     }
+
+    @Test
+    public void testStartupReadOnly() {
+        when(editorContextProvider.isReadOnly()).thenReturn(true);
+        tested.onStartup(new DefaultPlaceRequest());
+        verify(stunnerEditor, times(1)).setReadOnly(eq(true));
+        verifyDocksAreInit();
+    }
+
+    private void verifyDocksAreInit() {
+        verify(diagramPropertiesDock, times(1)).init(eq(AuthoringPerspective.PERSPECTIVE_ID));
+        verify(diagramPreviewAndExplorerDock, times(1)).init(eq(AuthoringPerspective.PERSPECTIVE_ID));
+    }
+
+    @Test
+    public void testOnFocus() {
+        tested.onFocus();
+        verify(stunnerEditor, times(1)).focus();
+        verify(stunnerEditor, never()).lostFocus();
+    }
+
+    @Test
+    public void testOnLostFocus() {
+        tested.onLostFocus();
+        verify(stunnerEditor, times(1)).lostFocus();
+        verify(stunnerEditor, never()).focus();
+    }
+
+    @Test
+    public void testIsDirty() {
+        when(stunnerEditor.isDirty()).thenReturn(true);
+        assertTrue(tested.isDirty());
+    }
+
+    @Test
+    public void testOnClose() {
+        tested.onClose();
+        verify(diagramPropertiesDock, times(1)).close();
+        verify(diagramPreviewAndExplorerDock, times(1)).close();
+        verify(stunnerEditor, times(1)).close();
+    }
+
+    @Test
+    public void testAsWidget() {
+        IsWidget w = mock(IsWidget.class);
+        when(stunnerEditor.getView()).thenReturn(w);
+        assertEquals(w, tested.asWidget());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testGetContentFromDiagram() {
+        Promise rawValue = mock(Promise.class);
+        when(diagramServices.transform(eq(diagram))).thenReturn(rawValue);
+        when(stunnerEditor.isXmlEditorEnabled()).thenReturn(false);
+        assertEquals(rawValue, tested.getContent());
+    }
+
+    @Test
+    public void testGetContentFromXmlEditor() {
+        when(stunnerEditor.isXmlEditorEnabled()).thenReturn(true);
+        TextEditorView textEditorView = mock(TextEditorView.class);
+        when(stunnerEditor.getXmlEditorView()).thenReturn(textEditorView);
+        when(textEditorView.getContent()).thenReturn("xmlTestContent");
+
+        Promise content = tested.getContent();
+
+        // TODO
+    }
+
+    @Test
+    public void testGetPreview() {
+
+        // TODO
+
+    }
+
+    @Test
+    public void testSetContent() {
+
+        // TODO
+
+    }
+
+    // TODO: Keep old tests here?
+    /*
 
     @Test
     public void testSuperOnCloseOnSetContent() {
@@ -239,4 +243,6 @@ public class BPMNDiagramEditorTest {
         editor.flush();
         verify(formsFlushManager, times(1)).flush(clientSession, ELEMENTUUID);
     }
+
+     */
 }

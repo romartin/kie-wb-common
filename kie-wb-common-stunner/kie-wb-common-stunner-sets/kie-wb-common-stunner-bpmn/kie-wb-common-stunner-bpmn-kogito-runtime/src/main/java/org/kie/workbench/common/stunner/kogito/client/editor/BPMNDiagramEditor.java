@@ -15,58 +15,34 @@
  */
 package org.kie.workbench.common.stunner.kogito.client.editor;
 
-import java.util.Optional;
-import java.util.function.Consumer;
-
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Event;
-import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import elemental2.promise.Promise;
-import org.jboss.errai.ioc.client.api.ManagedInstance;
-import org.kie.workbench.common.kogito.client.editor.MultiPageEditorContainerView;
+import org.appformer.client.context.EditorContextProvider;
+import org.kie.workbench.common.stunner.client.widgets.editor.StunnerEditor;
 import org.kie.workbench.common.stunner.client.widgets.presenters.Viewer;
-import org.kie.workbench.common.stunner.client.widgets.presenters.session.impl.SessionEditorPresenter;
-import org.kie.workbench.common.stunner.client.widgets.presenters.session.impl.SessionViewerPresenter;
 import org.kie.workbench.common.stunner.core.client.annotation.DiagramEditor;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
 import org.kie.workbench.common.stunner.core.client.canvas.CanvasHandler;
 import org.kie.workbench.common.stunner.core.client.canvas.util.CanvasFileExport;
-import org.kie.workbench.common.stunner.core.client.components.layout.LayoutHelper;
-import org.kie.workbench.common.stunner.core.client.components.layout.OpenDiagramLayoutExecutor;
-import org.kie.workbench.common.stunner.core.client.error.DiagramClientErrorHandler;
-import org.kie.workbench.common.stunner.core.client.i18n.ClientTranslationService;
 import org.kie.workbench.common.stunner.core.client.service.ClientRuntimeError;
 import org.kie.workbench.common.stunner.core.client.service.ServiceCallback;
 import org.kie.workbench.common.stunner.core.client.session.ClientSession;
-import org.kie.workbench.common.stunner.core.client.session.impl.EditorSession;
-import org.kie.workbench.common.stunner.core.client.session.impl.ViewerSession;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
 import org.kie.workbench.common.stunner.core.diagram.Metadata;
-import org.kie.workbench.common.stunner.core.documentation.DocumentationView;
-import org.kie.workbench.common.stunner.forms.client.event.FormPropertiesOpened;
 import org.kie.workbench.common.stunner.forms.client.widgets.FormsFlushManager;
 import org.kie.workbench.common.stunner.kogito.client.docks.DiagramEditorPreviewAndExplorerDock;
 import org.kie.workbench.common.stunner.kogito.client.docks.DiagramEditorPropertiesDock;
-import org.kie.workbench.common.stunner.kogito.client.editor.event.OnDiagramFocusEvent;
-import org.kie.workbench.common.stunner.kogito.client.menus.BPMNStandaloneEditorMenuSessionItems;
 import org.kie.workbench.common.stunner.kogito.client.perspectives.AuthoringPerspective;
 import org.kie.workbench.common.stunner.kogito.client.service.AbstractKogitoClientDiagramService;
-import org.kie.workbench.common.widgets.client.menu.FileMenuBuilder;
 import org.uberfire.backend.vfs.Path;
 import org.uberfire.backend.vfs.PathFactory;
 import org.uberfire.client.annotations.WorkbenchClientEditor;
-import org.uberfire.client.annotations.WorkbenchMenu;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
-import org.uberfire.client.annotations.WorkbenchPartTitleDecoration;
 import org.uberfire.client.annotations.WorkbenchPartView;
-import org.uberfire.client.mvp.PlaceManager;
 import org.uberfire.client.promise.Promises;
-import org.uberfire.client.workbench.events.ChangeTitleWidgetEvent;
-import org.uberfire.client.workbench.widgets.common.ErrorPopupPresenter;
-import org.uberfire.ext.widgets.core.client.editors.texteditor.TextEditorView;
 import org.uberfire.lifecycle.GetContent;
 import org.uberfire.lifecycle.GetPreview;
 import org.uberfire.lifecycle.IsDirty;
@@ -78,150 +54,92 @@ import org.uberfire.lifecycle.OnOpen;
 import org.uberfire.lifecycle.OnStartup;
 import org.uberfire.lifecycle.SetContent;
 import org.uberfire.mvp.PlaceRequest;
-import org.uberfire.workbench.events.NotificationEvent;
-import org.uberfire.workbench.model.menu.Menus;
 
 @ApplicationScoped
 @DiagramEditor
 @WorkbenchClientEditor(identifier = BPMNDiagramEditor.EDITOR_ID)
-public class BPMNDiagramEditor extends AbstractDiagramEditor {
+public class BPMNDiagramEditor {
 
     public static final String EDITOR_ID = "BPMNDiagramEditor";
 
+    private final Promises promises;
+    private final EditorContextProvider editorContextProvider;
+    private final StunnerEditor stunnerEditor;
+    private final AbstractKogitoClientDiagramService diagramServices;
+    private final CanvasFileExport canvasFileExport;
     private final DiagramEditorPreviewAndExplorerDock diagramPreviewAndExplorerDock;
     private final DiagramEditorPropertiesDock diagramPropertiesDock;
-    private final LayoutHelper layoutHelper;
-    private final OpenDiagramLayoutExecutor openDiagramLayoutExecutor;
-    protected final AbstractKogitoClientDiagramService diagramServices;
-    protected final FormsFlushManager formsFlushManager;
-    private final CanvasFileExport canvasFileExport;
-    private final Promises promises;
-
-    protected String formElementUUID;
+    private final FormsFlushManager formsFlushManager;
 
     @Inject
-    public BPMNDiagramEditor(final View view,
-                             final FileMenuBuilder fileMenuBuilder,
-                             final PlaceManager placeManager,
-                             final MultiPageEditorContainerView multiPageEditorContainerView,
-                             final Event<ChangeTitleWidgetEvent> changeTitleNotificationEvent,
-                             final Event<NotificationEvent> notificationEvent,
-                             final Event<OnDiagramFocusEvent> onDiagramFocusEvent,
-                             final TextEditorView xmlEditorView,
-                             final ManagedInstance<SessionEditorPresenter<EditorSession>> editorSessionPresenterInstances,
-                             final ManagedInstance<SessionViewerPresenter<ViewerSession>> viewerSessionPresenterInstances,
-                             final BPMNStandaloneEditorMenuSessionItems menuSessionItems,
-                             final ErrorPopupPresenter errorPopupPresenter,
-                             final DiagramClientErrorHandler diagramClientErrorHandler,
-                             final ClientTranslationService translationService,
-                             final DocumentationView documentationView,
-                             final DiagramEditorPreviewAndExplorerDock diagramPreviewAndExplorerDock,
-                             final DiagramEditorPropertiesDock diagramPropertiesDock,
-                             final LayoutHelper layoutHelper,
-                             final OpenDiagramLayoutExecutor openDiagramLayoutExecutor,
-                             final AbstractKogitoClientDiagramService diagramServices,
-                             final FormsFlushManager formsFlushManager,
-                             final CanvasFileExport canvasFileExport,
-                             final Promises promises) {
-        super(view,
-              fileMenuBuilder,
-              placeManager,
-              multiPageEditorContainerView,
-              changeTitleNotificationEvent,
-              notificationEvent,
-              onDiagramFocusEvent,
-              xmlEditorView,
-              editorSessionPresenterInstances,
-              viewerSessionPresenterInstances,
-              menuSessionItems,
-              errorPopupPresenter,
-              diagramClientErrorHandler,
-              translationService,
-              documentationView);
-        this.diagramPreviewAndExplorerDock = diagramPreviewAndExplorerDock;
-        this.diagramPropertiesDock = diagramPropertiesDock;
-        this.layoutHelper = layoutHelper;
-        this.openDiagramLayoutExecutor = openDiagramLayoutExecutor;
+    public BPMNDiagramEditor(Promises promises,
+                             EditorContextProvider editorContextProvider,
+                             StunnerEditor stunnerEditor,
+                             AbstractKogitoClientDiagramService diagramServices,
+                             CanvasFileExport canvasFileExport,
+                             DiagramEditorPreviewAndExplorerDock diagramPreviewAndExplorerDock,
+                             DiagramEditorPropertiesDock diagramPropertiesDock,
+                             FormsFlushManager formsFlushManager) {
+        this.promises = promises;
+        this.editorContextProvider = editorContextProvider;
+        this.stunnerEditor = stunnerEditor;
         this.diagramServices = diagramServices;
         this.canvasFileExport = canvasFileExport;
+        this.diagramPreviewAndExplorerDock = diagramPreviewAndExplorerDock;
+        this.diagramPropertiesDock = diagramPropertiesDock;
         this.formsFlushManager = formsFlushManager;
-        this.promises = promises;
     }
 
     @OnStartup
-    @SuppressWarnings("unused")
     public void onStartup(final PlaceRequest place) {
-        superDoStartUp(place);
-        initDocks();
-        getWidget().init(this);
-    }
+        boolean isReadOnly = place.getParameter("readOnly", null) != null;
+        isReadOnly |= editorContextProvider.isReadOnly();
+        // isReadOnly = true;
+        stunnerEditor.setReadOnly(isReadOnly);
 
-    void superDoStartUp(final PlaceRequest place) {
-        super.doStartUp(place);
-    }
+        // Docks.
+        diagramPropertiesDock.init(AuthoringPerspective.PERSPECTIVE_ID);
+        diagramPreviewAndExplorerDock.init(AuthoringPerspective.PERSPECTIVE_ID);
 
-    @Override
-    public void open(final Diagram diagram,
-                     final Viewer.Callback callback) {
-        this.layoutHelper.applyLayout(diagram, openDiagramLayoutExecutor);
-        super.open(diagram, callback);
+        // Editor's commands.
+        commandsInit();
     }
 
     @OnOpen
-    @SuppressWarnings("unused")
     public void onOpen() {
-        super.doOpen();
-    }
-
-    @OnClose
-    @SuppressWarnings("unused")
-    public void onClose() {
-        superOnClose();
-        closeDocks();
-    }
-
-    void superOnClose() {
-        super.doClose();
-    }
-
-    @Override
-    public void onDiagramLoad() {
-        final Optional<CanvasHandler> canvasHandler = Optional.ofNullable(getCanvasHandler());
-
-        canvasHandler.ifPresent(c -> {
-            final Metadata metadata = c.getDiagram().getMetadata();
-            metadata.setPath(makeMetadataPath(metadata.getRoot(), metadata.getTitle()));
-            openDocks();
-        });
-    }
-
-    private Path makeMetadataPath(final Path root,
-                                  final String title) {
-        final String uri = root.toURI();
-        return PathFactory.newPath(title, uri + "/" + title + ".bpmn");
     }
 
     @OnFocus
-    @SuppressWarnings("unused")
     public void onFocus() {
-        superDoFocus();
-        onDiagramLoad();
-    }
-
-    void superDoFocus() {
-        super.doFocus();
+        stunnerEditor.focus();
     }
 
     @OnLostFocus
-    @SuppressWarnings("unused")
     public void onLostFocus() {
-        super.doLostFocus();
+        stunnerEditor.lostFocus();
     }
 
-    @Override
-    @WorkbenchPartTitleDecoration
-    public IsWidget getTitle() {
-        return super.getTitle();
+    @IsDirty
+    public boolean isDirty() {
+        return stunnerEditor.isDirty();
+    }
+
+    @OnMayClose
+    public boolean onMayClose() {
+        return !isDirty() || showConfirmClose();
+    }
+
+    private boolean showConfirmClose() {
+        // TODO: return baseEditorView.confirmClose();
+        return true;
+    }
+
+    @OnClose
+    public void onClose() {
+        commandsDestroy();
+        diagramPropertiesDock.close();
+        diagramPreviewAndExplorerDock.close();
+        stunnerEditor.close();
     }
 
     @WorkbenchPartTitle
@@ -229,46 +147,24 @@ public class BPMNDiagramEditor extends AbstractDiagramEditor {
         return "";
     }
 
-    @WorkbenchMenu
-    public void getMenus(final Consumer<Menus> menusConsumer) {
-        menusConsumer.accept(super.getMenus());
-    }
-
-    @Override
-    protected void makeMenuBar() {
-        if (!menuBarInitialized) {
-            getMenuSessionItems().populateMenu(getFileMenuBuilder());
-            makeAdditionalStunnerMenus(getFileMenuBuilder());
-            menuBarInitialized = true;
-        }
-    }
-
-    @Override
     @WorkbenchPartView
     public IsWidget asWidget() {
-        return super.asWidget();
-    }
-
-    @OnMayClose
-    public boolean onMayClose() {
-        return super.mayClose();
-    }
-
-    @Override
-    public String getEditorIdentifier() {
-        return EDITOR_ID;
+        return stunnerEditor.getView();
     }
 
     @GetContent
-    @Override
     public Promise getContent() {
+        if (stunnerEditor.isXmlEditorEnabled()) {
+            String value = stunnerEditor.getXmlEditorView().getContent();
+            return promises.resolve(value);
+        }
         flush();
-        return diagramServices.transform(getEditor().getEditorProxy().getContentSupplier().get());
+        return diagramServices.transform(stunnerEditor.getDiagram());
     }
 
     @GetPreview
     public Promise getPreview() {
-        CanvasHandler canvasHandler = getCanvasHandler();
+        CanvasHandler canvasHandler = stunnerEditor.getCanvasHandler();
         if (canvasHandler != null) {
             return Promise.resolve(canvasFileExport.exportToSvg((AbstractCanvasHandler) canvasHandler));
         } else {
@@ -276,43 +172,39 @@ public class BPMNDiagramEditor extends AbstractDiagramEditor {
         }
     }
 
-    @Override
-    @IsDirty
-    public boolean isDirty() {
-        return super.isDirty();
+    private void flush() {
+        formsFlushManager.flush(stunnerEditor.getSession());
     }
 
     @SetContent
-    @Override
-    @SuppressWarnings("all")
     public Promise setContent(final String path, final String value) {
+        // Close current editor, if any.
+        stunnerEditor.close();
         Promise<Void> promise =
                 promises.create((success, failure) -> {
-                    superOnClose();
                     diagramServices.transform(path,
                                               value,
                                               new ServiceCallback<Diagram>() {
 
                                                   @Override
                                                   public void onSuccess(final Diagram diagram) {
-                                                      getEditor().open(diagram,
-                                                                       new Viewer.Callback() {
-                                                                           @Override
-                                                                           public void onSuccess() {
-                                                                               success.onInvoke((Void) null);
-                                                                           }
+                                                      stunnerEditor.open(diagram, new Viewer.Callback() {
+                                                          @Override
+                                                          public void onSuccess() {
+                                                              onDiagramOpenSuccess();
+                                                              success.onInvoke((Void) null);
+                                                          }
 
-                                                                           @Override
-                                                                           public void onError(ClientRuntimeError error) {
-                                                                               BPMNDiagramEditor.this.getEditor().onLoadError(error);
-                                                                               failure.onInvoke(error);
-                                                                           }
-                                                                       });
+                                                          @Override
+                                                          public void onError(ClientRuntimeError error) {
+                                                              failure.onInvoke(error);
+                                                          }
+                                                      });
                                                   }
 
                                                   @Override
                                                   public void onError(final ClientRuntimeError error) {
-                                                      BPMNDiagramEditor.this.getEditor().onLoadError(error);
+                                                      stunnerEditor.handleError(error);
                                                       failure.onInvoke(error);
                                                   }
                                               });
@@ -320,34 +212,31 @@ public class BPMNDiagramEditor extends AbstractDiagramEditor {
         return promise;
     }
 
-    @Override
-    public void resetContentHash() {
-        setOriginalContentHash(getCurrentDiagramHash());
-    }
+    private void onDiagramOpenSuccess() {
+        CanvasHandler canvasHandler = stunnerEditor.getCanvasHandler();
 
-    void initDocks() {
-        diagramPropertiesDock.init(AuthoringPerspective.PERSPECTIVE_ID);
-        diagramPreviewAndExplorerDock.init(AuthoringPerspective.PERSPECTIVE_ID);
-    }
+        // Configure path's.
+        Metadata metadata = canvasHandler.getDiagram().getMetadata();
+        String title = metadata.getTitle();
+        final String uri = metadata.getRoot().toURI();
+        Path path = PathFactory.newPath(title, uri + "/" + title + ".bpmn");
+        metadata.setPath(path);
 
-    void openDocks() {
+        commandsBind(stunnerEditor.getSession());
+
         diagramPropertiesDock.open();
         diagramPreviewAndExplorerDock.open();
     }
 
-    void closeDocks() {
-        diagramPropertiesDock.close();
-        diagramPreviewAndExplorerDock.close();
+    private void commandsInit() {
+        // TODO
     }
 
-    void onFormsOpenedEvent(@Observes FormPropertiesOpened event) {
-        formElementUUID = event.getUuid();
+    private void commandsBind(ClientSession session) {
+        // TODO
     }
 
-    void flush() {
-        if (getSessionPresenter() != null) {
-            ClientSession session = getSessionPresenter().getInstance();
-            formsFlushManager.flush(session, formElementUUID);
-        }
+    private void commandsDestroy() {
+        // TODO
     }
 }

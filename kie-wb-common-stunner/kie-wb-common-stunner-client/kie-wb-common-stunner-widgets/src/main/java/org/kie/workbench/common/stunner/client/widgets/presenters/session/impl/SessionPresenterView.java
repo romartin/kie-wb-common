@@ -66,6 +66,7 @@ public class SessionPresenterView extends Composite
     protected static final int DELAY = 3000;
     protected static final int NOTIFICATION_LOCK_TIMEOUT = DELAY + 1000;
 
+    // TODO: Drop loading stuff!
     @Inject
     @DataField
     private Label loadingPanel;
@@ -172,7 +173,9 @@ public class SessionPresenterView extends Composite
     }
 
     @Override
-    public IsWidget getSessionHeaderContainer() { return sessionHeaderContainer.getWidget(0); }
+    public IsWidget getSessionHeaderContainer() {
+        return sessionHeaderContainer.getWidget(0);
+    }
 
     @Override
     public IsWidget getPaletteWidget() {

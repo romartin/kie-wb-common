@@ -48,6 +48,7 @@ import org.kie.workbench.common.stunner.core.diagram.Diagram;
  * - It provides a more complex view type that supports adding views on left and top sides of the canvas area,
  * which are used for the Palette and Toolbar component's views, if present. The view can display both notifications
  * and error messages generated for the active session, if enabled.
+ *
  * @param <S> The session type.
  * @param <H> The canvas handler type.
  * @param <D> The diagram type.
@@ -61,7 +62,9 @@ public interface SessionPresenter<S extends ClientSession, H extends CanvasHandl
         default void onOpen(D diagram) {
         }
 
-        void afterSessionOpened();
+        default void afterSessionOpened() {
+
+        }
     }
 
     interface View extends IsWidget,
@@ -108,12 +111,19 @@ public interface SessionPresenter<S extends ClientSession, H extends CanvasHandl
         }
     }
 
+    @Override
+    View getView();
+
+    // TODO: Drop unused stuff?
     SessionPresenter<S, H, D> withToolbar(final boolean hasToolbar);
 
+    // TODO: Drop unused stuff?
     SessionPresenter<S, H, D> withPalette(final boolean hasPalette);
 
+    // TODO: Drop unused stuff?
     SessionPresenter<S, H, D> displayNotifications(final Predicate<Notification.Type> typePredicate);
 
+    // TODO: Drop unused stuff?
     SessionPresenter<S, H, D> hideNotifications();
 
     void open(final D diagram,

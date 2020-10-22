@@ -26,6 +26,7 @@ import org.kie.workbench.common.stunner.core.client.service.ClientRuntimeError;
 import org.kie.workbench.common.stunner.core.definition.exception.DefinitionNotFoundException;
 import org.kie.workbench.common.stunner.core.i18n.CoreTranslationMessages;
 
+// TODO: Drop?
 public class DiagramClientErrorHandler extends ClientErrorHandler {
 
     @Inject

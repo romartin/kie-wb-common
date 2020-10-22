@@ -18,22 +18,24 @@ package org.kie.workbench.common.stunner.kogito.client.service;
 import elemental2.promise.Promise;
 import org.kie.workbench.common.stunner.core.client.service.ServiceCallback;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
-import org.kie.workbench.common.stunner.kogito.api.editor.impl.KogitoDiagramResourceImpl;
 
 public interface KogitoClientDiagramService {
 
+    // TODO: Refactor as prmise?
     void transform(final String xml,
                    final ServiceCallback<Diagram> callback);
 
     /**
      * Transforms an XML into a Diagram. The fileName is provided to set a Id and Name same as fileName
+     *
      * @param fileName FileName of file
-     * @param xml XML representation
+     * @param xml      XML representation
      * @param callback Callback to signal success or failure
      */
+    // TODO: Refactor as prmise?
     default void transform(final String fileName, final String xml, final ServiceCallback<Diagram> callback) {
         transform(xml, callback);
     }
 
-    Promise<String> transform(final KogitoDiagramResourceImpl resource);
+    Promise<String> transform(final Diagram diagram);
 }

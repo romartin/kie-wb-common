@@ -29,30 +29,25 @@ import javax.inject.Inject;
 import com.google.gwt.user.client.ui.IsWidget;
 import org.jboss.errai.common.client.api.Caller;
 import org.jboss.errai.common.client.api.RemoteCallback;
-import org.jboss.errai.ioc.client.api.ManagedInstance;
 import org.kie.workbench.common.stunner.bpmn.BPMNDefinitionSet;
 import org.kie.workbench.common.stunner.bpmn.client.BPMNShapeSet;
+import org.kie.workbench.common.stunner.client.widgets.editor.StunnerEditor;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionPresenter;
-import org.kie.workbench.common.stunner.client.widgets.presenters.session.impl.SessionEditorPresenter;
-import org.kie.workbench.common.stunner.client.widgets.presenters.session.impl.SessionViewerPresenter;
 import org.kie.workbench.common.stunner.cm.CaseManagementDefinitionSet;
 import org.kie.workbench.common.stunner.cm.client.CaseManagementShapeSet;
 import org.kie.workbench.common.stunner.cm.project.client.resources.i18n.CaseManagementProjectClientConstants;
 import org.kie.workbench.common.stunner.cm.project.client.type.CaseManagementDiagramResourceType;
 import org.kie.workbench.common.stunner.cm.project.service.CaseManagementSwitchViewService;
 import org.kie.workbench.common.stunner.core.client.annotation.DiagramEditor;
-import org.kie.workbench.common.stunner.core.client.error.DiagramClientErrorHandler;
 import org.kie.workbench.common.stunner.core.client.i18n.ClientTranslationService;
 import org.kie.workbench.common.stunner.core.client.session.ClientSession;
-import org.kie.workbench.common.stunner.core.client.session.impl.EditorSession;
-import org.kie.workbench.common.stunner.core.client.session.impl.ViewerSession;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
 import org.kie.workbench.common.stunner.core.documentation.DocumentationView;
-import org.kie.workbench.common.stunner.kogito.client.editor.event.OnDiagramFocusEvent;
-import org.kie.workbench.common.stunner.kogito.client.editor.event.OnDiagramLoseFocusEvent;
-import org.kie.workbench.common.stunner.kogito.client.screens.DiagramEditorPropertiesScreen;
+import org.kie.workbench.common.stunner.forms.client.screens.DiagramEditorPropertiesScreen;
 import org.kie.workbench.common.stunner.project.client.docks.StunnerDocksHandler;
 import org.kie.workbench.common.stunner.project.client.editor.AbstractProjectDiagramEditor;
+import org.kie.workbench.common.stunner.project.client.editor.event.OnDiagramFocusEvent;
+import org.kie.workbench.common.stunner.project.client.editor.event.OnDiagramLoseFocusEvent;
 import org.kie.workbench.common.stunner.project.client.screens.ProjectMessagesListener;
 import org.kie.workbench.common.stunner.project.client.service.ClientProjectDiagramService;
 import org.kie.workbench.common.stunner.project.diagram.ProjectDiagram;
@@ -65,8 +60,6 @@ import org.uberfire.client.annotations.WorkbenchPartTitleDecoration;
 import org.uberfire.client.annotations.WorkbenchPartView;
 import org.uberfire.client.workbench.docks.UberfireDock;
 import org.uberfire.client.workbench.docks.UberfireDocks;
-import org.uberfire.client.workbench.widgets.common.ErrorPopupPresenter;
-import org.uberfire.ext.widgets.core.client.editors.texteditor.TextEditorView;
 import org.uberfire.lifecycle.OnClose;
 import org.uberfire.lifecycle.OnFocus;
 import org.uberfire.lifecycle.OnLostFocus;
@@ -74,7 +67,6 @@ import org.uberfire.lifecycle.OnMayClose;
 import org.uberfire.lifecycle.OnOpen;
 import org.uberfire.lifecycle.OnStartup;
 import org.uberfire.mvp.PlaceRequest;
-import org.uberfire.workbench.events.NotificationEvent;
 import org.uberfire.workbench.model.menu.Menus;
 
 @Dependent
@@ -93,14 +85,8 @@ public class CaseManagementDiagramEditor extends AbstractProjectDiagramEditor<Ca
 
     @Inject
     public CaseManagementDiagramEditor(final AbstractProjectDiagramEditor.View view,
-                                       final TextEditorView xmlEditorView,
-                                       final ManagedInstance<SessionEditorPresenter<EditorSession>> editorSessionPresenterInstances,
-                                       final ManagedInstance<SessionViewerPresenter<ViewerSession>> viewerSessionPresenterInstances,
                                        final Event<OnDiagramFocusEvent> onDiagramFocusEvent,
                                        final Event<OnDiagramLoseFocusEvent> onDiagramLostFocusEvent,
-                                       final Event<NotificationEvent> notificationEvent,
-                                       final ErrorPopupPresenter errorPopupPresenter,
-                                       final DiagramClientErrorHandler diagramClientErrorHandler,
                                        final DocumentationView documentationView,
                                        final CaseManagementDiagramResourceType resourceType,
                                        final CaseManagementProjectEditorMenuSessionItems menuSessionItems,
@@ -108,25 +94,21 @@ public class CaseManagementDiagramEditor extends AbstractProjectDiagramEditor<Ca
                                        final ClientTranslationService translationService,
                                        final ClientProjectDiagramService projectDiagramServices,
                                        final Caller<ProjectDiagramResourceService> projectDiagramResourceServiceCaller,
+                                       final StunnerEditor stunnerEditor,
                                        final Caller<CaseManagementSwitchViewService> caseManagementSwitchViewService,
                                        final UberfireDocks uberfireDocks,
                                        final StunnerDocksHandler stunnerDocksHandler) {
         super(view,
-              xmlEditorView,
-              editorSessionPresenterInstances,
-              viewerSessionPresenterInstances,
               onDiagramFocusEvent,
               onDiagramLostFocusEvent,
-              notificationEvent,
-              errorPopupPresenter,
-              diagramClientErrorHandler,
               documentationView,
               resourceType,
               menuSessionItems,
               projectMessagesListener,
               translationService,
               projectDiagramServices,
-              projectDiagramResourceServiceCaller);
+              projectDiagramResourceServiceCaller,
+              stunnerEditor);
         this.caseManagementSwitchViewService = caseManagementSwitchViewService;
         this.switchedToProcess = new AtomicBoolean();
         this.switchViewControl = initSwitchViewControl();
@@ -168,7 +150,7 @@ public class CaseManagementDiagramEditor extends AbstractProjectDiagramEditor<Ca
     }
 
     private void updateSessionEditorPresenter(final String defSetId, final String shapeSetId) {
-        final SessionPresenter<? extends ClientSession, ?, Diagram> presenter = this.getSessionPresenter();
+        final SessionPresenter<? extends ClientSession, ?, Diagram> presenter = getStunnerEditor().getPresenter();
         if (presenter != null) {
             final Diagram d = presenter.getHandler().getDiagram();
             CaseManagementDiagramEditor.this.onSwitch(d, defSetId, shapeSetId);
@@ -194,7 +176,6 @@ public class CaseManagementDiagramEditor extends AbstractProjectDiagramEditor<Ca
         stunnerDocks.stream()
                 .filter(dock -> dock.getPlaceRequest().getIdentifier().compareTo(DiagramEditorPropertiesScreen.SCREEN_ID) == 0)
                 .forEach(uberfireDocks::open);
-        super.doOpen();
     }
 
     @OnClose
@@ -205,12 +186,12 @@ public class CaseManagementDiagramEditor extends AbstractProjectDiagramEditor<Ca
 
     @OnFocus
     public void onFocus() {
-        super.doFocus();
+        getStunnerEditor().focus();
     }
 
     @OnLostFocus
     public void onLostFocus() {
-        super.doLostFocus();
+        getStunnerEditor().lostFocus();
     }
 
     @WorkbenchPartTitleDecoration
@@ -235,13 +216,7 @@ public class CaseManagementDiagramEditor extends AbstractProjectDiagramEditor<Ca
 
     @OnMayClose
     public boolean onMayClose() {
-        return super.mayClose(getCurrentDiagramHash());
-    }
-
-    @Override
-    public SessionEditorPresenter<EditorSession> newSessionEditorPresenter() {
-        return (SessionEditorPresenter<EditorSession>) super.newSessionEditorPresenter()
-                .displayNotifications(type -> false);
+        return super.mayClose(getCurrentContentHash());
     }
 
     @Override
