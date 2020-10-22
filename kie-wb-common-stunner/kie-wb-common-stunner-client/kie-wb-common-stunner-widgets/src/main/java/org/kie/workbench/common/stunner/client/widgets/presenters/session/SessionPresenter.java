@@ -61,7 +61,9 @@ public interface SessionPresenter<S extends ClientSession, H extends CanvasHandl
         default void onOpen(D diagram) {
         }
 
-        void afterSessionOpened();
+        default void afterSessionOpened() {
+
+        }
     }
 
     interface View extends IsWidget,

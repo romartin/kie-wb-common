@@ -16,59 +16,12 @@
 
 package org.kie.workbench.common.stunner.kogito.client.editor;
 
-import com.google.gwtmockito.GwtMockitoTestRunner;
-import org.jboss.errai.ioc.client.api.ManagedInstance;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.kie.workbench.common.kogito.client.editor.MultiPageEditorContainerView;
-import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionPresenter;
-import org.kie.workbench.common.stunner.client.widgets.presenters.session.impl.SessionEditorPresenter;
-import org.kie.workbench.common.stunner.client.widgets.presenters.session.impl.SessionViewerPresenter;
-import org.kie.workbench.common.stunner.core.client.canvas.util.CanvasFileExport;
-import org.kie.workbench.common.stunner.core.client.components.layout.LayoutHelper;
-import org.kie.workbench.common.stunner.core.client.components.layout.OpenDiagramLayoutExecutor;
-import org.kie.workbench.common.stunner.core.client.error.DiagramClientErrorHandler;
-import org.kie.workbench.common.stunner.core.client.i18n.ClientTranslationService;
-import org.kie.workbench.common.stunner.core.client.session.ClientSession;
-import org.kie.workbench.common.stunner.core.client.session.impl.EditorSession;
-import org.kie.workbench.common.stunner.core.client.session.impl.ViewerSession;
-import org.kie.workbench.common.stunner.core.diagram.Diagram;
-import org.kie.workbench.common.stunner.core.diagram.Metadata;
-import org.kie.workbench.common.stunner.core.documentation.DocumentationView;
-import org.kie.workbench.common.stunner.forms.client.event.FormPropertiesOpened;
-import org.kie.workbench.common.stunner.forms.client.widgets.FormsFlushManager;
-import org.kie.workbench.common.stunner.kogito.api.editor.impl.KogitoDiagramResourceImpl;
-import org.kie.workbench.common.stunner.kogito.client.docks.DiagramEditorPreviewAndExplorerDock;
-import org.kie.workbench.common.stunner.kogito.client.docks.DiagramEditorPropertiesDock;
-import org.kie.workbench.common.stunner.kogito.client.editor.event.OnDiagramFocusEvent;
-import org.kie.workbench.common.stunner.kogito.client.menus.BPMNStandaloneEditorMenuSessionItems;
-import org.kie.workbench.common.stunner.kogito.client.perspectives.AuthoringPerspective;
-import org.kie.workbench.common.stunner.kogito.client.service.AbstractKogitoClientDiagramService;
-import org.kie.workbench.common.widgets.client.menu.FileMenuBuilder;
-import org.mockito.InOrder;
-import org.mockito.Mock;
-import org.uberfire.client.mvp.PlaceManager;
-import org.uberfire.client.promise.Promises;
-import org.uberfire.client.workbench.events.ChangeTitleWidgetEvent;
-import org.uberfire.client.workbench.widgets.common.ErrorPopupPresenter;
-import org.uberfire.ext.widgets.core.client.editors.texteditor.TextEditorView;
-import org.uberfire.mocks.EventSourceMock;
-import org.uberfire.promise.SyncPromises;
-import org.uberfire.workbench.events.NotificationEvent;
+// TODO
 
-import static org.jgroups.util.Util.assertEquals;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-@RunWith(GwtMockitoTestRunner.class)
+// @RunWith(GwtMockitoTestRunner.class)
 public class BPMNDiagramEditorTest {
 
-    private static final String ELEMENTUUID = "ElementUUID";
+    /*private static final String ELEMENTUUID = "ElementUUID";
 
     private BPMNDiagramEditor editor;
 
@@ -238,5 +191,5 @@ public class BPMNDiagramEditorTest {
         editor.formElementUUID = ELEMENTUUID;
         editor.flush();
         verify(formsFlushManager, times(1)).flush(clientSession, ELEMENTUUID);
-    }
+    }*/
 }

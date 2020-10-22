@@ -31,6 +31,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * observes events.
  * See {@link ScreenEventPublisher}.
  */
+
+// TODO: Deprecate or drop this
+
 @Qualifier
 @Retention(RUNTIME)
 @Target({ElementType.TYPE, ElementType.FIELD, ElementType.PARAMETER})
