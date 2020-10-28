@@ -110,12 +110,16 @@ public interface SessionPresenter<S extends ClientSession, H extends CanvasHandl
         }
     }
 
+    // TODO: Drop unused stuff?
     SessionPresenter<S, H, D> withToolbar(final boolean hasToolbar);
 
+    // TODO: Drop unused stuff?
     SessionPresenter<S, H, D> withPalette(final boolean hasPalette);
 
+    // TODO: Drop unused stuff?
     SessionPresenter<S, H, D> displayNotifications(final Predicate<Notification.Type> typePredicate);
 
+    // TODO: Drop unused stuff?
     SessionPresenter<S, H, D> hideNotifications();
 
     void open(final D diagram,

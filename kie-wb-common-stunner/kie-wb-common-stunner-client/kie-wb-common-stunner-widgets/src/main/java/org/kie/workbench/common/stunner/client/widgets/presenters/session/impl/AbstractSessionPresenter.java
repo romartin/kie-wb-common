@@ -19,6 +19,8 @@ package org.kie.workbench.common.stunner.client.widgets.presenters.session.impl;
 import java.lang.annotation.Annotation;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.enterprise.event.Event;
 
@@ -47,6 +49,8 @@ import org.kie.workbench.common.stunner.core.util.DefinitionUtils;
 public abstract class AbstractSessionPresenter<D extends Diagram, H extends AbstractCanvasHandler,
         S extends AbstractSession, E extends SessionViewer<S, H, D>>
         implements SessionPresenter<S, H, D> {
+
+    private static final Logger LOGGER = Logger.getLogger(AbstractSessionPresenter.class.getName());
 
     private final DefinitionUtils definitionUtils;
     private final SessionManager sessionManager;
@@ -324,6 +328,8 @@ public abstract class AbstractSessionPresenter<D extends Diagram, H extends Abst
         if (isDisplayErrors()) {
             getView().showError(message);
         }
+
+        log(message);
     }
 
     private void showError(final ClientRuntimeError error) {
@@ -331,6 +337,8 @@ public abstract class AbstractSessionPresenter<D extends Diagram, H extends Abst
             getView().showLoading(false);
             getView().showError(error.getMessage());
         }
+
+        log(error.getMessage(), error.getThrowable());
     }
 
     @SuppressWarnings("unchecked")
@@ -398,5 +406,17 @@ public abstract class AbstractSessionPresenter<D extends Diagram, H extends Abst
                 .orElse(t -> false)
                 .or(Notification.Type.WARNING::equals)
                 .test(Notification.Type.ERROR);
+    }
+
+    private static void log(String message, Throwable throwable) {
+        if (null != throwable) {
+            LOGGER.log(Level.SEVERE, message, throwable);
+        } else {
+            log(message);
+        }
+    }
+
+    private static void log(String message) {
+        LOGGER.severe(message);
     }
 }

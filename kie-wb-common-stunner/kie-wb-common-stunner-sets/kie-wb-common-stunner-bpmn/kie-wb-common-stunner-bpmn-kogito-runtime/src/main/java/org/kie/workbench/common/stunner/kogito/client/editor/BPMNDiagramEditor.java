@@ -15,11 +15,13 @@
  */
 package org.kie.workbench.common.stunner.kogito.client.editor;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import elemental2.promise.Promise;
@@ -40,7 +42,13 @@ import org.kie.workbench.common.stunner.core.client.session.ClientSession;
 import org.kie.workbench.common.stunner.core.client.session.impl.EditorSession;
 import org.kie.workbench.common.stunner.core.client.session.impl.ViewerSession;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
+import org.kie.workbench.common.stunner.core.diagram.Metadata;
+import org.kie.workbench.common.stunner.kogito.client.docks.DiagramEditorPreviewAndExplorerDock;
+import org.kie.workbench.common.stunner.kogito.client.docks.DiagramEditorPropertiesDock;
+import org.kie.workbench.common.stunner.kogito.client.perspectives.AuthoringPerspective;
 import org.kie.workbench.common.stunner.kogito.client.service.AbstractKogitoClientDiagramService;
+import org.uberfire.backend.vfs.Path;
+import org.uberfire.backend.vfs.PathFactory;
 import org.uberfire.client.annotations.WorkbenchClientEditor;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
 import org.uberfire.client.annotations.WorkbenchPartView;
@@ -74,6 +82,8 @@ public class BPMNDiagramEditor {
     private final ManagedInstance<SessionViewerPresenter<ViewerSession>> viewerSessionPresenterInstances;
     protected final AbstractKogitoClientDiagramService diagramServices;
     private final CanvasFileExport canvasFileExport;
+    private final DiagramEditorPreviewAndExplorerDock diagramPreviewAndExplorerDock;
+    private final DiagramEditorPropertiesDock diagramPropertiesDock;
     private final ErrorPopupPresenter errorPopupPresenter;
 
     private SessionDiagramPresenter diagramPresenter;
@@ -85,6 +95,8 @@ public class BPMNDiagramEditor {
                              ManagedInstance<SessionViewerPresenter<ViewerSession>> viewerSessionPresenterInstances,
                              AbstractKogitoClientDiagramService diagramServices,
                              CanvasFileExport canvasFileExport,
+                             DiagramEditorPreviewAndExplorerDock diagramPreviewAndExplorerDock,
+                             DiagramEditorPropertiesDock diagramPropertiesDock,
                              ErrorPopupPresenter errorPopupPresenter) {
         this.promises = promises;
         this.editorContextProvider = editorContextProvider;
@@ -92,6 +104,8 @@ public class BPMNDiagramEditor {
         this.viewerSessionPresenterInstances = viewerSessionPresenterInstances;
         this.diagramServices = diagramServices;
         this.canvasFileExport = canvasFileExport;
+        this.diagramPreviewAndExplorerDock = diagramPreviewAndExplorerDock;
+        this.diagramPropertiesDock = diagramPropertiesDock;
         this.errorPopupPresenter = errorPopupPresenter;
         this.view = new FlowPanel();
     }
@@ -100,14 +114,16 @@ public class BPMNDiagramEditor {
     public void onStartup(final PlaceRequest place) {
         log("onStartup");
 
+        GWT.setUncaughtExceptionHandler(e -> log("BPMN Editor exception happened!", e));
+
         boolean isReadOnly = place.getParameter("readOnly", null) != null;
         isReadOnly |= editorContextProvider.isReadOnly();
         // isReadOnly = true;
         log("readonly = " + isReadOnly);
 
         // TODO: Init docks.
-        // diagramPropertiesDock.init(AuthoringPerspective.PERSPECTIVE_ID);
-        // diagramPreviewAndExplorerDock.init(AuthoringPerspective.PERSPECTIVE_ID);
+        diagramPropertiesDock.init(AuthoringPerspective.PERSPECTIVE_ID);
+        diagramPreviewAndExplorerDock.init(AuthoringPerspective.PERSPECTIVE_ID);
 
         // TODO: Init Menus?
 
@@ -117,12 +133,23 @@ public class BPMNDiagramEditor {
         } else {
             diagramPresenter = viewerSessionPresenterInstances.get();
         }
+        diagramPresenter.displayNotifications(type -> true);
         view.add(diagramPresenter.getView());
     }
 
     @OnOpen
     public void onOpen() {
         log("onOpen");
+    }
+
+    void openDocks() {
+        diagramPropertiesDock.open();
+        diagramPreviewAndExplorerDock.open();
+    }
+
+    void closeDocks() {
+        diagramPropertiesDock.close();
+        diagramPreviewAndExplorerDock.close();
     }
 
     @OnFocus
@@ -153,9 +180,7 @@ public class BPMNDiagramEditor {
     @OnClose
     public void onClose() {
         log("onClose");
-        // TODO: menuSessionItems.destroy();
-        // TODO: presenter.destroySession();
-        // TODO: viewer/editorSessionPresenterInstances.destroyAll(); ?
+        close();
     }
 
     @WorkbenchPartTitle
@@ -209,10 +234,9 @@ public class BPMNDiagramEditor {
     @SetContent
     public Promise setContent(final String path, final String value) {
         log("setContent ==> " + value);
-        //return promises.resolve();
         Promise<Void> promise =
                 promises.create((success, failure) -> {
-                    onClose();
+                    // TODO: onClose();
                     diagramServices.transform(path,
                                               value,
                                               new ServiceCallback<Diagram>() {
@@ -245,7 +269,6 @@ public class BPMNDiagramEditor {
 
     public void open(final Diagram diagram,
                      final Viewer.Callback callback) {
-        // TODO: this.layoutHelper.applyLayout(diagram, openDiagramLayoutExecutor);
 
         // TODO: baseEditorView.showLoading();
 
@@ -253,28 +276,65 @@ public class BPMNDiagramEditor {
 
             @Override
             public void onSuccess() {
-                // TODO: initialiseKieEditorForSession(diagram);
-                // TODO: menuSessionItems.ifPresent(menuItems -> menuItems.bind(getSession()));
+                onDiagramOpenSuccess();
                 callback.onSuccess();
             }
 
             @Override
             public void onError(ClientRuntimeError error) {
-                // TODO: onLoadError(error);
+                // TODO: hide Loading
                 onEditorError(error);
                 callback.onError(error);
             }
         });
     }
 
+    private void onDiagramOpenSuccess() {
+
+        // TODO: updateTitle(diagram.getMetadata().getTitle());
+
+        // Configure path's.
+        Metadata metadata = getCanvasHandler().getDiagram().getMetadata();
+        String title = metadata.getTitle();
+        final String uri = metadata.getRoot().toURI();
+        Path path = PathFactory.newPath(title, uri + "/" + title + ".bpmn");
+        metadata.setPath(path);
+
+        // TODO: setOriginalContentHash(getCurrentDiagramHash());
+
+        // TODO: menuSessionItems.ifPresent(menuItems -> menuItems.bind(getSession()));
+
+        // Docks.
+        openDocks();
+
+        // TODO: hide Loading
+    }
+
+    private void close() {
+        // TODO: menuSessionItems.destroy();
+        // TODO: presenter.destroySession();
+        // TODO: viewer/editorSessionPresenterInstances.destroyAll(); ?
+        closeDocks();
+    }
+
     private void onEditorError(ClientRuntimeError error) {
-        log(error.getMessage());
+        final String message = error.getThrowable() != null ?
+                error.getThrowable().getMessage() : error.getMessage();
+        log(message, error.getThrowable());
         errorPopupPresenter.showMessage(error.getMessage());
     }
 
     @WorkbenchPartView
     public IsWidget asWidget() {
         return view;
+    }
+
+    private static void log(String message, Throwable throwable) {
+        if (null != throwable) {
+            LOGGER.log(Level.SEVERE, message, throwable);
+        } else {
+            log(message);
+        }
     }
 
     private static void log(String message) {
