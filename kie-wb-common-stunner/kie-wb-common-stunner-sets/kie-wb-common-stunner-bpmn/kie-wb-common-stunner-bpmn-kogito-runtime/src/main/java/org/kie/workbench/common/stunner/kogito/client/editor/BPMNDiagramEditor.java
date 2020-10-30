@@ -15,6 +15,7 @@
  */
 package org.kie.workbench.common.stunner.kogito.client.editor;
 
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -22,27 +23,20 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import elemental2.promise.Promise;
 import org.appformer.client.context.EditorContextProvider;
-import org.jboss.errai.ioc.client.api.ManagedInstance;
 import org.kie.workbench.common.stunner.client.widgets.presenters.Viewer;
-import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionDiagramPresenter;
-import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionPresenter;
-import org.kie.workbench.common.stunner.client.widgets.presenters.session.impl.SessionEditorPresenter;
-import org.kie.workbench.common.stunner.client.widgets.presenters.session.impl.SessionViewerPresenter;
 import org.kie.workbench.common.stunner.core.client.annotation.DiagramEditor;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
 import org.kie.workbench.common.stunner.core.client.canvas.CanvasHandler;
 import org.kie.workbench.common.stunner.core.client.canvas.util.CanvasFileExport;
 import org.kie.workbench.common.stunner.core.client.service.ClientRuntimeError;
 import org.kie.workbench.common.stunner.core.client.service.ServiceCallback;
-import org.kie.workbench.common.stunner.core.client.session.ClientSession;
-import org.kie.workbench.common.stunner.core.client.session.impl.EditorSession;
-import org.kie.workbench.common.stunner.core.client.session.impl.ViewerSession;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
 import org.kie.workbench.common.stunner.core.diagram.Metadata;
+import org.kie.workbench.common.stunner.forms.client.widgets.FormsFlushManager;
+import org.kie.workbench.common.stunner.kogito.api.editor.impl.KogitoDiagramResourceImpl;
 import org.kie.workbench.common.stunner.kogito.client.docks.DiagramEditorPreviewAndExplorerDock;
 import org.kie.workbench.common.stunner.kogito.client.docks.DiagramEditorPropertiesDock;
 import org.kie.workbench.common.stunner.kogito.client.perspectives.AuthoringPerspective;
@@ -76,38 +70,34 @@ public class BPMNDiagramEditor {
     public static final String EDITOR_ID = "BPMNDiagramEditor";
 
     private final Promises promises;
-    private final FlowPanel view;
     private final EditorContextProvider editorContextProvider;
-    private final ManagedInstance<SessionEditorPresenter<EditorSession>> editorSessionPresenterInstances;
-    private final ManagedInstance<SessionViewerPresenter<ViewerSession>> viewerSessionPresenterInstances;
-    protected final AbstractKogitoClientDiagramService diagramServices;
+    private final StunnerKogitoEditor kogitoEditor;
+    private final AbstractKogitoClientDiagramService diagramServices;
     private final CanvasFileExport canvasFileExport;
     private final DiagramEditorPreviewAndExplorerDock diagramPreviewAndExplorerDock;
     private final DiagramEditorPropertiesDock diagramPropertiesDock;
+    private final FormsFlushManager formsFlushManager;
     private final ErrorPopupPresenter errorPopupPresenter;
-
-    private SessionDiagramPresenter diagramPresenter;
 
     @Inject
     public BPMNDiagramEditor(Promises promises,
                              EditorContextProvider editorContextProvider,
-                             ManagedInstance<SessionEditorPresenter<EditorSession>> editorSessionPresenterInstances,
-                             ManagedInstance<SessionViewerPresenter<ViewerSession>> viewerSessionPresenterInstances,
+                             StunnerKogitoEditor kogitoEditor,
                              AbstractKogitoClientDiagramService diagramServices,
                              CanvasFileExport canvasFileExport,
                              DiagramEditorPreviewAndExplorerDock diagramPreviewAndExplorerDock,
                              DiagramEditorPropertiesDock diagramPropertiesDock,
+                             FormsFlushManager formsFlushManager,
                              ErrorPopupPresenter errorPopupPresenter) {
         this.promises = promises;
         this.editorContextProvider = editorContextProvider;
-        this.editorSessionPresenterInstances = editorSessionPresenterInstances;
-        this.viewerSessionPresenterInstances = viewerSessionPresenterInstances;
+        this.kogitoEditor = kogitoEditor;
         this.diagramServices = diagramServices;
         this.canvasFileExport = canvasFileExport;
         this.diagramPreviewAndExplorerDock = diagramPreviewAndExplorerDock;
         this.diagramPropertiesDock = diagramPropertiesDock;
+        this.formsFlushManager = formsFlushManager;
         this.errorPopupPresenter = errorPopupPresenter;
-        this.view = new FlowPanel();
     }
 
     @OnStartup
@@ -120,21 +110,14 @@ public class BPMNDiagramEditor {
         isReadOnly |= editorContextProvider.isReadOnly();
         // isReadOnly = true;
         log("readonly = " + isReadOnly);
+        kogitoEditor.setReadOnly(isReadOnly);
 
-        // TODO: Init docks.
+        // Docks.
         diagramPropertiesDock.init(AuthoringPerspective.PERSPECTIVE_ID);
         diagramPreviewAndExplorerDock.init(AuthoringPerspective.PERSPECTIVE_ID);
 
-        // TODO: Init Menus?
-
-        // Instantiate editor instance.
-        if (!isReadOnly) {
-            diagramPresenter = editorSessionPresenterInstances.get();
-        } else {
-            diagramPresenter = viewerSessionPresenterInstances.get();
-        }
-        diagramPresenter.displayNotifications(type -> true);
-        view.add(diagramPresenter.getView());
+        // Menus.
+        Menus.init();
     }
 
     @OnOpen
@@ -142,39 +125,33 @@ public class BPMNDiagramEditor {
         log("onOpen");
     }
 
-    void openDocks() {
-        diagramPropertiesDock.open();
-        diagramPreviewAndExplorerDock.open();
-    }
-
-    void closeDocks() {
-        diagramPropertiesDock.close();
-        diagramPreviewAndExplorerDock.close();
-    }
-
     @OnFocus
     public void onFocus() {
         log("onFocus");
-        diagramPresenter.focus();
+        kogitoEditor.focus();
     }
 
     @OnLostFocus
     public void onLostFocus() {
         log("onLostFocus");
-        diagramPresenter.lostFocus();
+        kogitoEditor.lostFocus();
     }
 
     @IsDirty
     public boolean isDirty() {
         log("isDirty");
-        // TODO
-        return false;
+        return DiagramState.isDirty();
     }
 
     @OnMayClose
     public boolean onMayClose() {
         log("onMayClose");
-        return false;
+        return !isDirty() || showConfirmClose();
+    }
+
+    private boolean showConfirmClose() {
+        // TODO: return baseEditorView.confirmClose();
+        return true;
     }
 
     @OnClose
@@ -203,23 +180,14 @@ public class BPMNDiagramEditor {
     public Promise getContent() {
         log("getContent");
         flush();
-        //  TODO: return diagramServices.transform(getEditor().getEditorProxy().getContentSupplier().get());
-        return promises.resolve("rogeeeeeerContent");
-    }
-
-    private ClientSession getSession() {
-        return (ClientSession) diagramPresenter.getInstance();
-    }
-
-    private CanvasHandler getCanvasHandler() {
-        return (CanvasHandler) diagramPresenter.getHandler();
+        KogitoDiagramResourceImpl resource = new KogitoDiagramResourceImpl(kogitoEditor.getCanvasHandler().getDiagram());
+        return diagramServices.transform(resource);
     }
 
     @GetPreview
     public Promise getPreview() {
         log("getPreview");
-        //return promises.resolve("rogeeeeeerPreview");
-        CanvasHandler canvasHandler = getCanvasHandler();
+        CanvasHandler canvasHandler = kogitoEditor.getCanvasHandler();
         if (canvasHandler != null) {
             return Promise.resolve(canvasFileExport.exportToSvg((AbstractCanvasHandler) canvasHandler));
         } else {
@@ -227,8 +195,8 @@ public class BPMNDiagramEditor {
         }
     }
 
-    void flush() {
-        // TODO: formsFlushManager.flush(getSession(), formElementUUID);
+    private void flush() {
+        formsFlushManager.flush(kogitoEditor.getSession());
     }
 
     @SetContent
@@ -236,16 +204,17 @@ public class BPMNDiagramEditor {
         log("setContent ==> " + value);
         Promise<Void> promise =
                 promises.create((success, failure) -> {
-                    // TODO: onClose();
+                    close();
                     diagramServices.transform(path,
                                               value,
                                               new ServiceCallback<Diagram>() {
 
                                                   @Override
                                                   public void onSuccess(final Diagram diagram) {
-                                                      open(diagram, new Viewer.Callback() {
+                                                      kogitoEditor.open(diagram, new Viewer.Callback() {
                                                           @Override
                                                           public void onSuccess() {
+                                                              onDiagramOpenSuccess();
                                                               success.onInvoke((Void) null);
                                                           }
 
@@ -267,54 +236,46 @@ public class BPMNDiagramEditor {
         return promise;
     }
 
-    public void open(final Diagram diagram,
-                     final Viewer.Callback callback) {
-
-        // TODO: baseEditorView.showLoading();
-
-        diagramPresenter.open(diagram, new SessionPresenter.SessionPresenterCallback() {
-
-            @Override
-            public void onSuccess() {
-                onDiagramOpenSuccess();
-                callback.onSuccess();
-            }
-
-            @Override
-            public void onError(ClientRuntimeError error) {
-                // TODO: hide Loading
-                onEditorError(error);
-                callback.onError(error);
-            }
-        });
-    }
-
     private void onDiagramOpenSuccess() {
+
+        CanvasHandler canvasHandler = kogitoEditor.getCanvasHandler();
+        DiagramState.init(() -> canvasHandler.getDiagram());
 
         // TODO: updateTitle(diagram.getMetadata().getTitle());
 
         // Configure path's.
-        Metadata metadata = getCanvasHandler().getDiagram().getMetadata();
+        Metadata metadata = canvasHandler.getDiagram().getMetadata();
         String title = metadata.getTitle();
         final String uri = metadata.getRoot().toURI();
         Path path = PathFactory.newPath(title, uri + "/" + title + ".bpmn");
         metadata.setPath(path);
 
-        // TODO: setOriginalContentHash(getCurrentDiagramHash());
+        DiagramState.reset();
 
-        // TODO: menuSessionItems.ifPresent(menuItems -> menuItems.bind(getSession()));
+        Menus.bind(kogitoEditor.getSession());
 
-        // Docks.
         openDocks();
-
-        // TODO: hide Loading
     }
 
     private void close() {
-        // TODO: menuSessionItems.destroy();
-        // TODO: presenter.destroySession();
-        // TODO: viewer/editorSessionPresenterInstances.destroyAll(); ?
+        Menus.destroy();
         closeDocks();
+        kogitoEditor.close();
+    }
+
+    private void openDocks() {
+        diagramPropertiesDock.open();
+        diagramPreviewAndExplorerDock.open();
+    }
+
+    private void closeDocks() {
+        diagramPropertiesDock.close();
+        diagramPreviewAndExplorerDock.close();
+    }
+
+    // TODO: call this.
+    private void onLoadError(final ClientRuntimeError error) {
+        // TODO: Show xml editor.
     }
 
     private void onEditorError(ClientRuntimeError error) {
@@ -326,7 +287,7 @@ public class BPMNDiagramEditor {
 
     @WorkbenchPartView
     public IsWidget asWidget() {
-        return view;
+        return kogitoEditor.getView();
     }
 
     private static void log(String message, Throwable throwable) {
@@ -339,5 +300,54 @@ public class BPMNDiagramEditor {
 
     private static void log(String message) {
         LOGGER.severe(message);
+    }
+
+    // TODO
+    private static class Menus {
+
+        static void init() {
+
+        }
+
+        static void bind(Object session) {
+            // TODO: menuSessionItems.ifPresent(menuItems -> menuItems.bind(getSession()));
+        }
+
+        static void destroy() {
+
+        }
+    }
+
+    // TODO
+    private static class DiagramState {
+
+        private static int currentHash;
+        static Supplier<Diagram> diagram;
+
+        static void init(Supplier<Diagram> diagram) {
+            DiagramState.diagram = diagram;
+        }
+
+        static int getContentHash() {
+            if (null == diagram) {
+                return 0;
+            }
+            Diagram diagram = DiagramState.diagram.get();
+            if (null == diagram) {
+                return 0;
+            }
+            int hash = diagram.hashCode();
+            // TODO: Original impl is also looking for shapes stuff?
+            return hash;
+        }
+
+        // TODO: Who calls this? somewhere from kogito ( before was BaseKogitoEditor#resetContentHash() )?
+        static void reset() {
+            currentHash = getContentHash();
+        }
+
+        static boolean isDirty() {
+            return null != diagram && getContentHash() != currentHash;
+        }
     }
 }

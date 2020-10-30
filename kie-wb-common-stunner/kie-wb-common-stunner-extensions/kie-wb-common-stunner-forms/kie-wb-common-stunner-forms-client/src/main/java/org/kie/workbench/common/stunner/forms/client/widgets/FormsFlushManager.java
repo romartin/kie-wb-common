@@ -17,25 +17,39 @@
 package org.kie.workbench.common.stunner.forms.client.widgets;
 
 import javax.annotation.PreDestroy;
+import javax.enterprise.event.Observes;
 import javax.inject.Singleton;
 
 import org.kie.workbench.common.stunner.core.client.session.ClientSession;
+import org.kie.workbench.common.stunner.forms.client.event.FormPropertiesOpened;
 import org.kie.workbench.common.stunner.forms.client.widgets.container.FormsContainer;
 
 @Singleton
 public class FormsFlushManager {
 
+    protected String formElementUUID;
     protected FormsContainer container;
 
     void setCurrentContainer(FormsContainer container) {
         this.container = container;
     }
 
+    public void flush(ClientSession session) {
+        if (container != null) {
+            container.flush(session.getCanvasHandler().getDiagram().getGraph().getUUID(), formElementUUID);
+        }
+    }
+
+    // TODO: Remove this method.
     public void flush(ClientSession session,
                       String elementUUID) {
         if (container != null) {
             container.flush(session.getCanvasHandler().getDiagram().getGraph().getUUID(), elementUUID);
         }
+    }
+
+    void onFormsOpenedEvent(@Observes FormPropertiesOpened event) {
+        formElementUUID = event.getUuid();
     }
 
     @PreDestroy
