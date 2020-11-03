@@ -17,11 +17,9 @@
 package org.kie.workbench.common.stunner.bpmn.client.forms.fields.conditionEditor;
 
 import org.kie.workbench.common.stunner.bpmn.forms.conditions.ParseConditionResult;
-import org.kie.workbench.common.stunner.kogito.api.Kogito;
 import org.kie.workbench.common.stunner.kogito.client.service.KogitoClientService;
 
-@Kogito
 public interface ConditionEditorParsingService
         extends KogitoClientService<String, ParseConditionResult> {
-    
+
 }

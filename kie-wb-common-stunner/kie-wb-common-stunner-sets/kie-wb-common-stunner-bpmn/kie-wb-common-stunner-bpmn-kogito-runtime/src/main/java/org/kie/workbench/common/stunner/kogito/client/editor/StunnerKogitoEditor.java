@@ -19,8 +19,10 @@ package org.kie.workbench.common.stunner.kogito.client.editor;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IsWidget;
+import elemental2.dom.DomGlobal;
 import org.jboss.errai.ioc.client.api.ManagedInstance;
 import org.kie.workbench.common.stunner.client.widgets.presenters.Viewer;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionDiagramPresenter;
@@ -33,12 +35,19 @@ import org.kie.workbench.common.stunner.core.client.session.ClientSession;
 import org.kie.workbench.common.stunner.core.client.session.impl.EditorSession;
 import org.kie.workbench.common.stunner.core.client.session.impl.ViewerSession;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
+import org.kie.workbench.common.stunner.core.diagram.DiagramParsingException;
+import org.kie.workbench.common.stunner.core.diagram.Metadata;
+import org.uberfire.client.workbench.widgets.common.ErrorPopupPresenter;
+import org.uberfire.ext.widgets.common.client.ace.AceEditorMode;
+import org.uberfire.ext.widgets.core.client.editors.texteditor.TextEditorView;
 
 @ApplicationScoped
 public class StunnerKogitoEditor {
 
     private final ManagedInstance<SessionEditorPresenter<EditorSession>> editorSessionPresenterInstances;
     private final ManagedInstance<SessionViewerPresenter<ViewerSession>> viewerSessionPresenterInstances;
+    private final TextEditorView xmlEditorView;
+    private final ErrorPopupPresenter errorPopupPresenter;
     private final FlowPanel view;
 
     private SessionDiagramPresenter diagramPresenter;
@@ -46,9 +55,13 @@ public class StunnerKogitoEditor {
 
     @Inject
     public StunnerKogitoEditor(ManagedInstance<SessionEditorPresenter<EditorSession>> editorSessionPresenterInstances,
-                               ManagedInstance<SessionViewerPresenter<ViewerSession>> viewerSessionPresenterInstances) {
+                               ManagedInstance<SessionViewerPresenter<ViewerSession>> viewerSessionPresenterInstances,
+                               TextEditorView xmlEditorView,
+                               ErrorPopupPresenter errorPopupPresenter) {
         this.editorSessionPresenterInstances = editorSessionPresenterInstances;
         this.viewerSessionPresenterInstances = viewerSessionPresenterInstances;
+        this.xmlEditorView = xmlEditorView;
+        this.errorPopupPresenter = errorPopupPresenter;
         this.isReadOnly = false;
         this.view = new FlowPanel();
     }
@@ -74,6 +87,35 @@ public class StunnerKogitoEditor {
                 callback.onError(error);
             }
         });
+    }
+
+    public void handleError(final ClientRuntimeError error) {
+        final Throwable e = error.getThrowable();
+        if (e instanceof DiagramParsingException) {
+            final DiagramParsingException dpe = (DiagramParsingException) e;
+            final Metadata metadata = dpe.getMetadata();
+            final String xml = dpe.getXml();
+
+            // TODO: setOriginalContentHash(xml.hashCode());
+            // TODO: updateTitle(metadata.getTitle());
+            // TODO: menuSessionItems.setEnabled(false);
+
+            close();
+
+            xmlEditorView.setReadOnly(isReadOnly());
+            xmlEditorView.setContent(xml, AceEditorMode.XML);
+            view.add(xmlEditorView.asWidget());
+            // TODO getNotificationEvent().fire(new NotificationEvent(translationService.getValue(KogitoClientConstants.DIAGRAM_PARSING_ERROR, Objects.toString(e.getMessage(), "")), NotificationEvent.NotificationType.ERROR));
+
+            Scheduler.get().scheduleDeferred(xmlEditorView::onResize);
+        } else {
+            final String message = error.getThrowable() != null ?
+                    error.getThrowable().getMessage() : error.getMessage();
+            DomGlobal.console.error("[StunnerKogitoEditor] ERROR: " + message);
+            errorPopupPresenter.showMessage(message);
+            //close editor in case of error when opening the editor
+            // TODO getPlaceManager().forceClosePlace(getPlaceRequest());
+        }
     }
 
     private void init() {
@@ -107,6 +149,10 @@ public class StunnerKogitoEditor {
             viewerSessionPresenterInstances.destroyAll();
             view.clear();
         }
+    }
+
+    public boolean isReadOnly() {
+        return isReadOnly;
     }
 
     private boolean isClosed() {

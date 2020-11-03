@@ -17,9 +17,7 @@
 package org.kie.workbench.common.stunner.kogito.client.service;
 
 import elemental2.promise.Promise;
-import org.kie.workbench.common.stunner.kogito.api.Kogito;
 
-@Kogito
 public interface KogitoClientService<T, R> {
 
     Promise<R> call(T input);

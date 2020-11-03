@@ -47,7 +47,6 @@ import org.uberfire.client.annotations.WorkbenchClientEditor;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
 import org.uberfire.client.annotations.WorkbenchPartView;
 import org.uberfire.client.promise.Promises;
-import org.uberfire.client.workbench.widgets.common.ErrorPopupPresenter;
 import org.uberfire.lifecycle.GetContent;
 import org.uberfire.lifecycle.GetPreview;
 import org.uberfire.lifecycle.IsDirty;
@@ -77,7 +76,6 @@ public class BPMNDiagramEditor {
     private final DiagramEditorPreviewAndExplorerDock diagramPreviewAndExplorerDock;
     private final DiagramEditorPropertiesDock diagramPropertiesDock;
     private final FormsFlushManager formsFlushManager;
-    private final ErrorPopupPresenter errorPopupPresenter;
 
     @Inject
     public BPMNDiagramEditor(Promises promises,
@@ -87,8 +85,7 @@ public class BPMNDiagramEditor {
                              CanvasFileExport canvasFileExport,
                              DiagramEditorPreviewAndExplorerDock diagramPreviewAndExplorerDock,
                              DiagramEditorPropertiesDock diagramPropertiesDock,
-                             FormsFlushManager formsFlushManager,
-                             ErrorPopupPresenter errorPopupPresenter) {
+                             FormsFlushManager formsFlushManager) {
         this.promises = promises;
         this.editorContextProvider = editorContextProvider;
         this.kogitoEditor = kogitoEditor;
@@ -97,7 +94,6 @@ public class BPMNDiagramEditor {
         this.diagramPreviewAndExplorerDock = diagramPreviewAndExplorerDock;
         this.diagramPropertiesDock = diagramPropertiesDock;
         this.formsFlushManager = formsFlushManager;
-        this.errorPopupPresenter = errorPopupPresenter;
     }
 
     @OnStartup
@@ -273,16 +269,11 @@ public class BPMNDiagramEditor {
         diagramPreviewAndExplorerDock.close();
     }
 
-    // TODO: call this.
-    private void onLoadError(final ClientRuntimeError error) {
-        // TODO: Show xml editor.
-    }
-
     private void onEditorError(ClientRuntimeError error) {
         final String message = error.getThrowable() != null ?
                 error.getThrowable().getMessage() : error.getMessage();
         log(message, error.getThrowable());
-        errorPopupPresenter.showMessage(error.getMessage());
+        kogitoEditor.handleError(error);
     }
 
     @WorkbenchPartView

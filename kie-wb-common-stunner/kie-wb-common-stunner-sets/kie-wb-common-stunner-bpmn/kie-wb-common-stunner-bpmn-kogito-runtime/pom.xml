@@ -733,7 +733,7 @@
         <artifactId>gwt-maven-plugin</artifactId>
         <configuration>
           <extraJvmArgs>-Xmx8G -Xms1G -Xss1M -XX:CompileThreshold=7000 -Derrai.dynamic_validation.enabled=true</extraJvmArgs>
-          <module>org.kie.workbench.common.stunner.kogito.KogitoBPMNEditorWithSourceMap</module>
+          <module>org.kie.workbench.common.stunner.kogito.KogitoBPMNEditor</module>
           <localWorkers>8</localWorkers>
           <noServer>false</noServer>
           <logLevel>WARN</logLevel>
@@ -743,7 +743,6 @@
           <optimizationLevel>0</optimizationLevel>
           <strict>true</strict>
           <style>PRETTY</style>
-          <saveSource>true</saveSource>
           <deploy>${project.build.directory}/gwt-symbols-deploy</deploy>
           <hostedWebapp>src/main/webapp</hostedWebapp>
           <runTarget>test.html</runTarget>
@@ -871,33 +870,6 @@
             <addMavenDescriptor>true</addMavenDescriptor>
           </archive>
         </configuration>
-        <!--
-        TODO:
-        <executions>
-          <execution>
-            <id>add-source-maps</id>
-            <phase>package</phase>
-            <goals>
-              <goal>war</goal>
-            </goals>
-            <configuration>
-              <webResources>
-                <resource>
-                  <directory>${basedir}/target/extra/org.kie.workbench.common.stunner.kogito.KogitoBPMNEditor/src</directory>
-                  <targetPath>sourcemaps</targetPath>
-                </resource>
-                <resource>
-                  <directory>${basedir}/target/extra/org.kie.workbench.common.stunner.kogito.KogitoBPMNEditor/symbolMaps</directory>
-                  <includes>
-                    <include>*.json</include>
-                  </includes>
-                  <targetPath>sourcemaps</targetPath>
-                </resource>
-              </webResources>
-            </configuration>
-          </execution>
-        </executions>
-        -->
       </plugin>
 
       <plugin>
