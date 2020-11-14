@@ -239,6 +239,21 @@
       <groupId>org.uberfire</groupId>
       <artifactId>uberfire-security-api</artifactId>
     </dependency>
+
+    <!-- TODO:
+      Do not use anymore org.uberfire:uberfire-security-backend
+      See https://github.com/kiegroup/appformer/commit/640e23e505bcd3a3cd8314228896bb304f8a6a0b
+    -->
+    <dependency>
+      <groupId>org.uberfire</groupId>
+      <artifactId>uberfire-security-backend</artifactId>
+      <version>7.45.0.Final</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jdom</groupId>
+      <artifactId>jdom</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>org.uberfire</groupId>
       <artifactId>uberfire-widgets-properties-editor-api</artifactId>
@@ -381,31 +396,6 @@
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-workbench-models-commons</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-workbench-models-guided-dtable</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-workbench-models-guided-dtree</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-workbench-models-guided-scorecard</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-workbench-models-guided-template</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-workbench-models-test-scenarios</artifactId>
     </dependency>
 
     <!-- Guvnor -->
@@ -1373,16 +1363,9 @@
             <compileSourcesArtifact>org.kie.workbench.screens:kie-wb-common-workbench-client</compileSourcesArtifact>
             <compileSourcesArtifact>org.kie.workbench.profile:kie-wb-common-profile-api</compileSourcesArtifact>
 
-            <!-- Drools shared models -->
-
-            <compileSourcesArtifact>org.drools:drools-workbench-models-datamodel-api</compileSourcesArtifact>
-
-            <!-- Models held in drools, for drools-wb and others -->
+            <!-- Drools  -->
             <compileSourcesArtifact>org.drools:drools-workbench-models-commons</compileSourcesArtifact>
-            <compileSourcesArtifact>org.drools:drools-workbench-models-guided-dtable</compileSourcesArtifact>
-            <compileSourcesArtifact>org.drools:drools-workbench-models-guided-scorecard</compileSourcesArtifact>
-            <compileSourcesArtifact>org.drools:drools-workbench-models-guided-template</compileSourcesArtifact>
-            <compileSourcesArtifact>org.drools:drools-workbench-models-test-scenarios</compileSourcesArtifact>
+            <compileSourcesArtifact>org.drools:drools-workbench-models-datamodel-api</compileSourcesArtifact>
 
             <!-- UberFire Extensions -->
             <compileSourcesArtifact>org.uberfire:uberfire-commons-editor-api</compileSourcesArtifact>
