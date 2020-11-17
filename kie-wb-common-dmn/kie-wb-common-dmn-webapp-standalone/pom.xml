@@ -38,6 +38,20 @@
 
   <dependencies>
 
+    <!-- TODO:
+      Do not use anymore org.uberfire:uberfire-security-backend
+      See https://github.com/kiegroup/appformer/commit/640e23e505bcd3a3cd8314228896bb304f8a6a0b
+    -->
+    <dependency>
+      <groupId>org.uberfire</groupId>
+      <artifactId>uberfire-security-backend</artifactId>
+      <version>7.45.0.Final</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jdom</groupId>
+      <artifactId>jdom</artifactId>
+    </dependency>
+
     <!--Logs-->
     <dependency>
       <groupId>org.slf4j</groupId>
