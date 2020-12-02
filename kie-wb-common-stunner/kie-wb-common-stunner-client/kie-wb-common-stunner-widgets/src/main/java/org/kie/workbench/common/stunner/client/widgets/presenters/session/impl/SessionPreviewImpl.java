@@ -140,6 +140,11 @@ public class SessionPreviewImpl<S extends AbstractSession>
                 new DiagramPreviewProxy<Diagram>(view,
                                                  preferencesRegistries) {
                     @Override
+                    public void open(Diagram item, int width, int height, DiagramViewerCallback<Diagram> callback) {
+                        // TODO lienzo-native
+                    }
+
+                    @Override
                     public SelectionControl<AbstractCanvasHandler, Element> getSelectionControl() {
                         return selectionControl;
                     }
@@ -372,5 +377,10 @@ public class SessionPreviewImpl<S extends AbstractSession>
     @SuppressWarnings("unchecked")
     public MediatorsControl<AbstractCanvas> getMediatorsControl() {
         return mediatorsControl;
+    }
+
+    @Override
+    public void open(S item, int width, int height, SessionViewerCallback<Diagram> callback) {
+        // TODO lienzo-native
     }
 }

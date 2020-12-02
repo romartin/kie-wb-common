@@ -47,6 +47,11 @@ public abstract class DiagramPreviewProxy<D extends Diagram>
         this.viewer =
                 new DiagramViewerProxy<D>(view) {
                     @Override
+                    public void open(D item, int width, int height, DiagramViewerCallback<D> callback) {
+                        // TODO lienzo-native
+                    }
+
+                    @Override
                     public SelectionControl<AbstractCanvasHandler, Element> getSelectionControl() {
                         return DiagramPreviewProxy.this.getSelectionControl();
                     }

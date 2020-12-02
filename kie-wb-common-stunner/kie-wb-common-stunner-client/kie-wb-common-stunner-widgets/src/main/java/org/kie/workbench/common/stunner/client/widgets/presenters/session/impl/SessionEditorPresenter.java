@@ -180,4 +180,9 @@ public class SessionEditorPresenter<S extends EditorSession>
             session.getSelectionControl().clearSelection();
         }
     }
+
+    @Override
+    public void open(S item, int width, int height, SessionPresenterCallback<Diagram> callback) {
+        // TODO lienzo-native
+    }
 }

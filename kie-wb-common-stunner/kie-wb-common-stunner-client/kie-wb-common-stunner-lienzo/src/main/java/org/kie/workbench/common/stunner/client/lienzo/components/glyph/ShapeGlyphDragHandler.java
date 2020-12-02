@@ -87,7 +87,7 @@ public class ShapeGlyphDragHandler {
     }
 
     ShapeGlyphDragHandler(final LienzoGlyphRenderer<Glyph> glyphLienzoGlyphRenderer,
-                          final List<HandlerRegistration> handlerRegistrations,
+                          final GWTHandlerRegistration handlerRegistrations,
                           final Supplier<AbsolutePanel> rootPanelSupplier,
                           final Function<ShapeGlyphDragHandler.Item, LienzoPanelWidget> lienzoPanelBuilder,
                           final BiConsumer<Command, Integer> timer) {
