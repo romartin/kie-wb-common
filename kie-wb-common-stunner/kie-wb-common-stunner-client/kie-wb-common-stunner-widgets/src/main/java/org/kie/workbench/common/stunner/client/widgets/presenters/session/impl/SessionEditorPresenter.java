@@ -108,6 +108,9 @@ public class SessionEditorPresenter<S extends EditorSession>
         super.onSessionOpened(session);
         cardinalityStateHandler.bind(session);
         sessionDiagramOpenedEvent.fire(new SessionDiagramOpenedEvent(session));
+
+        // Initialize canvas resizeObserver
+        editor.getCanvasPanel().getView().onResize();
     }
 
     void onScreenMaximizedEvent(@Observes ScreenMaximizedEvent event) {
