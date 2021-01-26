@@ -16,33 +16,49 @@
 
 package org.kie.workbench.common.stunner.client.lienzo.components.views;
 
-import com.ait.lienzo.tools.client.event.HandlerRegistration;
+import com.ait.lienzo.tools.client.event.EventType;
+import elemental2.dom.EventListener;
+import elemental2.dom.HTMLDivElement;
 import org.kie.workbench.common.stunner.client.lienzo.canvas.LienzoPanel;
 import org.uberfire.mvp.Command;
 
 public class LienzoPanelFocusHandler {
 
-    HandlerRegistration overHandler;
-    HandlerRegistration outHandler;
+    EventListener mouseOverListener;
+    EventListener mouseOutListener;
+
+    HTMLDivElement panel;
+    static final String ON_MOUSE_OVER = EventType.MOUSE_OVER.getType();
+    static final String ON_MOUSE_OUT = EventType.MOUSE_OUT.getType();
 
     public LienzoPanelFocusHandler listen(final LienzoPanel panel,
                                           final Command onFocus,
                                           final Command onLostFocus) {
         clear();
-        // TODO: lienzo-to-native  overHandler = panel.getView().addMouseOverHandler(mouseOverEvent -> onFocus.execute());
-        // TODO: lienzo-to-native  outHandler = panel.getView().addMouseOutHandler(mouseOutEvent -> onLostFocus.execute());
+
+        this.panel = panel.getView().getElement();
+        this.mouseOverListener = mouseOverEvent -> onFocus.execute();
+        this.mouseOutListener = mouseOutEvent -> onLostFocus.execute();
+        this.panel.addEventListener(ON_MOUSE_OVER, mouseOverListener);
+        this.panel.addEventListener(ON_MOUSE_OUT, mouseOutListener);
+
         return this;
     }
 
     public LienzoPanelFocusHandler clear() {
-        if (null != overHandler) {
-            overHandler.removeHandler();
-            overHandler = null;
+        if (null != panel) {
+            if (null != mouseOverListener) {
+                panel.removeEventListener(ON_MOUSE_OVER, mouseOverListener);
+            }
+            if (null != mouseOutListener) {
+                panel.removeEventListener(ON_MOUSE_OUT, mouseOutListener);
+            }
         }
-        if (null != outHandler) {
-            outHandler.removeHandler();
-            outHandler = null;
-        }
+
+        mouseOverListener = null;
+        mouseOutListener = null;
+        panel = null;
+
         return this;
     }
 }

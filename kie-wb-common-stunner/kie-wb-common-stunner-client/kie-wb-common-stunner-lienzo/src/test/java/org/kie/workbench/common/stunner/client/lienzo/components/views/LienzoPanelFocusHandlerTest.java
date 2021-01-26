@@ -17,18 +17,13 @@
 package org.kie.workbench.common.stunner.client.lienzo.components.views;
 
 import com.ait.lienzo.client.widget.panel.LienzoBoundsPanel;
-import com.ait.lienzo.tools.client.event.HandlerRegistration;
 import com.google.gwtmockito.GwtMockitoTestRunner;
 import org.junit.Before;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.workbench.common.stunner.client.lienzo.canvas.LienzoPanel;
 import org.mockito.Mock;
 import org.uberfire.mvp.Command;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(GwtMockitoTestRunner.class)
@@ -70,7 +65,7 @@ public class LienzoPanelFocusHandlerTest {
         verify(panelView, times(1)).addMouseOutHandler(outHandlerArgumentCaptor.capture());
         outHandlerArgumentCaptor.getValue().onMouseOut(mock(MouseOutEvent.class));
         verify(onLostFocus, times(1)).execute();
-    }*/
+
 
     @Test
     public void testClear() {
@@ -82,4 +77,6 @@ public class LienzoPanelFocusHandlerTest {
         verify(out, times(1)).removeHandler();
         verify(over, times(1)).removeHandler();
     }
+
+    */
 }
