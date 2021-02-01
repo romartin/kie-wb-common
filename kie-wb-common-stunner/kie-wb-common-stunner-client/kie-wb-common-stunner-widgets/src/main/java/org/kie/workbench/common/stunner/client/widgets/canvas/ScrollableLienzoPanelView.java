@@ -42,16 +42,9 @@ public class ScrollableLienzoPanelView
             return;
         }
 
-        // TODO: lienzo-to-native
-        /*presenter.register(
-                addKeyDownHandler(event -> presenter.onKeyDown(event.getNativeKeyCode()))
-        );
-        presenter.register(
-                addKeyPressHandler(event -> presenter.onKeyPress(event.getUnicodeCharCode()))
-        );
-        presenter.register(
-                addKeyUpHandler(event -> presenter.onKeyUp(event.getNativeKeyCode()))
-        );*/
+        presenter.addKeyDownHandler(event -> presenter.onKeyDown(event));
+        presenter.addKeyPressHandler(event -> presenter.onKeyPress(event));
+        presenter.addKeyUpHandler(event -> presenter.onKeyUp(event));
     }
 
     boolean isRemoteCommunicationEnabled() {

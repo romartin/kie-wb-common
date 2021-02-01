@@ -31,6 +31,7 @@ import com.google.gwt.event.dom.client.DomEvent;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 import elemental2.dom.EventListener;
+import jsinterop.base.Js;
 import org.jboss.errai.common.client.ui.ElementWrapperWidget;
 import org.kie.workbench.common.stunner.client.lienzo.canvas.LienzoLayer;
 import org.kie.workbench.common.stunner.client.lienzo.canvas.LienzoPanel;
@@ -56,6 +57,16 @@ public class StunnerLienzoBoundsPanel
     private EventListener mouseUpEventListener;
     private Supplier<LienzoBoundsPanel> panelBuilder;
     private LienzoBoundsPanel view;
+
+    private EventListener keyUpEventListener;
+    private EventListener keyDownEventListener;
+    private EventListener keyPressEventListener;
+
+    static final String ON_KEY_DOWN = "keydown";
+    static final String ON_KEY_UP = "keyup";
+    static final String ON_KEY_PRESS = "keypress";
+    static final String ON_MOUSE_DOWN = "mousedown";
+    static final String ON_MOUSE_UP = "mouseup";
 
     @Inject
     public StunnerLienzoBoundsPanel(final Event<KeyPressEvent> keyPressEvent,
@@ -95,16 +106,16 @@ public class StunnerLienzoBoundsPanel
         final NativeEvent blur = Document.get().createBlurEvent();
         for (int i = 0; i < RootPanel.get().getWidgetCount(); i++) {
             final Widget w = RootPanel.get().getWidget(i);
-            DomEvent.fireNativeEvent(blur,
-                                     w);
+            DomEvent.fireNativeEvent(blur, w);
         }
     }
 
     private void initHandlers() {
         mouseDownEventListener = e -> onMouseDown();
         mouseUpEventListener = e -> onMouseUp();
-        getLienzoPanel().getElement().addEventListener("mousedown", mouseDownEventListener);
-        getLienzoPanel().getElement().addEventListener("mouseup", mouseUpEventListener);
+
+        getLienzoPanel().getElement().addEventListener(ON_MOUSE_DOWN, mouseDownEventListener);
+        getLienzoPanel().getElement().addEventListener(ON_MOUSE_UP, mouseUpEventListener);
     }
 
     private com.ait.lienzo.client.widget.panel.LienzoPanel getLienzoPanel() {
@@ -113,7 +124,8 @@ public class StunnerLienzoBoundsPanel
 
     @Override
     public LienzoPanel focus() {
-        // TODO: lienzo-to-native  view.setFocus(true);
+        // TODO: lienzo-to-native  check if it works
+        view.getElement().focus();
         return this;
     }
 
@@ -138,8 +150,27 @@ public class StunnerLienzoBoundsPanel
     }
 
     public void destroy() {
-        getLienzoPanel().getElement().removeEventListener("mousedown", mouseDownEventListener);
-        getLienzoPanel().getElement().removeEventListener("mouseup", mouseUpEventListener);
+        if (null != mouseDownEventListener) {
+            getLienzoPanel().getElement().removeEventListener(ON_MOUSE_DOWN, mouseDownEventListener);
+            mouseDownEventListener = null;
+        }
+        if (null != mouseUpEventListener) {
+            getLienzoPanel().getElement().removeEventListener(ON_MOUSE_UP, mouseUpEventListener);
+            mouseUpEventListener = null;
+        }
+        if (null != keyUpEventListener) {
+            getLienzoPanel().getElement().removeEventListener(ON_KEY_UP, keyUpEventListener);
+            keyUpEventListener = null;
+        }
+        if (null != keyUpEventListener) {
+            getLienzoPanel().getElement().removeEventListener(ON_KEY_DOWN, keyDownEventListener);
+            keyDownEventListener = null;
+        }
+        if (null != keyUpEventListener) {
+            getLienzoPanel().getElement().removeEventListener(ON_KEY_PRESS, keyPressEventListener);
+            keyUpEventListener = null;
+        }
+
         view.destroy();
         panelBuilder = null;
         view = null;
@@ -165,35 +196,62 @@ public class StunnerLienzoBoundsPanel
         mouseUpEvent.fire(new CanvasMouseUpEvent());
     }
 
-    void onKeyPress(final int unicodeChar) {
-        final KeyboardEvent.Key key = getKey(unicodeChar);
+    // TODO: lienzo-to-native  check if it works
+    void onKeyPress(final elemental2.dom.Event event) {
+        elemental2.dom.KeyboardEvent nativeKeyboardEvent = Js.uncheckedCast(event);
+        final KeyboardEvent.Key key = getKey(nativeKeyboardEvent.code);
         if (null != key) {
             keyPressEvent.fire(new KeyPressEvent(key));
         }
     }
 
-    void onKeyDown(final int unicodeChar) {
-        final KeyboardEvent.Key key = getKey(unicodeChar);
+    // TODO: lienzo-to-native  check if it works
+    void onKeyDown(final elemental2.dom.Event event) {
+        elemental2.dom.KeyboardEvent nativeKeyboardEvent = Js.uncheckedCast(event);
+        final KeyboardEvent.Key key = getKey(nativeKeyboardEvent.code);
         if (null != key) {
             keyDownEvent.fire(new KeyDownEvent(key));
         }
     }
 
-    void onKeyUp(final int unicodeChar) {
-        final KeyboardEvent.Key key = getKey(unicodeChar);
+    // TODO: lienzo-to-native  check if it works
+    void onKeyUp(final elemental2.dom.Event event) {
+        elemental2.dom.KeyboardEvent nativeKeyboardEvent = Js.uncheckedCast(event);
+        final KeyboardEvent.Key key = getKey(nativeKeyboardEvent.code);
         if (null != key) {
             keyUpEvent.fire(new KeyUpEvent(key));
         }
     }
 
-    private KeyboardEvent.Key getKey(final int unicodeChar) {
+    // TODO: lienzo-to-native  check if it works
+    private KeyboardEvent.Key getKey(final String stringCode) {
         final KeyboardEvent.Key[] keys = KeyboardEvent.Key.values();
         for (final KeyboardEvent.Key key : keys) {
-            final int c = key.getUnicharCode();
-            if (c == unicodeChar) {
+            if (key.getStringCode().equals(stringCode)) {
                 return key;
             }
         }
         return null;
+    }
+
+    void addKeyDownHandler(final EventListener keyDownEventListener) {
+        if (null != keyDownEventListener) {
+            this.keyDownEventListener = keyDownEventListener;
+            getLienzoPanel().getElement().addEventListener(ON_KEY_DOWN, this.keyDownEventListener);
+        }
+    }
+
+    void addKeyPressHandler(final EventListener keyPressEventListener) {
+        if (null != keyPressEventListener) {
+            this.keyPressEventListener = keyPressEventListener;
+            getLienzoPanel().getElement().addEventListener(ON_KEY_PRESS, this.keyPressEventListener);
+        }
+    }
+
+    void addKeyUpHandler(final EventListener keyUpEventListener) {
+        if (null != keyUpEventListener) {
+            this.keyUpEventListener = keyUpEventListener;
+            getLienzoPanel().getElement().addEventListener(ON_KEY_UP, this.keyUpEventListener);
+        }
     }
 }

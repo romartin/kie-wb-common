@@ -27,6 +27,7 @@ import com.ait.lienzo.client.core.shape.Layer;
 import com.ait.lienzo.client.widget.panel.impl.ScrollablePanel;
 import com.ait.lienzo.client.widget.panel.util.PanelTransformUtils;
 import com.ait.lienzo.tools.client.event.EventType;
+import com.ait.lienzo.tools.client.event.HandlerRegistration;
 import com.ait.lienzo.tools.client.event.MouseEventUtil;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -66,6 +67,7 @@ public class ZoomLevelSelectorPresenter {
     private double zoomFactor;
     private EventListener panelResizeEventListener;
     private EventListener selectorMouseOverEventListener;
+    private HandlerRegistration transformChangedHandler;
 
     private Timer hideTimer;
     private boolean zoomLevelInit = true;
@@ -128,7 +130,7 @@ public class ZoomLevelSelectorPresenter {
 
         reposition();
 
-        // TODO: lienzo-to-native  transformChangedHandler = layer.getViewport().addViewportTransformChangedHandler(event -> onViewportTransformChanged());
+        transformChangedHandler = layer.getViewport().addViewportTransformChangedHandler(event -> onViewportTransformChanged());
 
         selectorMouseOverEventListener = mouseOverEvent -> cancelHide();
         selectorElement.addEventListener(ON_MOUSE_OVER, selectorMouseOverEventListener);
@@ -188,10 +190,10 @@ public class ZoomLevelSelectorPresenter {
             ((ScrollablePanel) getPanel().getView()).removeResizeEventListener(panelResizeEventListener);
             panelResizeEventListener = null;
         }
-        /*if (null != transformChangedHandler) {
+        if (null != transformChangedHandler) {
             transformChangedHandler.removeHandler();
             transformChangedHandler = null;
-        }*/
+        }
         if (null != selectorMouseOverEventListener) {
             selectorElement.removeEventListener(ON_MOUSE_OVER, selectorMouseOverEventListener);
             selectorMouseOverEventListener = null;

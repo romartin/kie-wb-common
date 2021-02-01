@@ -36,7 +36,12 @@ import org.kie.workbench.common.stunner.core.client.canvas.controls.keyboard.Key
 import org.kie.workbench.common.stunner.core.client.canvas.controls.keyboard.KeyboardControl.KogitoKeyShortcutKeyDownThenUp;
 import org.kie.workbench.common.stunner.core.client.event.keyboard.KeyboardEvent.Key;
 import org.kie.workbench.common.stunner.core.client.i18n.ClientTranslationService;
+import org.kie.workbench.common.stunner.core.i18n.CoreTranslationMessages;
 
+import static com.ait.lienzo.client.core.mediator.EventFilter.ALT;
+import static com.ait.lienzo.client.core.mediator.EventFilter.META;
+import static org.appformer.client.context.OperatingSystem.LINUX;
+import static org.appformer.client.context.OperatingSystem.MACOS;
 import static org.kie.workbench.common.stunner.core.client.canvas.controls.keyboard.KeysMatcher.doKeysMatch;
 
 @Dependent
@@ -66,11 +71,9 @@ public class LienzoCanvasMediators {
     }
 
     private static Function<LienzoBoundsPanel, PanelMediators> getMediatorsBuilder(final EditorContextProvider editorContextProvider) {
-        // TODO: lienzo-to-native
-        /*return editorContextProvider.getOperatingSystem().orElse(LINUX).equals(MACOS)
+        return editorContextProvider.getOperatingSystem().orElse(LINUX).equals(MACOS)
                 ? panel -> PanelMediators.build(panel, META, ALT)
-                : panel -> PanelMediators.build(panel, CONTROL, ALT);*/
-        return p -> null;
+                : PanelMediators::build;
     }
 
     LienzoCanvasMediators(final KeyEventHandler keyEventHandler,
@@ -122,20 +125,20 @@ public class LienzoCanvasMediators {
     }
 
     public void setMinScale(final double minScale) {
-        // TODO: lienzo-to-native  mediators.getZoomMediator().setMinScale(minScale);
+        mediators.getZoomMediator().setMinScale(minScale);
     }
 
     public void setMaxScale(final double maxScale) {
-        // TODO: lienzo-to-native  mediators.getZoomMediator().setMaxScale(maxScale);
-        // TODO: lienzo-to-native  mediators.getPreviewMediator().setMaxScale(maxScale);
+        mediators.getZoomMediator().setMaxScale(maxScale);
+        mediators.getPreviewMediator().setMaxScale(maxScale);
     }
 
     public void setZoomFactor(final double factor) {
-        // TODO: lienzo-to-native  mediators.getZoomMediator().setZoomFactor(factor);
+        mediators.getZoomMediator().setZoomFactor(factor);
     }
 
     public void setScaleAboutPoint(final boolean scaleAboutPoint) {
-        // TODO: lienzo-to-native  mediators.getZoomMediator().setScaleAboutPoint(scaleAboutPoint);
+        mediators.getZoomMediator().setScaleAboutPoint(scaleAboutPoint);
     }
 
     public void enable() {
@@ -150,7 +153,7 @@ public class LienzoCanvasMediators {
     @PreDestroy
     public void destroy() {
         if (null != mediators) {
-            // TODO: lienzo-to-native  mediators.destroy();
+            mediators.destroy();
             mediators = null;
         }
     }
@@ -172,19 +175,17 @@ public class LienzoCanvasMediators {
     }
 
     private void enablePreview() {
-        // TODO: lienzo-to-native
-        /*if (null != mediators && mediators.enablePreview()) {
+        if (null != mediators && mediators.enablePreview()) {
             cursor.accept(CURSOR_PREVIEW);
             notification.show(translationService.getNotNullValue(CoreTranslationMessages.MEDIATOR_PREVIEW));
-        }*/
+        }
     }
 
     private void clear() {
-        // TODO: lienzo-to-native
-        /*if (null != mediators) {
+        if (null != mediators) {
             cursor.accept(CURSOR_DEFAULT);
             mediators.disablePreview();
             notification.hide();
-        }*/
+        }
     }
 }
