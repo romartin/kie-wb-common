@@ -81,10 +81,10 @@ public class LienzoCanvasNotificationTest {
     @Test
     public void testDestroy() {
         EventListener e = mock(EventListener.class);
-        tested.mouseOutEventListener = e;
+        tested.mouseLeaveEventListener = e;
         tested.destroy();
         // TODO: lienzo-to-native  verify(e, times(1)).removeHandler();
-        assertNull(tested.mouseOutEventListener);
+        assertNull(tested.mouseLeaveEventListener);
         assertNull(tested.panel);
     }
 }

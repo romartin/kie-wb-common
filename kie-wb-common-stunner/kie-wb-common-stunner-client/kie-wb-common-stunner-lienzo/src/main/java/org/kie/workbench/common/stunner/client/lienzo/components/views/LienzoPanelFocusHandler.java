@@ -16,7 +16,6 @@
 
 package org.kie.workbench.common.stunner.client.lienzo.components.views;
 
-import com.ait.lienzo.tools.client.event.EventType;
 import elemental2.dom.EventListener;
 import elemental2.dom.HTMLDivElement;
 import org.kie.workbench.common.stunner.client.lienzo.canvas.LienzoPanel;
@@ -25,11 +24,11 @@ import org.uberfire.mvp.Command;
 public class LienzoPanelFocusHandler {
 
     EventListener mouseOverListener;
-    EventListener mouseOutListener;
+    EventListener mouseLeaveListener;
 
     HTMLDivElement panel;
-    static final String ON_MOUSE_OVER = EventType.MOUSE_OVER.getType();
-    static final String ON_MOUSE_OUT = EventType.MOUSE_OUT.getType();
+    static final String ON_MOUSE_OVER = "mouseover";
+    static final String ON_MOUSE_LEAVE = "mouseleave";
 
     public LienzoPanelFocusHandler listen(final LienzoPanel panel,
                                           final Command onFocus,
@@ -38,9 +37,9 @@ public class LienzoPanelFocusHandler {
 
         this.panel = panel.getView().getElement();
         this.mouseOverListener = mouseOverEvent -> onFocus.execute();
-        this.mouseOutListener = mouseOutEvent -> onLostFocus.execute();
+        this.mouseLeaveListener = mouseLeaveEvent -> onLostFocus.execute();
         this.panel.addEventListener(ON_MOUSE_OVER, mouseOverListener);
-        this.panel.addEventListener(ON_MOUSE_OUT, mouseOutListener);
+        this.panel.addEventListener(ON_MOUSE_LEAVE, mouseLeaveListener);
 
         return this;
     }
@@ -50,13 +49,13 @@ public class LienzoPanelFocusHandler {
             if (null != mouseOverListener) {
                 panel.removeEventListener(ON_MOUSE_OVER, mouseOverListener);
             }
-            if (null != mouseOutListener) {
-                panel.removeEventListener(ON_MOUSE_OUT, mouseOutListener);
+            if (null != mouseLeaveListener) {
+                panel.removeEventListener(ON_MOUSE_LEAVE, mouseLeaveListener);
             }
         }
 
         mouseOverListener = null;
-        mouseOutListener = null;
+        mouseLeaveListener = null;
         panel = null;
 
         return this;

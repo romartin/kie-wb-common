@@ -43,7 +43,8 @@ public class LienzoCanvasNotification {
 
     private final View view;
     Supplier<LienzoPanel> panel;
-    EventListener mouseOutEventListener;
+    EventListener mouseLeaveEventListener;
+    static final String ON_MOUSE_LEAVE = "mouseleave";
 
     @Inject
     public LienzoCanvasNotification(final View view) {
@@ -52,8 +53,8 @@ public class LienzoCanvasNotification {
 
     public void init(final Supplier<LienzoPanel> panel) {
         this.panel = panel;
-        this.mouseOutEventListener = e -> hide();
-        getPanelElement().addEventListener("mouseout", mouseOutEventListener);
+        this.mouseLeaveEventListener = e -> hide();
+        getPanelElement().addEventListener(ON_MOUSE_LEAVE, mouseLeaveEventListener);
     }
 
     public void show(final String text) {
@@ -76,8 +77,8 @@ public class LienzoCanvasNotification {
 
     @PreDestroy
     public void destroy() {
-        getPanelElement().removeEventListener("mouseout", mouseOutEventListener);
-        mouseOutEventListener = null;
+        getPanelElement().removeEventListener(ON_MOUSE_LEAVE, mouseLeaveEventListener);
+        mouseLeaveEventListener = null;
         panel = null;
     }
 
