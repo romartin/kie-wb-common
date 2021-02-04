@@ -267,8 +267,6 @@ public class LienzoMultipleSelectionControl<H extends AbstractCanvasHandler>
 
         public void destroy() {
             clear();
-            mouseEnterHandlerReg = null;
-            mouseExitHandlerReg = null;
         }
 
         public CursoredSelectionShapeProvider moveShapeToTop() {
@@ -285,6 +283,9 @@ public class LienzoMultipleSelectionControl<H extends AbstractCanvasHandler>
             if (null != mouseExitHandlerReg) {
                 mouseExitHandlerReg.removeHandler();
             }
+
+            mouseExitHandlerReg = null;
+            mouseEnterHandlerReg = null;
         }
     }
 }
