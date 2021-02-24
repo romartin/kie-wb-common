@@ -77,7 +77,9 @@ public class LienzoCanvasNotification {
 
     @PreDestroy
     public void destroy() {
-        getPanelElement().removeEventListener(ON_MOUSE_LEAVE, mouseLeaveEventListener);
+        if (null != mouseLeaveEventListener) {
+            getPanelElement().removeEventListener(ON_MOUSE_LEAVE, mouseLeaveEventListener);
+        }
         mouseLeaveEventListener = null;
         panel = null;
     }

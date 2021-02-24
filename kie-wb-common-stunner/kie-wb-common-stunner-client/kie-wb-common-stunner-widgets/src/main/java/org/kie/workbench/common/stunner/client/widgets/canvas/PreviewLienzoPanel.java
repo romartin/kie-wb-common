@@ -21,6 +21,9 @@ import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 
+import com.ait.lienzo.client.widget.panel.impl.PreviewPanel;
+import com.ait.lienzo.client.widget.panel.impl.ScrollablePanel;
+
 @Dependent
 @Typed(PreviewLienzoPanel.class)
 public class PreviewLienzoPanel
@@ -35,13 +38,13 @@ public class PreviewLienzoPanel
 
     @PostConstruct
     public void init() {
-        // TODO: lienzo-to-native
-       /* panel.setPanelBuilder((width, height) -> new PreviewPanel(width.orElse(300),
-                                                                  height.orElse(150)));*/
+        panel.setPanelBuilder(() -> new PreviewPanel(420, 210));
     }
 
     public PreviewLienzoPanel observe(final ScrollableLienzoPanel panel) {
-        // TODO: lienzo-to-native  getPreviewPanelView().observe((ScrollablePanel) panel.getDelegate().getView());
+        ((PreviewPanel) getDelegate().getView())
+                .observe((ScrollablePanel) panel.getDelegate().getView());
+
         return this;
     }
 

@@ -140,11 +140,6 @@ public class SessionPreviewImpl<S extends AbstractSession>
                 new DiagramPreviewProxy<Diagram>(view,
                                                  preferencesRegistries) {
                     @Override
-                    public void open(Diagram item, int width, int height, DiagramViewerCallback<Diagram> callback) {
-                        // TODO lienzo-native
-                    }
-
-                    @Override
                     public SelectionControl<AbstractCanvasHandler, Element> getSelectionControl() {
                         return selectionControl;
                     }
@@ -247,6 +242,9 @@ public class SessionPreviewImpl<S extends AbstractSession>
         selectionControl = InstanceUtils.lookup(selectionControls, qualifier);
         commandFactory = InstanceUtils.lookup(canvasCommandFactories, qualifier);
         commandManager = InstanceUtils.lookup(canvasCommandManagers, qualifier);
+
+        // Allow preview to scale as the diagram grows horizontally/vertically
+        mediatorsControl.init(canvas);
     }
 
     @SuppressWarnings("unchecked")
@@ -381,6 +379,6 @@ public class SessionPreviewImpl<S extends AbstractSession>
 
     @Override
     public void open(S item, int width, int height, SessionViewerCallback<Diagram> callback) {
-        // TODO lienzo-native
+        diagramPreview.open((Diagram) item, width, height, callback);
     }
 }

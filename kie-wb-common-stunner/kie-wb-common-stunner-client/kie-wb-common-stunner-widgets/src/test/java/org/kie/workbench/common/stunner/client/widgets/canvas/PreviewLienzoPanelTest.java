@@ -16,10 +16,28 @@
 
 package org.kie.workbench.common.stunner.client.widgets.canvas;
 
-// TODO: lienzo-to-native  @RunWith(LienzoMockitoTestRunner.class)
+import java.util.function.Supplier;
+
+import com.ait.lienzo.client.widget.panel.LienzoBoundsPanel;
+import com.ait.lienzo.client.widget.panel.impl.PreviewPanel;
+import com.ait.lienzo.client.widget.panel.impl.ScrollablePanel;
+import com.ait.lienzo.test.LienzoMockitoTestRunner;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+@RunWith(LienzoMockitoTestRunner.class)
 public class PreviewLienzoPanelTest {
 
-    /*@Mock
+    @Mock
     private StunnerLienzoBoundsPanel panel;
 
     private PreviewLienzoPanel tested;
@@ -33,13 +51,15 @@ public class PreviewLienzoPanelTest {
     @SuppressWarnings("unchecked")
     public void testInit() {
         tested.init();
-        ArgumentCaptor<BiFunction> builderCaptor = ArgumentCaptor.forClass(BiFunction.class);
-        verify(panel, times(1)).setPanelBuilder(builderCaptor.capture());
-        BiFunction<OptionalInt, OptionalInt, LienzoBoundsPanel> builder = builderCaptor.getValue();
-        LienzoBoundsPanel result = builder.apply(OptionalInt.of(300), OptionalInt.of(450));
+        ArgumentCaptor<Supplier> builderCaptor = ArgumentCaptor.forClass(Supplier.class);
+        verify(panel, times(1)).setPanelBuilder((Supplier<LienzoBoundsPanel>) builderCaptor.capture());
+
+        //TODO lienzo-to-native
+        /*Supplier<LienzoBoundsPanel> builder = builderCaptor.getValue();
+        LienzoBoundsPanel result = builder.get();
         assertTrue(result instanceof PreviewPanel);
-        assertEquals(300, result.getWidthPx());
-        assertEquals(450, result.getHeightPx());
+        assertEquals(300, result.getWidePx());
+        assertEquals(450, result.getHighPx());*/
     }
 
     @Test
@@ -53,5 +73,5 @@ public class PreviewLienzoPanelTest {
         when(delegate2.getView()).thenReturn(previewView);
         tested.observe(delegate);
         verify(view, times(1)).observe(eq(previewView));
-    }*/
+    }
 }
