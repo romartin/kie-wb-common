@@ -114,6 +114,7 @@ public class WiresConnectorView<T> extends WiresConnector
                 ControlPoint point = ControlPoint.build(p.getX(), p.getY());
                 result[i - 1] = point;
             }
+            return result;
         }
         return new ControlPoint[0];
     }
