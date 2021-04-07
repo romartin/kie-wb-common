@@ -259,7 +259,7 @@ public final class MapSelectionControl<H extends AbstractCanvasHandler>
         }
     }
 
-    public void onCanvasElementSelected(final CanvasSelectionEvent event) {
+    void onCanvasElementSelected(final CanvasSelectionEvent event) {
         checkNotNull("event",
                      event);
         if (null == canvasHandler) {
@@ -283,7 +283,9 @@ public final class MapSelectionControl<H extends AbstractCanvasHandler>
     public void onCanvasClearSelection(final CanvasClearSelectionEvent event) {
         checkNotNull("event",
                      event);
-        if (null != canvasHandler && canvasHandler.equals(event.getCanvasHandler())) {
+        if (null != canvasHandler
+                && canvasHandler.equals(event.getCanvasHandler())
+                && !getSelectedItems().isEmpty()) {
             this.clearSelection(false);
         }
     }
