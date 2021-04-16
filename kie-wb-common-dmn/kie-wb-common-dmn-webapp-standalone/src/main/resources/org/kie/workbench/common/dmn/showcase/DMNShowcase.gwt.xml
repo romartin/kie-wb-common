@@ -40,7 +40,6 @@
 
   <!-- Stunner -->
   <inherits name="org.kie.workbench.common.stunner.client.StunnerWidgets"/>
-  <inherits name="org.kie.workbench.common.stunner.kogito.StunnerKogitoClient"/>
 
   <!-- Form modeler -->
   <inherits name="org.kie.workbench.common.stunner.forms.StunnerFormsClient"/>
@@ -70,5 +69,9 @@
   <!-- Specify the paths for translatable code -->
   <source path="api"/>
   <source path="client"/>
+
+  <!-- Temporary workaround for ClassCastExceptions happening on DMN Marshaller models -->
+  <set-property name="jre.checks.type" value="DISABLED" />
+  <set-property name="jre.checkedMode" value="DISABLED" />
 
 </module>

@@ -31,7 +31,7 @@ import org.kie.workbench.common.widgets.decoratedgrid.client.widget.events.Delet
 import org.kie.workbench.common.widgets.decoratedgrid.client.widget.events.InsertRowEvent;
 import org.kie.workbench.common.widgets.decoratedgrid.client.widget.events.UpdateColumnDataEvent;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -198,5 +198,12 @@ public class AnalyzerControllerImplTest {
         controller.onUpdateColumnData(new UpdateColumnDataEvent(10,
                                                                 columnData));
         verify(analyzer).updateColumns(1);
+    }
+
+    @Test
+    public void sort() throws Exception {
+        final ArrayList<Integer> rowOrder = new ArrayList<>();
+        controller.sort(rowOrder);
+        verify(analyzer).sort(rowOrder);
     }
 }

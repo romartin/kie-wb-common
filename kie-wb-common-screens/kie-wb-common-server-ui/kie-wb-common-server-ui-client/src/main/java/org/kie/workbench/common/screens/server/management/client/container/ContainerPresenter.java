@@ -152,6 +152,9 @@ public class ContainerPresenter {
                 containerSpec.getId() != null &&
                 containerSpec.getId().equals(content.getContainerSpec().getId())) {
             resetReleaseIdForFailedContainers(content.getContainers(), content.getContainerSpec());
+            if (isFailedContainerSpec(content.getContainers(), content.getContainerSpec())) {
+                content.getContainerSpec().setStatus(KieContainerStatus.FAILED);
+            }
             setup(content.getContainerSpec(),
                   content.getContainers());
         } else {
@@ -166,12 +169,15 @@ public class ContainerPresenter {
                 container.addMessage(new Message(Severity.ERROR, Collections.emptyList()));
             }
         });
-        Optional<Container> optionalContainer = containers.stream().filter(container -> KieContainerStatus.FAILED != container.getStatus()).findFirst();
-        if (!optionalContainer.isPresent() && containers.size() > 0) {
-            containerSpec.setStatus(KieContainerStatus.FAILED);
-        }
     }
 
+    private boolean isFailedContainerSpec(Collection<Container> containers, ContainerSpec containerSpec) {
+        Optional<Container> allContainersAreFailed = containers.stream().filter(container -> KieContainerStatus.FAILED != container.getStatus()).findFirst();
+        if (!allContainersAreFailed.isPresent() && containers.size() > 0) {
+            return true;
+        }
+        return false;
+    }
 
     public void refreshOnContainerUpdateEvent(@Observes final ContainerUpdateEvent updateEvent) {
         final ContainerRuntimeOperation runtimeOperation = updateEvent.getContainerRuntimeOperation();
@@ -437,8 +443,8 @@ public class ContainerPresenter {
 
         String getStartContainerErrorMessage();
 
-        String getCanNotStopContainerMessage();
-
         String getFailedContainerErrrMessage();
+
+        String getCanNotStopContainerMessage();
     }
 }

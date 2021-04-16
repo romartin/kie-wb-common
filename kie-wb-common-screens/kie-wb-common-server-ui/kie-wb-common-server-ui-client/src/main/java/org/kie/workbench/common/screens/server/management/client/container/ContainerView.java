@@ -276,13 +276,13 @@ public class ContainerView extends Composite
     }
 
     @Override
-    public String getCanNotStopContainerMessage() {
-        return translationService.format(Constants.CanNot_Stop_Container);
+    public String getFailedContainerErrrMessage() {
+        return translationService.format(Constants.NewContainer_FailedContainer);
     }
 
     @Override
-    public String getFailedContainerErrrMessage() {
-        return translationService.format(Constants.NewContainer_FailedContainer);
+    public String getCanNotStopContainerMessage() {
+        return translationService.format(Constants.CanNot_Stop_Container);
     }
 
     private String getConfirmRemovePopupMessage() {

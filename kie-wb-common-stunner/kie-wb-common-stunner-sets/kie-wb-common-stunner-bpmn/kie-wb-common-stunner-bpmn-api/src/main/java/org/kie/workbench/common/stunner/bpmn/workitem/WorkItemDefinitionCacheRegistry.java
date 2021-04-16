@@ -37,6 +37,8 @@ public class WorkItemDefinitionCacheRegistry implements WorkItemDefinitionRegist
 
     @Override
     public Collection<WorkItemDefinition> items() {
+        // It is done for GWT/Errai compatibility since HashMap$Values do not
+        // have empty constructor. Do not simplify!
         return definitions.values().stream().collect(Collectors.toList());
     }
 

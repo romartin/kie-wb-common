@@ -55,8 +55,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -291,8 +291,8 @@ public class ConnectionAcceptorControlImplTest {
                                                   connection);
         assertTrue(allow);
         verify(commandManager,
-               never()).execute(eq(canvasHandler),
-                                eq(setConnectionSourceNodeCommand));
+               times(1)).execute(eq(canvasHandler),
+                                 eq(setConnectionSourceNodeCommand));
         verify(commandManager,
                never()).allow(any(AbstractCanvasHandler.class),
                               any(SetConnectionSourceNodeCommand.class));
@@ -307,6 +307,9 @@ public class ConnectionAcceptorControlImplTest {
                                                   edge,
                                                   connection);
         assertTrue(allow);
+        verify(commandManager,
+               times(1)).execute(eq(canvasHandler),
+                                 eq(setConnectionTargetNodeCommand));
         verify(commandManager,
                never()).allow(any(AbstractCanvasHandler.class),
                               any(SetConnectionTargetNodeCommand.class));
@@ -345,6 +348,40 @@ public class ConnectionAcceptorControlImplTest {
         verify(commandManager,
                never()).execute(any(AbstractCanvasHandler.class),
                                 any(SetConnectionSourceNodeCommand.class));
+    }
+
+    @Test
+    public void testAcceptSourceAsOnlyConnectionChanges() {
+        when(edge.getSourceNode()).thenReturn(node);
+        when(edgeContent.getSourceConnection()).thenReturn(Optional.of(mock(Connection.class)));
+        tested.init(canvasHandler);
+        final boolean accept = tested.acceptSource(node,
+                                                   edge,
+                                                   connection);
+        assertTrue(accept);
+        verify(commandManager,
+               times(1)).execute(eq(canvasHandler),
+                                 eq(setConnectionSourceNodeCommand));
+        verify(commandManager,
+               never()).allow(any(AbstractCanvasHandler.class),
+                              any(SetConnectionSourceNodeCommand.class));
+    }
+
+    @Test
+    public void testAcceptTargetAsOnlyConnectionChanges() {
+        when(edge.getTargetNode()).thenReturn(node);
+        when(edgeContent.getTargetConnection()).thenReturn(Optional.of(mock(Connection.class)));
+        tested.init(canvasHandler);
+        final boolean accept = tested.acceptTarget(node,
+                                                   edge,
+                                                   connection);
+        assertTrue(accept);
+        verify(commandManager,
+               times(1)).execute(eq(canvasHandler),
+                                 eq(setConnectionTargetNodeCommand));
+        verify(commandManager,
+               never()).allow(any(AbstractCanvasHandler.class),
+                              any(SetConnectionSourceNodeCommand.class));
     }
 
     @Test

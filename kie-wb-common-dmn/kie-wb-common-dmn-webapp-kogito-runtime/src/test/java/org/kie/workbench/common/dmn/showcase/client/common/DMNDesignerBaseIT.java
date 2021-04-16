@@ -20,9 +20,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
@@ -32,6 +32,12 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
+import org.kie.soup.commons.util.Maps;
+import org.kie.workbench.common.dmn.showcase.client.common.wait.WaitUtils;
+import org.kie.workbench.common.dmn.showcase.client.selenium.component.DecisionNavigator;
+import org.kie.workbench.common.dmn.showcase.client.selenium.locator.CommonCSSLocator;
+import org.kie.workbench.common.dmn.showcase.client.selenium.locator.EditorXPathLocator;
+import org.kie.workbench.common.dmn.showcase.client.selenium.locator.PropertiesPanelXPathLocator;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -39,7 +45,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmlunit.assertj.XmlAssert;
@@ -47,10 +52,19 @@ import org.xmlunit.assertj.XmlAssert;
 import static java.util.Arrays.asList;
 import static org.apache.commons.io.FileUtils.copyFile;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.openqa.selenium.By.className;
-import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElementLocated;
+import static org.kie.workbench.common.dmn.api.definition.model.DMNModelInstrumentedBase.Namespace.DC;
+import static org.kie.workbench.common.dmn.api.definition.model.DMNModelInstrumentedBase.Namespace.DMN;
+import static org.kie.workbench.common.dmn.api.definition.model.DMNModelInstrumentedBase.Namespace.DMNDI;
+import static org.kie.workbench.common.dmn.api.definition.model.DMNModelInstrumentedBase.Namespace.KIE;
 
 public class DMNDesignerBaseIT {
+
+    protected static final Map<String, String> NAMESPACES = new Maps.Builder<String, String>()
+            .put(DMN.getPrefix(), DMN.getUri())
+            .put(DMNDI.getPrefix(), DMNDI.getUri())
+            .put(DC.getPrefix(), DC.getUri())
+            .put(KIE.getPrefix(), KIE.getUri())
+            .build();
 
     private static final Logger LOG = LoggerFactory.getLogger(DMNDesignerBaseIT.class);
 
@@ -64,17 +78,15 @@ public class DMNDesignerBaseIT {
 
     private static final String INDEX_HTML_PATH = "file:///" + new File(INDEX_HTML).getAbsolutePath();
 
-    private static final String DECISION_NAVIGATOR_EXPAND = "qe-docks-item-W-org.kie.dmn.decision.navigator";
-
-    private static final String PROPERTIES_PANEL = "qe-docks-item-E-DiagramEditorPropertiesScreen";
-
     private static final Boolean HEADLESS = Boolean.valueOf(System.getProperty("org.kie.dmn.kogito.browser.headless"));
 
     private static final String SCREENSHOTS_DIR = System.getProperty("org.kie.dmn.kogito.screenshots.dir");
 
     private WebDriver driver;
 
-    protected WebElement decisionNavigatorExpandButton;
+    protected WaitUtils waitUtils;
+
+    protected DecisionNavigator decisionNavigator;
 
     protected WebElement propertiesPanel;
 
@@ -88,6 +100,9 @@ public class DMNDesignerBaseIT {
         driver = new FirefoxDriver(getFirefoxOptions());
         driver.get(INDEX_HTML_PATH);
         driver.manage().window().maximize();
+
+        waitUtils = new WaitUtils(driver);
+        decisionNavigator = DecisionNavigator.initialize(waitUtils);
 
         waitDMNDesignerElements();
     }
@@ -126,13 +141,9 @@ public class DMNDesignerBaseIT {
     }
 
     private void waitDMNDesignerElements() {
-        decisionNavigatorExpandButton = waitOperation()
-                .withMessage("Presence of decision navigator expand button is prerequisite for all tests")
-                .until(visibilityOfElementLocated(className(DECISION_NAVIGATOR_EXPAND)));
-
-        propertiesPanel = waitOperation()
-                .withMessage("Presence of properties panel expand button is prerequisite for all tests")
-                .until(visibilityOfElementLocated(className(PROPERTIES_PANEL)));
+        propertiesPanel = waitUtils.waitUntilElementIsVisible(
+                PropertiesPanelXPathLocator.propertiesPanelButton(),
+                "Presence of properties panel expand button is prerequisite for all tests");
     }
 
     private final File screenshotDirectory = initScreenshotDirectory();
@@ -149,19 +160,15 @@ public class DMNDesignerBaseIT {
 
     protected void setContent(final String xml) {
         ((JavascriptExecutor) driver).executeScript(String.format(SET_CONTENT_TEMPLATE, xml));
-        waitOperation()
-                .withMessage("Designer was not loaded")
-                .until(visibilityOfElementLocated(className("uf-multi-page-editor")));
+        waitUtils.waitUntilElementIsVisible(
+                CommonCSSLocator.multiPageEditor(),
+                "Designer was not loaded");
     }
 
     protected String getContent() {
         final Object result = ((JavascriptExecutor) driver).executeScript(GET_CONTENT_TEMPLATE);
         assertThat(result).isInstanceOf(String.class);
         return (String) result;
-    }
-
-    protected WebDriverWait waitOperation() {
-        return new WebDriverWait(driver, Duration.ofSeconds(10).getSeconds());
     }
 
     protected void executeDMNTestCase(final String directory,
@@ -182,6 +189,35 @@ public class DMNDesignerBaseIT {
                 .ignoreWhitespace()
                 .withAttributeFilter(attr -> !ignoredAttributes.contains(attr.getName()))
                 .areSimilar();
+    }
+
+    /**
+     * Returned element is a handle for navigating and invoking edit mode of expression cells
+     *
+     * getEditor().sendKeys(Keys.ENTER) - start edit mode of the cell
+     * getEditor().sendKeys(Keys.ARROW_DOWN) - move cell selection down by one
+     */
+    protected WebElement getEditor() {
+        final WebElement editor = waitUtils.waitUntilElementIsPresent(EditorXPathLocator.expressionEditor(),
+                                                                      "Expression editor probably not activated");
+
+        return editor;
+    }
+
+    /**
+     * Returned element is a handle for typing text into expression
+     *
+     * Prerequisite:
+     * getEditor().sendKeys(Keys.ENTER) - start edit mode of the cell
+     *
+     * getAutocompleteEditor().sendKeys(Keys.CONTROL, Keys.SPACE) - display autocomplete suggestions
+     * getAutocompleteEditor().sendKeys(Keys.TAB) - finish edit mode
+     */
+    protected WebElement getAutocompleteEditor() {
+        final WebElement editor = waitUtils.waitUntilElementIsPresent(EditorXPathLocator.expressionAutocompleteEditor(),
+                                                                      "Autocompletion not shown");
+
+        return editor;
     }
 
     protected void saveScreenShot(final String... prefixes) {

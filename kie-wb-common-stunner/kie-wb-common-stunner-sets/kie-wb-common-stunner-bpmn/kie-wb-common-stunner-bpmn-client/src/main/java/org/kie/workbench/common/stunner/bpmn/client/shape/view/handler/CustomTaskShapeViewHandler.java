@@ -23,6 +23,7 @@ import com.ait.lienzo.client.core.shape.IPrimitive;
 import com.ait.lienzo.client.core.shape.Picture;
 import org.kie.workbench.common.stunner.bpmn.client.workitem.WorkItemDefinitionClientUtils;
 import org.kie.workbench.common.stunner.bpmn.workitem.CustomTask;
+import org.kie.workbench.common.stunner.bpmn.workitem.WorkItemDefinition;
 import org.kie.workbench.common.stunner.bpmn.workitem.WorkItemDefinitionRegistry;
 import org.kie.workbench.common.stunner.client.lienzo.util.LienzoShapeUtils;
 import org.kie.workbench.common.stunner.core.client.shape.view.ShapeViewHandler;
@@ -51,12 +52,17 @@ public class CustomTaskShapeViewHandler
     public void handle(final CustomTask bean,
                        final SVGShapeView<?> view) {
         // Obtain the work item's icon data url.
-        final String itemIconData = workItemDefinitionRegistry
-                .get()
-                .get(bean.getName())
-                .getIconDefinition()
-                .getIconData();
-        final String iconData = null != itemIconData ? itemIconData : WorkItemDefinitionClientUtils.getDefaultIconData();
+        final WorkItemDefinition wid = workItemDefinitionRegistry.get().get(bean.getName());
+        final String iconData;
+
+        if (null != wid
+                && null != wid.getIconDefinition()
+                && null != wid.getIconDefinition().getIconData()) {
+            iconData = wid.getIconDefinition().getIconData();
+        } else {
+            iconData = WorkItemDefinitionClientUtils.getDefaultIconData();
+        }
+
         // Obtain the image element from the svg shape view.
         final SVGPrimitive svgPrimitive = SVGViewUtils.getPrimitive(view, WID_ICON_ID).get();
         // Load the icon data.
@@ -93,4 +99,3 @@ public class CustomTaskShapeViewHandler
         return true;
     }
 }
-

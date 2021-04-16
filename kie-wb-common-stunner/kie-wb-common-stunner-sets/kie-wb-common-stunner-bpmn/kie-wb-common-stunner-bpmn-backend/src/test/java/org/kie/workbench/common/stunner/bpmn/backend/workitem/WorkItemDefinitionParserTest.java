@@ -34,11 +34,12 @@ import org.junit.runner.RunWith;
 import org.kie.workbench.common.stunner.bpmn.backend.workitem.service.WorkItemDefinitionRemoteService;
 import org.kie.workbench.common.stunner.bpmn.workitem.WorkItemDefinition;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.eq;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -154,6 +155,24 @@ public class WorkItemDefinitionParserTest {
         assertEquals(ICON_DATA, workItemDefinition.getIconDefinition().getIconData());
         assertEquals("|Body:String,FilePath:String,Password:String,User:String|", workItemDefinition.getParameters());
         assertEquals("||", workItemDefinition.getResults());
+    }
+
+    @Test
+    public void testEmptyWorkItemDefinition() {
+        WorkItemDefinition wid = WorkItemDefinitionParser.emptyWid();
+
+        assertNotNull(wid.getIconDefinition());
+        assertTrue(wid.getIconDefinition().getUri().isEmpty());
+        assertTrue(wid.getUri().isEmpty());
+        assertTrue(wid.getName().isEmpty());
+        assertTrue(wid.getCategory().isEmpty());
+        assertTrue(wid.getDescription().isEmpty());
+        assertTrue(wid.getDocumentation().isEmpty());
+        assertTrue(wid.getDisplayName().isEmpty());
+        assertTrue(wid.getResults().isEmpty());
+        assertTrue(wid.getDefaultHandler().isEmpty());
+        assertNotNull(wid.getDependencies());
+        assertTrue(wid.getParameters().isEmpty());
     }
 
     public static String loadStream(String path) throws IOException {

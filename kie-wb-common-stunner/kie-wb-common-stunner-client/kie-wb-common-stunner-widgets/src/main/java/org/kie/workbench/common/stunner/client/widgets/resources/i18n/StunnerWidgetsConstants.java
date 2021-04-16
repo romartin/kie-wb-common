@@ -83,10 +83,7 @@ public interface StunnerWidgetsConstants {
     @TranslationKey(defaultValue = "Data Object-Name")
     String MarshallingResponsePopup_dataObjectWithName = "MarshallingMessage.dataObjectWithName";
 
-    @TranslationKey(defaultValue = "contains Illegal Chars ([space], #, :, [quotes]), will be replaced with (-)")
-    String MarshallingResponsePopup_dataObjectWithIllegalCharacters = "MarshallingMessage.dataObjectWithIllegalCharacters";
-
-    @TranslationKey(defaultValue = "Data Object with Invalid Name Exists")
+    @TranslationKey(defaultValue = "Data Object with Invalid Name Exists. Illegal chars will be replaced by -")
     String MarshallingResponsePopup_dataObjectWithInvalidName = "MarshallingMessage.dataObjectWithInvalidName";
 
     @TranslationKey(defaultValue = "Info")
@@ -94,4 +91,16 @@ public interface StunnerWidgetsConstants {
 
     @TranslationKey(defaultValue = "Info")
     String SessionCardinalityStateHandler_EmptyStateMessage = "SessionCardinalityStateHandler.EmptyStateMessage";
+
+    @TranslationKey(defaultValue = "Download")
+    String DownloadDiagram = "DownloadDiagram";
+
+    @TranslationKey(defaultValue = "Error")
+    String DiagramParsingError = "DiagramParsingError";
+
+    @TranslationKey(defaultValue = "Explorer")
+    String ScreenExplorerTitle = "ScreenExplorerTitle";
+
+    @TranslationKey(defaultValue = "Explorer")
+    String Documentation = "Documentation";
 }

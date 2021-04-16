@@ -16,6 +16,23 @@
 
 package org.kie.workbench.common.stunner.client.lienzo.components.toolbox.actions;
 
+//import com.ait.lienzo.client.core.shape.toolbox.grid.AutoGrid;
+//import com.ait.lienzo.client.core.shape.toolbox.grid.Point2DGrid;
+//import com.ait.lienzo.client.core.shape.toolbox.items.ButtonItem;
+//import com.ait.lienzo.test.LienzoMockitoTestRunner;
+//import org.junit.Before;
+//import org.junit.Test;
+//import org.junit.runner.RunWith;
+//import org.kie.workbench.common.stunner.core.definition.shape.Glyph;
+//import org.mockito.ArgumentCaptor;
+//
+//import static org.junit.Assert.assertEquals;
+//import static org.mockito.ArgumentMatchers.eq;
+//import static org.mockito.Mockito.mock;
+//import static org.mockito.Mockito.times;
+//import static org.mockito.Mockito.verify;
+//import static org.mockito.Mockito.when;
+
 // TODO lienzo-native: @RunWith(LienzoMockitoTestRunner.class)
 public class FlowActionsToolboxViewTest
         extends AbstractActionsToolboxViewTest {

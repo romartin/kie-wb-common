@@ -28,7 +28,7 @@ import org.kie.workbench.common.stunner.core.client.session.command.ManagedClien
 import org.kie.workbench.common.stunner.forms.client.session.command.GenerateDiagramFormsSessionCommand;
 import org.kie.workbench.common.stunner.forms.client.session.command.GenerateProcessFormsSessionCommand;
 import org.kie.workbench.common.stunner.forms.client.session.command.GenerateSelectedFormsSessionCommand;
-import org.kie.workbench.common.stunner.kogito.client.editor.AbstractDiagramEditorMenuItemsBuilder;
+import org.kie.workbench.common.stunner.project.client.editor.AbstractDiagramEditorMenuItemsBuilder;
 import org.kie.workbench.common.widgets.client.menu.FileMenuBuilder;
 import org.mockito.Mock;
 import org.uberfire.mvp.Command;
@@ -36,9 +36,9 @@ import org.uberfire.workbench.model.menu.MenuItem;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -90,7 +90,7 @@ public class AbstractProcessProjectEditorMenuSessionItemsTest {
         when(sessionCommands.getCommands()).thenReturn(commands);
 
         when(itemsBuilder.getTranslationService()).thenReturn(translationService);
-        when(translationService.getValue(anyString())).thenAnswer(invocation -> invocation.getArgumentAt(0, String.class));
+        when(translationService.getValue(anyString())).thenAnswer(invocation -> invocation.getArgument(0, String.class));
 
         when(menuBuilder.addNewTopLevelMenu(any(MenuItem.class))).thenReturn(menuBuilder);
 

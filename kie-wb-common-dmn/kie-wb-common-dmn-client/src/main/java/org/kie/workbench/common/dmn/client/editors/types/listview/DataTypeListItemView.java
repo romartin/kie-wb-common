@@ -32,7 +32,6 @@ import elemental2.dom.NodeList;
 import org.jboss.errai.ui.client.local.spi.TranslationService;
 import org.jboss.errai.ui.shared.api.annotations.DataField;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
-import org.kie.workbench.common.dmn.api.qualifiers.DMNEditor;
 import org.kie.workbench.common.dmn.client.editors.common.RemoveHelper;
 import org.kie.workbench.common.dmn.client.editors.types.common.DataType;
 import org.kie.workbench.common.dmn.client.editors.types.common.HiddenHelper;
@@ -40,6 +39,10 @@ import org.kie.workbench.common.dmn.client.editors.types.listview.common.ListIte
 import org.kie.workbench.common.dmn.client.editors.types.listview.common.SmallSwitchComponent;
 import org.kie.workbench.common.dmn.client.editors.types.listview.constraint.DataTypeConstraint;
 import org.kie.workbench.common.stunner.core.client.ReadOnlyProvider;
+import org.uberfire.client.workbench.ouia.OuiaAttribute;
+import org.uberfire.client.workbench.ouia.OuiaComponent;
+import org.uberfire.client.workbench.ouia.OuiaComponentIdAttribute;
+import org.uberfire.client.workbench.ouia.OuiaComponentTypeAttribute;
 
 import static org.kie.workbench.common.dmn.client.editors.types.common.HiddenHelper.hide;
 import static org.kie.workbench.common.dmn.client.editors.types.common.HiddenHelper.show;
@@ -59,7 +62,8 @@ import static org.kie.workbench.common.dmn.client.resources.i18n.DMNEditorConsta
 
 @Dependent
 @Templated
-public class DataTypeListItemView implements DataTypeListItem.View {
+public class DataTypeListItemView implements DataTypeListItem.View,
+                                             OuiaComponent {
 
     public static final String UUID_ATTR = "data-row-uuid";
 
@@ -81,7 +85,7 @@ public class DataTypeListItemView implements DataTypeListItem.View {
     @Inject
     public DataTypeListItemView(final HTMLDivElement view,
                                 final TranslationService translationService,
-                                final @DMNEditor ReadOnlyProvider readOnlyProvider) {
+                                final ReadOnlyProvider readOnlyProvider) {
         this.view = view;
         this.translationService = translationService;
         this.readOnlyProvider = readOnlyProvider;
@@ -97,12 +101,30 @@ public class DataTypeListItemView implements DataTypeListItem.View {
         return view;
     }
 
+    @Override
+    public OuiaComponentTypeAttribute ouiaComponentType() {
+        return new OuiaComponentTypeAttribute("dmn-data-type-item");
+    }
+
+    @Override
+    public OuiaComponentIdAttribute ouiaComponentId() {
+        return new OuiaComponentIdAttribute(presenter != null && presenter.getDataType() != null ?
+                                                    presenter.getDataType().getName() : "unknown");
+    }
+
+    @Override
+    public Consumer<OuiaAttribute> ouiaAttributeRenderer() {
+        return ouiaAttribute -> view.setAttribute(ouiaAttribute.getName(),
+                                                  ouiaAttribute.getValue());
+    }
+
     void setupRowMetadata(final DataType dataType) {
 
         getDragAndDropElement().setAttribute(UUID_ATTR, dataType.getUUID());
         getDragAndDropElement().setAttribute(PARENT_UUID_ATTR, dataType.getParentUUID());
 
         setupRowCSSClass(dataType);
+        initOuiaComponentAttributes();
     }
 
     void setupRowCSSClass(final DataType dataType) {
@@ -423,6 +445,7 @@ public class DataTypeListItemView implements DataTypeListItem.View {
     OnclickFn getOnSaveAction() {
         return (e) -> {
             presenter.saveAndCloseEditMode();
+            ouiaAttributeRenderer().accept(ouiaComponentId());
             return true;
         };
     }

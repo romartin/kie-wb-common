@@ -21,6 +21,11 @@ import org.kie.server.controller.api.model.spec.ContainerSpec;
 @Remote
 public interface ContainerService {
 
+    /**
+     * Return true, when the Container has Process Definition and Process instance.
+     * @param containerSpec
+     * @return
+     */
     boolean isRunningContainer(ContainerSpec containerSpec);
 
 }

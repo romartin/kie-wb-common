@@ -19,6 +19,7 @@ package org.kie.workbench.common.dmn.client.docks.navigator.tree;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
@@ -40,11 +41,14 @@ import org.jboss.errai.ui.client.local.api.IsElement;
 import org.jboss.errai.ui.shared.api.annotations.DataField;
 import org.jboss.errai.ui.shared.api.annotations.EventHandler;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
-import org.kie.workbench.common.dmn.api.qualifiers.DMNEditor;
 import org.kie.workbench.common.dmn.client.docks.navigator.DecisionNavigatorItem;
 import org.kie.workbench.common.dmn.client.editors.common.RemoveHelper;
 import org.kie.workbench.common.stunner.core.client.ReadOnlyProvider;
 import org.uberfire.client.mvp.LockRequiredEvent;
+import org.uberfire.client.workbench.ouia.OuiaAttribute;
+import org.uberfire.client.workbench.ouia.OuiaComponent;
+import org.uberfire.client.workbench.ouia.OuiaComponentIdAttribute;
+import org.uberfire.client.workbench.ouia.OuiaComponentTypeAttribute;
 
 import static java.util.Optional.ofNullable;
 
@@ -161,7 +165,8 @@ public class DecisionNavigatorTreeView implements DecisionNavigatorTreePresenter
     }
 
     @Templated("DecisionNavigatorTreeView.html#item")
-    public static class TreeItem implements IsElement {
+    public static class TreeItem implements IsElement,
+                                            OuiaComponent {
 
         private final ReadOnlyProvider readOnlyProvider;
         @DataField("text-content")
@@ -198,7 +203,7 @@ public class DecisionNavigatorTreeView implements DecisionNavigatorTreePresenter
                         final @Named("i") HTMLElement edit,
                         final @Named("i") HTMLElement remove,
                         final Event<LockRequiredEvent> locker,
-                        final @DMNEditor ReadOnlyProvider readOnlyProvider) {
+                        final ReadOnlyProvider readOnlyProvider) {
             this.textContent = textContent;
             this.inputText = inputText;
             this.icon = icon;
@@ -267,8 +272,31 @@ public class DecisionNavigatorTreeView implements DecisionNavigatorTreePresenter
             updateCSSClass();
             updateLabel();
             updateSubItems(children);
-
+            initOuiaComponentAttributes();
             return this;
+        }
+
+        @Override
+        public Consumer<OuiaAttribute> ouiaAttributeRenderer() {
+            return ouiaAttribute -> getElement().setAttribute(ouiaAttribute.getName(), ouiaAttribute.getValue());
+        }
+
+        @Override
+        public OuiaComponentTypeAttribute ouiaComponentType() {
+            return new OuiaComponentTypeAttribute(componentType());
+        }
+
+        @Override
+        public OuiaComponentIdAttribute ouiaComponentId() {
+            return new OuiaComponentIdAttribute(componentType() + "-" + getItem().getLabel());
+        }
+
+        private String componentType() {
+            if (getItem() != null) {
+                return "dmn-graph-navigator-" + getItem().getType().name().toLowerCase();
+            } else {
+                throw new IllegalStateException("Decision Navigator item can not be null");
+            }
         }
 
         void updateDataUUID() {
